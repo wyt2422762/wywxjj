@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{::link},~{})">
+  <title>物业维修基金管理系统</title>
+  <link rel="stylesheet" th:href="@{/static/css/index.css}">
+</head>
+<body class="layui-layout-body" layui-themealias="default">
+<div class="layui-layout layui-layout-admin">
+  <!-- 弹出层区域 -->
+  <!-- 修改密码弹出框 -->
+  <div th:replace="/common/dialog::editPasswordDialog"></div>
+  <!-- 弹出层区域 -->
+
+  <!-- 头部区域 -->
+  <div class="layui-header" style="background: #3e75e3!important;">
+    <div class="layui-logo" style="color:#fff;font-size:18px;background:#3e75e3!important;">
+      物业维修基金管理系统
+    </div>
+    <ul id="topMenu" class="layui-nav layui-bg-molv" lay-shrink="all" lay-filter="topMenu"
+        style="padding:0 50px;left:200px!important;">
+      <li class="layui-nav-item" th:each="mu,stat:${menu}"
+          th:attr="data-id=${mu.id},data-xtmkid=${mu.PT_XT_MKid},data-opts=${mu.getOptStr()},data-an=${mu.mkgnan},data-url=${mu.mkurl}">
+        <a href="javascript:;">
+          <img th:src="${mu.mkimg}" style="width:16px;height:16px;">
+          <cite th:text="${mu.mkmc}"></cite>
+        </a>
+        <dl class="layui-nav-child">
+          <dd th:each="cl,stat:${mu.childList}">
+            <a th:text="${cl.mkmc}"
+               th:attr="data-id=${cl.id},data-xtmkid=${cl.PT_XT_MKid},data-opts=${cl.getOptStr()},data-an=${cl.mkgnan},data-url=${cl.mkurl}"
+               class="menuItem" href="javascript:;"></a>
+          </dd>
+        </dl>
+      </li>
+    </ul>
+
+    <ul class="layui-nav layui-layout-right" style="margin-right: 25px;">
+      <li class="layui-nav-item">
+        <a href="javascript:;" th:inline="text">
+          <img th:src="@{/static/image/loginPhoto.jpg}" class="layui-nav-img"
+               style="width: 22px; height: 22px; border-radius: 100px; overflow: hidden; margin-right: 4px;">
+          [[${user.username}]]
+        </a>
+        <dl class="layui-nav-child layui-anim layui-anim-upbit">
+          <dd><a href="javascript:;" id="editPassword">修改密码</a></dd>
+          <dd><a href="javascript:;" id="logout">退出</a></dd>
+        </dl>
+      </li>
+    </ul>
+
+  </div>
+  <!-- 头部区域 -->
+
+  <!-- 页面标签区域 -->
+  <div class="layui-pagetabs" id="LAY_app_tabs">
+    <div class="layui-icon layui-tabs-control layui-icon-prev" layui-event="leftPage"></div>
+    <div class="layui-icon layui-tabs-control layui-icon-next" layui-event="rightPage"></div>
+    <div class="layui-icon layui-tabs-control layui-icon-down">
+      <ul class="layui-nav layui-tabs-select" id="layui-pagetabs-nav" lay-filter="layui-pagetabs-nav" lay-shrink="all">
+        <li class="layui-nav-item" lay-unselect="">
+          <a href="javascript:;"><span class="layui-nav-more"></span></a>
+          <dl class="layui-nav-child layui-anim-fadein">
+            <dd layui-event="closeThisTabs">
+              <a href="javascript:;">关闭当前标签页</a>
+            </dd>
+            <dd layui-event="closeOtherTabs">
+              <a href="javascript:;">关闭其它标签页</a>
+            </dd>
+            <dd layui-event="closeAllTabs">
+              <a href="javascript:;">关闭全部标签页</a>
+            </dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+    <div class="layui-tab" lay-unauto="" lay-allowclose="true" lay-filter="layui-layout-tabs">
+      <ul class="layui-tab-title" id="LAY_app_tabsheader">
+        <li lay-id="0" class="layui-this">
+          <i class="layui-icon layui-icon-home"></i>
+          <!--<i class="layui-icon layui-unselect layui-tab-close">ဆ</i>-->
+        </li>
+      </ul>
+    </div>
+
+
+  </div>
+  <!-- 页面标签区域 -->
+
+  <!-- 内容主体区域 -->
+  <div class="layui-body" id="LAY_app_body" style="top: 116px;bottom: 10px; left: 0px !important;">
+    <div class="layui-tabsbody-item layui-show">
+      <iframe src="" frameborder="0" class="layui-iframe"></iframe>
+    </div>
+  </div>
+  <!-- 内容主体区域 -->
+
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script th:inline="javascript">
+  layui.use(['element', 'layer', 'form'], function () {
+    let element = layui.element;
+    let layer = layui.layer;
+    let form = layui.form;
+
+    let admin = {
+      tabsPage: {},
+      //获取页面标签主体元素
+      tabsBody: function (index) {
+        return $("#LAY_app_body").find('.layui-tabsbody-item').eq(index || 0);
+      },
+      //切换页面标签主体
+      tabsBodyChange: function (index, options) {
+        admin.tabsBody(index).addClass("layui-show").siblings().removeClass("layui-show");
+        admin.rollPage('auto', index);
+      },
+      //打开新的标签页
+      openTabsPage: function (obj) {
+        let title = $(obj).html();
+        let id = $(obj).attr("data-id");
+        let url = ctx + $(obj).attr("data-url");
+        let data_an = $(obj).attr("data-an");
+        let data_opts = $(obj).attr("data-opts");
+        let tabs = $('#LAY_app_tabsheader>li');
+
+        //声明一个是否点击过的标志 默认是false点击过
+        let check = false;
+        let menuFrames = $(".menu-iframe");
+        let checkId;
+        //循环所有的 tab 里面的 iframe 【class = menu-iframe】
+        //找到 是否在当前iframe有你点击的id
+        for (let i = 0; i < menuFrames.length; i++) {
+          let iframeId = $(menuFrames[i]).attr('tab-id');
+          //判断当前点击的菜单项id是否和已经存在的iframe的id相等
+          if (id === iframeId) {
+            check = true;
+            checkId = iframeId;
+            break;
+          }
+        }
+
+        if (check) {
+          //找到了 点击过 我把当前找到位置的id  tabChange方法 让他选中
+          element.tabChange('layui-layout-tabs', checkId)
+        } else {
+          //没找到 没点过
+          $("#LAY_app_body").append([
+            '<div class="layui-tabsbody-item layui-show">',
+            '<iframe scrolling="no" data-an="' + data_an + '" class="menu-iframe" frameborder="no" border="0" tab-id="' + id + '" style="width: 100%;height: 100%;" src="' + url + '?opts=' + data_opts + '"></iframe>',
+            '</div>'].join(''));
+          admin.tabsPage.index = tabs.length;
+          element.tabAdd('layui-layout-tabs', {
+            title: title + '<i class="layui-icon layui-unselect layui-tab-close">ဆ</i>',
+            id: id,
+            //content: '<iframe scrolling="no" data-an="' + data_an + '" class="menu-iframe" frameborder="no" border="0" tab-id="' + id + '" style="width: 100%;height: 100%;" src="' + url + '?opts=' + data_an + '"></iframe>'
+          });
+          //将id是当前点击的id的tab的内容切换到当前的tab
+          element.tabChange('layui-layout-tabs', id);
+        }
+      },
+      //同步路由
+      setThisRouter: function (othis) {
+        let layid = othis.attr('lay-id'), attr = othis.attr('lay-attr'), index = othis.index();
+        admin.tabsBodyChange(index, {
+          url: attr
+        });
+      },
+      //左右滚动tab标签
+      rollPage: function (type, index) {
+        let tabsHeader = $('#LAY_app_tabsheader')
+          , liItem = tabsHeader.children('li')
+          , scrollWidth = tabsHeader.prop('scrollWidth')
+          , outerWidth = tabsHeader.outerWidth()
+          , tabsLeft = parseFloat(tabsHeader.css('left'));
+        //右左往右
+        if (type === 'left') {
+          if (!tabsLeft && tabsLeft <= 0) return;
+
+          //当前的left减去可视宽度，用于与上一轮的页标比较
+          let prefLeft = -tabsLeft - outerWidth;
+
+          liItem.each(function (index, item) {
+            let li = $(item), left = li.position().left;
+            if (left >= prefLeft) {
+              tabsHeader.css('left', -left);
+              return false;
+            }
+          });
+        } else if (type === 'auto') { //自动滚动
+          (function () {
+            let thisLi = liItem.eq(index), thisLeft;
+
+            if (!thisLi[0]) return;
+            thisLeft = thisLi.position().left;
+
+            //当目标标签在可视区域左侧时
+            if (thisLeft < -tabsLeft) {
+              return tabsHeader.css('left', -thisLeft);
+            }
+
+            //当目标标签在可视区域右侧时
+            if (thisLeft + thisLi.outerWidth() >= outerWidth - tabsLeft) {
+              let subLeft = thisLeft + thisLi.outerWidth() - (outerWidth - tabsLeft);
+              liItem.each(function (i, item) {
+                let li = $(item), left = li.position().left;
+                //从当前可视区域的最左第二个节点遍历，如果减去最左节点的差 > 目标在右侧不可见的宽度，则将该节点放置可视区域最左
+                if (left + tabsLeft > 0) {
+                  if (left - tabsLeft > subLeft) {
+                    tabsHeader.css('left', -left);
+                    return false;
+                  }
+                }
+              });
+            }
+          }());
+        } else {
+          //默认向左滚动
+          liItem.each(function (i, item) {
+            let li = $(item), left = li.position().left;
+            if (left + li.outerWidth() >= outerWidth - tabsLeft) {
+              tabsHeader.css('left', -left);
+              return false;
+            }
+          });
+        }
+      },
+      //向右滚动页面标签
+      leftPage: function () {
+        admin.rollPage('left');
+      },
+      //向左滚动页面标签
+      rightPage: function () {
+        admin.rollPage();
+      },
+      //关闭当前标签页
+      closeThisTabs: function () {
+        if (!admin.tabsPage.index) return;
+        $('#LAY_app_tabsheader>li').eq(admin.tabsPage.index).find('.layui-tab-close').trigger('click');
+      },
+      //关闭其它标签页
+      closeOtherTabs: function (type) {
+        if (type === 'all') {
+          $('#LAY_app_tabsheader>li:not(:first)').remove();
+          $('#LAY_app_body').find('.layui-tabsbody-item:not(:first)').remove();
+          $('#LAY_app_tabsheader>li').eq(0).trigger('click');
+        } else {
+          $('#LAY_app_tabsheader>li').each(function (index, item) {
+            if (index && index != admin.tabsPage.index) {
+              $(item).addClass('LAY-system-pagetabs-remove');
+              admin.tabsBody(index).addClass('LAY-system-pagetabs-remove');
+            }
+          });
+          $('.LAY-system-pagetabs-remove').remove();
+          let le = $('#LAY_app_tabsheader>li').length;
+          if (le === 1) {
+            $('#LAY_app_tabsheader>li').eq(0).trigger('click');
+          } else {
+            $('#LAY_app_tabsheader>li').eq(1).trigger('click');
+          }
+        }
+      },
+      //关闭全部标签页
+      closeAllTabs: function () {
+        admin.closeOtherTabs('all');
+      }
+    };
+
+    //头部菜单点击
+    $("body").on('click', ".menuItem", function () {
+      let othis = $(this), id = othis.attr("data-id");
+      admin.tabsPage.elem = othis;
+      admin.openTabsPage(othis);
+      //定位当前tabs
+      element.tabChange('menuTab', id);
+      admin.tabsBodyChange(admin.tabsPage.index, {});
+    });
+
+    //标签页标题点击
+    $("body").on('click', '#LAY_app_tabsheader>li', function () {
+      let othis = $(this), index = othis.index();
+      admin.tabsPage.type = 'tab';
+      admin.tabsPage.index = index;
+      admin.setThisRouter(othis);
+    });
+
+    //导航栏左右按钮点击
+    $("body").on('click', '*[layui-event]', function () {
+      let othis = $(this), attrEvent = othis.attr('layui-event');
+      admin[attrEvent] && admin[attrEvent].call(this, othis);
+    });
+
+    //为tab关闭按钮绑定事件
+    $("ul#LAY_app_tabsheader").on("click", ".layui-tab-close", function () {
+      element.tabDelete('layui-layout-tabs', $(this).parent("li").attr("lay-id"));
+    });
+
+    //监听 tabspage 删除
+    element.on('tabDelete(layui-layout-tabs)', function (obj) {
+      let othis = $('#LAY_app_tabsheader>li.layui-this');
+      obj.index && admin.tabsBody(obj.index).remove();
+      admin.setThisRouter(othis);
+    });
+
+    $("#logout").on("click", function () {
+      $.ajax({
+        url: ctx + "/login/logout",
+        async: false,
+        type: "POST",
+        success: function (data) {
+          CookieFunc.clear("user");
+          CookieFunc.clear("token");
+          window.top.location = ctx;
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.msg(XMLHttpRequest.responseJSON.msg);
+        }
+      });
+    });
+
+    //修改密码方法
+    $("#editPassword").on("click", function () {
+      top.layer.open({
+        type: 1,
+        title: '修改密码',
+        closeBtn: 1,
+        shadeClose: false,
+        area: ['600px', '350px'],
+        content: $('#editPasswordDialog'),
+        btn: ['保存', '取消'],
+        yes: function (index, layero) {
+          $("#editPasswordForm input[name=layerIndex]").val(index);
+          $("#editPasswordFormSubmit").click();
+          return false;
+        }, cancel: function (index, layero) {
+        }, end: function (index, layero) {
+          $("#editPasswordForm")[0].reset();
+          top.layer.close(index);
+        }
+      });
+    });
+
+    //提交修改密码
+    form.on('submit(editPasswordFormSubmitBut)', function (data) {
+      let oldPassword = data.field.oldPassword;
+      let newPassword = data.field.password;
+      let index = data.field.layerIndex;
+
+      $.ajax({
+        url: ctx + "GYFW/YHGL/editUserPassword",
+        data: {
+          "oldPassword": oldPassword,
+          "newPassword": newPassword,
+        },
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          top.layer.msg(data.msg);
+          top.layer.close(index); //关闭弹出框
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.msg(XMLHttpRequest.responseJSON.msg);
+        }
+      });
+      return false;
+    });
+
+    element.init();
+
+    $("div.layui-tab").on('mouseenter', '.layui-tab-title li', function () {
+      $(this).addClass("layui-custhis");
+    }).on('mouseleave', '.layui-tab-title li', function () {
+      $(this).removeClass("layui-custhis");
+    });
+
+    $("#topMenu").on('mouseenter', '.layui-nav-item', function () {
+      $(this).addClass("layui-custhis");
+    }).on('mouseleave', '.layui-nav-item', function () {
+      $(this).removeClass("layui-custhis");
+    });
+
+    //这里用来处理iframe的高度问题
+    window.setInterval(function () {
+      $(".layui-body .layui-tabsbody-item iframe").each(function () {
+        IframeFunc.autoHeight(this);
+      });
+    }, 500);
+
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
+  <title>物业维修基金管理系统-编辑物业公司</title>
+  <style>
+    .jb_2 {
+      padding-left: 30px !important;
+    }
+
+    .jb_3 {
+      padding-left: 40px !important;
+    }
+
+    .jb_4 {
+      padding-left: 50px !important;
+    }
+
+    .jb_5 {
+      padding-left: 60px !important;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-tab-item layui-show" style="padding: 10px;">
+  <div id="LAY_preview">
+    <form class="layui-form" method="post" id="wyGs_editForm">
+      <div class="layui-form">
+        <table class="layui-table">
+          <tbody>
+          <tr>
+            <th style="white-space: nowrap">企业名称</th>
+            <td>
+              <input type="text" name="qymc" lay-verify="required" placeholder=""
+                     class="layui-input" th:value="${wyGs.qymc}"/>
+            </td>
+            <th style="white-space: nowrap">营业执照号</th>
+            <td>
+              <input type="text" name="yyzzh" placeholder=""
+                     class="layui-input" th:value="${wyGs.yyzzh}"/>
+            </td>
+          </tr>
+          <tr>
+            <th>法人代表</th>
+            <td>
+              <input type="text" name="frdb" placeholder=""
+                     class="layui-input" th:value="${wyGs.frdb}"/>
+            </td>
+            <th>联系电话</th>
+            <td><input type="text" name="lxdh" placeholder=""
+                       class="layui-input" th:value="${wyGs.lxdh}"/></td>
+          </tr>
+          <tr>
+            <th>所在区域</th>
+            <td>
+              <input type="text" lay-verify="area" id="areas" name="fk_qybm" th:value="${wyGs.fk_qybm}"
+                     style="display: none;"/>
+            </td>
+            <th>成立时间</th>
+            <td>
+              <input type="text" name="clsj" id="clsj" placeholder=""
+                     class="layui-input" th:value="${wyGs.clsj}"/>
+            </td>
+          </tr>
+          <tr>
+            <th>办公地址</th>
+            <td colspan="3">
+              <input type="text" name="bgdz" placeholder=""
+                     class="layui-input" th:value="${wyGs.bgdz}"/>
+            </td>
+          </tr>
+          <tr>
+            <th>通讯地址</th>
+            <td colspan="3">
+              <input type="text" name="txdz" placeholder=""
+                     class="layui-input" th:value="${wyGs.txdz}"/>
+            </td>
+          </tr>
+          <tr>
+            <th>注册地址</th>
+            <td colspan="3">
+              <input type="text" name="zcdz" placeholder=""
+                     class="layui-input" th:value="${wyGs.zcdz}"/>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+        <input type="hidden" name="id" th:value="${wyGs.id}">
+      </div>
+      <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+    </form>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/sysMgr/wyGsMgr/wyGsMgr.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
+
+<script th:inline="javascript">
+  const xtglid = [[${user.fk_xtglid}]];
+  const qybm = [[${wyGs.fk_qybm}]];
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    let laydate = layui.laydate;
+    let form = layui.form;
+    //let table = layui.table;
+    let cascader = layui.cascader;
+
+    //日期选择
+    laydate.render({
+      elem: '#clsj'
+    });
+
+    //区域选择
+    cascader.render({
+      elem: $('#areas')[0],
+      multiple: false,
+      showAllLevels: true,
+      props: {
+        label: 'label',
+        value: 'value',
+        children: 'children'
+      },
+      options: AREAS,
+      defaultValue: qybm
+    });
+
+    //表单验证
+    form.verify({
+      area: function (value, item) {
+        if (!value) {
+          return '请选择所在区域';
+        }
+      }
+    });
+
+    form.on('submit(submitBut)', function (data1) {
+      let wyGs = {};
+      wyGs['id'] = data1.field.id;
+      wyGs['qymc'] = data1.field.qymc;
+      wyGs['fk_xtglid'] = xtglid;
+      if (data1.field.clsj) {
+        wyGs['clsj'] = data1.field.clsj;
+      }
+      wyGs['zcdz'] = data1.field.zcdz;
+      wyGs['frdb'] = data1.field.frdb;
+      wyGs['lxdh'] = data1.field.lxdh;
+      wyGs['bgdz'] = data1.field.bgdz;
+      wyGs['txdz'] = data1.field.txdz;
+      wyGs['yyzzh'] = data1.field.yyzzh;
+      wyGs['fk_qybm'] = data1.field.fk_qybm;
+
+      let index = top.layer.getFrameIndex(window.name); //获取窗口索引
+      aeWyGs(wyGs, index);
+
+      return false;
+    });
+  });
+</script>
+</body>
+</html>

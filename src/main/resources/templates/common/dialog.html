@@ -1,0 +1,77 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- 系统日志详情弹出层 -->
+<div th:fragment="sys_log_detail_alert" id="sys_log_detail_alert" style="display: none;">
+  <form class="layui-form">
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">ID:</label>
+        <div class="layui-input-inline">
+          <label class="layui-form-label id-data"></label>
+        </div>
+      </div>
+      <div class="layui-inline">
+        <label class="layui-form-label">remark:</label>
+        <div class="layui-input-inline">
+          <label class="layui-form-label remark-data"></label>
+        </div>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">action_type:</label>
+        <div class="layui-input-inline">
+          <label class="layui-form-label action_type-data"></label>
+        </div>
+      </div>
+      <div class="layui-inline">
+        <label class="layui-form-label">addtime:</label>
+        <div class="layui-input-inline">
+          <label class="layui-form-label addtime-data"></label>
+        </div>
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <div class="layui-inline">
+        <label class="layui-form-label">ip:</label>
+        <div class="layui-input-inline">
+          <label class="layui-form-label ip-data"></label>
+        </div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<!-- 修改密码弹出层 -->
+<div th:fragment="editPasswordDialog" id="editPasswordDialog" class="site-text site-block"
+     style="border: 1px solid #eee;display: none;padding: 20px;margin: 20px;">
+  <form class="layui-form" action="" lay-filter="editPasswordForm" id="editPasswordForm">
+    <div class="layui-form-item">
+      <label class="layui-form-label">原密码</label>
+      <div class="layui-input-block">
+        <input type="password" name="oldPassword" lay-verify="required" placeholder="请输入原密码"
+               autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">新密码</label>
+      <div class="layui-input-block">
+        <input type="password" name="password" lay-verify="required|pass" placeholder="请输入新密码"
+               autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <div class="layui-form-item">
+      <label class="layui-form-label">再次输入</label>
+      <div class="layui-input-block">
+        <input type="password" name="repassword" lay-verify="required|pass" placeholder="再次输入新密码"
+               autocomplete="off" class="layui-input">
+      </div>
+    </div>
+    <input type="hidden" name="layerIndex" lay-verify="required">
+    <button style="display:none;" lay-submit lay-filter="editPasswordFormSubmitBut"
+            id="editPasswordFormSubmit"></button>
+  </form>
+</div>
+</body>
+</html>

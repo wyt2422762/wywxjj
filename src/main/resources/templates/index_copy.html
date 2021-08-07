@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>主界面</title>
+</head>
+<body>
+<div class="layui-layout layui-layout-admin">
+  <!-- 弹出层区域 -->
+  <!-- 修改密码弹出框 -->
+  <div th:replace="/common/dialog::editPasswordDialog"></div>
+  <!-- 弹出层区域 -->
+
+  <!-- 头部区域 -->
+  <div class="layui-header">
+    <div class="layui-logo">主界面</div>
+    <ul class="layui-nav layui-layout-left">
+      <li class="layui-nav-item layui-this">
+        <a href="javascript:;">菜单1</a>
+        <dl class="layui-nav-child">
+          <dd><a href="">菜单1-1</a></dd>
+          <dd><a href="">菜单1-2</a></dd>
+          <dd><a href="">菜单1-3</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item">
+        <a href="javascript:;">菜单2</a>
+        <dl class="layui-nav-child">
+          <dd><a href="">菜单2-1</a></dd>
+          <dd><a href="">菜单2-2</a></dd>
+          <dd><a href="">菜单2-3</a></dd>
+        </dl>
+      </li>
+    </ul>
+    <ul class="layui-nav layui-layout-right" style="margin-right: 25px;">
+      <li class="layui-nav-item">
+        <a th:text="${user.username}" href="javascript:;">
+          <img src="//tva1.sinaimg.cn/crop.0.0.118.118.180/5db11ff4gw1e77d3nqrv8j203b03cweg.jpg"
+               class="layui-nav-img">
+          用户
+          <span class="layui-nav-more"></span></a>
+        <dl class="layui-nav-child layui-anim layui-anim-upbit">
+          <dd><a href="javascript:;" id="editPassword">修改密码</a></dd>
+          <dd><a href="javascript:;" id="logout">退出</a></dd>
+        </dl>
+      </li>
+    </ul>
+  </div>
+  <!-- 头部区域 -->
+
+  <!-- 左侧导航区域 -->
+  <div class="layui-side layui-side-menu layui-bg-black">
+    <div class="layui-side-scroll" id="leftMenu"></div>
+  </div>
+  <!-- 左侧导航区域 -->
+
+  <!-- 内容主体区域 -->
+  <div class="layui-body">
+    <div class="layui-tab layui-tab-card" lay-unauto lay-filter="menuTab">
+      <ul class="layui-tab-title">
+        <li class="layui-this" lay-id="0">主页</li>
+      </ul>
+      <div class="layui-tab-content">
+        <div class="layui-tab-item layui-show">
+          <iframe src="http://www.baidu.com" frameborder="0" border="0"
+                  class="menu-iframe" tab-id="first" style="width: 100%;height: 820px"></iframe>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- 内容主体区域 -->
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script th:inline="javascript">
+  const ctx = [[@{/}]];
+    layui.use(['element', 'layer', 'form'], function () {
+      let element = layui.element;
+      let layer = layui.layer;
+      let form = layui.form;
+
+      form.verify({
+        pass: function (value, item) {
+          if (!new RegExp("^(?=.*?[A-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$").test(value)) {
+            return '密码不符合要求';
+          }
+          if ($('input[name=repassword]').val() !== value) {
+            return '两次输入的密码不一致';
+          }
+        }
+      });
+
+      //获取所有的菜单
+      $.ajax({
+        type: "GET",
+        async: false,
+        url: ctx + "/index/getMenu",
+        dataType: "json",
+        success: function (data) {
+          var list = data.data;
+          if (list == null || list.length == 0) {
+            return;
+          }
+          //先添加所有的主材单
+          $.each(list, function (i, obj) {
+            if (obj.show) {
+              var content = '<ul class="layui-nav layui-nav-tree" lay-shrink="all" id="' + obj.id + '" lay-filter="layadmin-system-side-menu">';
+
+              content += '<li data-name="home" class="layui-nav-item layui-nav-itemed">' +
+                '<a href="javascript:;" data-id="' + obj.id + '" data-xtmkid="' + obj.pt_XT_MKid + '" data-opts="' + obj.opts.join(",") + '" data-an="' + obj.mkgnan + '"  lay-tips="' + obj.mkmc + '" lay-direction="2">' +
+                '<i class="layui-icon"></i>' + '<cite>' + obj.mkmc + '</cite>' +
+                '<span class="layui-nav-more"></span>' + '</a>';
+
+              //这里是添加所有的子菜单
+              content += loadchild(obj);
+              content += '</li>';
+
+              content += '<span class="layui-nav-bar" style="top: 22.5px; height: 0px; opacity: 0;"></span>'
+              content += '</ul>';
+
+              $("#leftMenu").append(content);
+            }
+          });
+        },
+        error: function (jqXHR) {
+          top.layer.msg(jqXHR.responseJSON.msg);
+        }
+      });
+
+      //组装子菜单的方法
+      function loadchild(obj) {
+        if (obj == null) {
+          return null;
+        }
+        var content = '';
+        if (obj.childList != null && obj.childList.length > 0) {
+          content += '<dl class="layui-nav-child">';
+        } else {
+          content += '<dl>';
+        }
+        if (obj.childList != null && obj.childList.length > 0) {
+          $.each(obj.childList, function (i, note) {
+            content += '<dd>';
+            content += '<a class="menuItem" data-opts="' + note.opts.join(",") + '" data-an="' + note.mkgnan + '" data-name="' + note.mkmc + '" data-id="' + note.id + '" data-xtmkid="' + note.pt_XT_MKid + '" data-url="' + ctx + note.mkurl + '" href="javascript:;" >' + note.mkmc + '</a>';
+            if (note.childList == null) {
+              return;
+            }
+            content += loadchild(note);
+            content += '</dd>';
+          });
+          content += '</dl>';
+        }
+        return content;
+      }
+
+      //动态tab操作
+      $(".menuItem").on('click', function () {
+        let title = $(this).html();
+        let id = $(this).attr("data-id");
+        let url = $(this).attr("data-url");
+        let data_an = $(this).attr("data-an");
+
+        //声明一个是否点击过的标志 默认是false点击过
+        let check = false;
+        let menuFrames = $(".menu-iframe");
+        let checkId;
+        //循环所有的 tab 里面的 iframe 【class = menu-iframe】
+        //找到 是否在当前iframe有你点击的id
+        for (let i = 0; i < menuFrames.length; i++) {
+          let iframeId = $(menuFrames[i]).attr('tab-id');
+          //判断当前点击的菜单项id是否和已经存在的iframe的id相等
+          if (id === iframeId) {
+            check = true;
+            checkId = iframeId;
+            break;
+          }
+        }
+
+        if (check) {
+          //找到了 点击过 我把当前找到位置的id  tabChange方法 让他选中
+          // let index=clickArray.indexOf(id);
+          element.tabChange('menuTab', checkId)
+        } else {
+          //没找到 没点过
+          element.tabAdd('menuTab', {
+            title: title + '<i class="layui-icon layui-unselect layui-tab-close">ဆ</i>',
+            id: id,
+            content: '<iframe data-an="' + data_an + '" class="menu-iframe" frameborder="no" border="0" tab-id="' + id + '" style="width: 100%;height: 820px" src="' + url + '?opts=' + data_an + '"></iframe>'
+          });
+          //将id是当前点击的id的tab的内容切换到当前的tab
+          element.tabChange('menuTab', id);
+        }
+      });
+
+      element.init();
+
+      //为tab关闭按钮绑定事件
+      $("ul.layui-tab-title").on("click", ".layui-tab-close", function () {
+        element.tabDelete("menuTab", $(this).parent("li").attr("lay-id"));
+      });
+
+      $("#logout").on("click", function () {
+        $.ajax({
+          url: ctx + "/login/logout",
+          async: false,
+          type: "POST",
+          success: function (data) {
+            window.top.location = ctx;
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            top.layer.msg(XMLHttpRequest.responseJSON.msg);
+          }
+        });
+      });
+
+      //修改密码方法
+      $("#editPassword").on("click", function () {
+        let index = top.layer.open({
+          type: 1,
+          title: '修改密码',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['600px', '350px'],
+          content: $('#editPasswordDialog'),
+          btn: ['保存', '取消'],
+          yes: function (index, layero) {
+            $("#editPasswordForm input[name=layerIndex]").val(index);
+            $("#editPasswordFormSubmit").click();
+            return false;
+          }, cancel: function (index, layero) {
+          }, end: function (index, layero) {
+            $("#editPasswordForm")[0].reset();
+            top.layer.close(index);
+          }
+        });
+      });
+
+      //提交修改密码
+      form.on('submit(editPasswordFormSubmitBut)', function (data) {
+        let oldPassword = data.field.oldPassword;
+        let newPassword = data.field.password;
+        let index = data.field.layerIndex;
+
+        $.ajax({
+          url: ctx + "GYFW/YHGL/editUserPassword",
+          data: {
+            "oldPassword": oldPassword,
+            "newPassword": newPassword,
+          },
+          async: false,
+          contentType: "application/json;charset=utf-8",
+          success: function (data) {
+            top.layer.msg(data.msg);
+            top.layer.close(index); //关闭弹出框
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            top.layer.msg(XMLHttpRequest.responseJSON.msg);
+          }
+        });
+        return false;
+      });
+
+    });
+</script>
+</body>
+</html>

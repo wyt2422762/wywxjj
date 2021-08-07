@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
+  <title>物业维修基金管理系统-添加角色</title>
+  <style>
+    .jb_2 {
+      padding-left: 30px !important;
+    }
+
+    .jb_3 {
+      padding-left: 40px !important;
+    }
+
+    .jb_4 {
+      padding-left: 50px !important;
+    }
+
+    .jb_5 {
+      padding-left: 60px !important;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-tab-item layui-show" style="padding: 10px;">
+  <div id="LAY_preview">
+    <form class="layui-form" method="post" id="role_addForm">
+      <div class="layui-form">
+        <div class="layui-form-item">
+          <div class="layui-inline">
+            <label class="layui-form-label">角色名称</label>
+            <div class="layui-input-inline">
+              <input type="text" name="JSMC" th:value="${roleName}" lay-verify="required"
+                     autocomplete="off" placeholder="" class="layui-input"/>
+              <input type="hidden" name="id" th:value="${roleId}" lay-verify="" autocomplete="off"
+                     placeholder="" class="layui-input"/>
+            </div>
+          </div>
+        </div>
+
+        <div class="layui-form-item">
+          <table class="layui-table" width="100%">
+            <thead>
+            <tr>
+              <th width="30%">选择功能</th>
+              <th width="60%">操作</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="rm,stat: ${roleModel}"
+                th:attr="data-id=${rm.id},data-jb=${rm.mkjb},data-anniu=${rm.mkgnan}">
+              <td th:text="${rm.mkmc}" th:classappend="'jb_' + ${rm.mkjb}"></td>
+              <td>
+                <div>
+                  <input th:each="anniu,stat1: ${rm.getMkAnnius()}" type="checkbox" lay-skin="primary"
+                         th:value="${anniu}" th:title="${anniu}" name="role_models"
+                         th:attr="data-id=${rm.id},data-xtmkid=${rm.PT_XT_MKid},data-actionType=${anniu}"
+                  />
+                </div>
+              </td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+    </form>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/sysMgr/roleMgr/roleMgr.js}"></script>
+
+<script th:inline="javascript">
+  const xtglid = [[${user.fk_xtglid}]];
+  layui.use(['element', 'laydate', 'table', 'form'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    //let table = layui.table;
+
+    form.on('submit(submitBut)', function (data1) {
+      let roleName = $("#role_addForm").find("input[name='JSMC']").val();
+      //这里构造json
+      let data = {};
+      let pT_JSGLmodel = {};
+      let pT_JS_MKList = [];
+
+      pT_JSGLmodel["jsmc"] = roleName;
+      pT_JSGLmodel["fk_xtglid"] = xtglid;
+
+      data["pT_JSGLmodel"] = pT_JSGLmodel;
+
+      let role_models = $("#role_addForm").find("input[name='role_models']:checked");
+      $(role_models).each(function () {
+        let json = {};
+        json["actionType"] = $(this).attr("data-actiontype");
+        json["fk_XTMKid"] = $(this).attr("data-id");
+        json["fk_xtglid"] = xtglid;
+        pT_JS_MKList.push(json);
+      });
+
+      data["pT_JS_MKList"] = pT_JS_MKList;
+
+      let index = top.layer.getFrameIndex(window.name); //获取窗口索引
+
+      aeRole(data, index);
+      return false;
+    });
+  });
+</script>
+
+</body>
+</html>

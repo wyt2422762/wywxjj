@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+系统日志配置文件
+Configuration后面的status，这个用于设置log4j2自身内部的信息输出，可以不设置，
+当设置成trace时，可以看到log4j2内部各种详细输出
+-->
+<!--monitorInterval：Log4j能够自动检测修改配置 文件和重新配置本身，设置间隔秒数-->
+<configuration monitorInterval="15">
+    <!--日志级别以及优先级排序:
+    OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL
+    -->
+    <!--<springProperty scope="context" name="slogPath" source="logging.file.path"/>-->
+
+    <!--变量配置-->
+    <Properties>
+        <!--
+            格式化输出：
+            %d表示日期，
+            %thread表示线程名，
+            %-5level：级别从左显示5个字符宽度
+            %msg：日志消息，%n是换行符
+        -->
+        <!--
+        %logger{36} 表示 Logger 名字最长36个字符
+        -->
+        <property name="pattern"
+                  value="%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level}[%thread] %style{%logger{36}}{cyan} : %msg%n"/>
+        <!-- 定义日志存储的路径，不要配置相对路径 -->
+        <property name="logPath" value="D:/log/wywxjj/dev"/>
+        <property name="fileName" value="wywxjj"/>
+    </Properties>
+
+    <!--
+        onMatch="ACCEPT" 表示匹配该级别及以上
+        onMatch="DENY" 表示不匹配该级别及以上
+        onMatch="NEUTRAL" 表示该级别及以上的，由下一个filter处理，如果当前是最后一个，则表示匹配该级别及以上
+        onMismatch="ACCEPT" 表示匹配该级别以下
+        onMismatch="NEUTRAL" 表示该级别及以下的，由下一个filter处理，如果当前是最后一个，则不匹配该级别以下的
+        onMismatch="DENY" 表示不匹配该级别以下的
+    -->
+
+    <appenders>
+        <!--设置在控制台打印日志-->
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${pattern}"/>
+        </Console>
+
+        <RollingRandomAccessFile name="file"
+                                 immediateFlush="true"
+                                 fileName="${logPath}/total.log"
+                                 filePattern="${logPath}/total-%d{yyyy-MM-dd}.log">
+            <PatternLayout pattern="${pattern}"/>
+            <Policies>
+                <!-- 按天生成日志文件-->
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <!-- 最多保存日志文件的数目 -->
+            <DefaultRolloverStrategy max="15"/>
+        </RollingRandomAccessFile>
+
+        <!-- debug日志文件 -->
+        <RollingRandomAccessFile name="debugFile"
+                                 immediateFlush="true"
+                                 fileName="${logPath}/debug.log"
+                                 filePattern="${logPath}/debug-%d{yyyy-MM-dd}.log">
+            <Filters>
+                <ThresholdFilter level="INFO" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="DEBUG" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${pattern}"/>
+            <Policies>
+                <!-- 按天生成日志文件-->
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <!-- 最多保存日志文件的数目 -->
+            <DefaultRolloverStrategy max="30"/>
+        </RollingRandomAccessFile>
+
+        <!-- info日志文件 -->
+        <RollingRandomAccessFile name="infoFile"
+                                 immediateFlush="true"
+                                 fileName="${logPath}/info.log"
+                                 filePattern="${logPath}/info-%d{yyyy-MM-dd}.log">
+            <Filters>
+                <ThresholdFilter level="warn" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="info" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${pattern}"/>
+            <Policies>
+                <!-- 按天生成日志文件-->
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <!-- 最多保存日志文件的数目 -->
+            <DefaultRolloverStrategy max="30"/>
+        </RollingRandomAccessFile>
+
+        <!-- warn日志文件 -->
+        <RollingRandomAccessFile name="warnFile"
+                                 immediateFlush="true"
+                                 fileName="${logPath}/warn.log"
+                                 filePattern="${logPath}/warn-%d{yyyy-MM-dd}.log">
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="DENY" onMismatch="NEUTRAL"/>
+                <ThresholdFilter level="WARN" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${pattern}"/>
+            <Policies>
+                <!--按天生成日志文件-->
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <!--最多保存日志文件的数目-->
+            <DefaultRolloverStrategy max="30"/>
+        </RollingRandomAccessFile>
+
+        <!-- error日志文件 -->
+        <RollingRandomAccessFile name="errorFile"
+                                 immediateFlush="true"
+                                 fileName="${logPath}/error.log"
+                                 filePattern="${logPath}/error-%d{yyyy-MM-dd}.log">
+            <Filters>
+                <ThresholdFilter level="ERROR" onMatch="ACCEPT" onMismatch="DENY"/>
+            </Filters>
+            <PatternLayout pattern="${pattern}"/>
+            <Policies>
+                <!-- 按天生成日志文件-->
+                <TimeBasedTriggeringPolicy modulate="true" interval="1"/>
+            </Policies>
+            <!-- 最多保存日志文件的数目 -->
+            <DefaultRolloverStrategy max="30"/>
+        </RollingRandomAccessFile>
+
+    </appenders>
+
+    <Loggers>
+        <!--过滤掉spring和mybatis的一些无用的DEBUG信息-->
+        <logger name="org.mybatis" level="info"/>
+        <Logger name="org.springframework" level="info"/>
+        <Logger name="_org.springframework" level="info"/>
+        <Logger name="org.thymeleaf" level="info"/>
+
+        <root level="DEBUG">
+            <appender-ref ref="console"/>
+            <appender-ref ref="file"/>
+            <appender-ref ref="debugFile"/>
+            <appender-ref ref="infoFile"/>
+            <appender-ref ref="warnFile"/>
+            <appender-ref ref="errorFile"/>
+        </root>
+    </Loggers>
+</configuration>

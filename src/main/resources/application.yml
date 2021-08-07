@@ -1,0 +1,31 @@
+# 服务配置
+server:
+  servlet:
+    context-path: /wywxjj
+  tomcat:
+    # tomcat的URI编码
+    uri-encoding: UTF-8
+
+# spring配置
+spring:
+  # 国际化信息
+  messages:
+    basename: i18n/**/*
+  profiles:
+    active: dev
+  devtools:
+    restart:
+      enabled: true
+  application:
+    name: wywxjj
+  mvc:
+    static-path-pattern: /wywxjj
+  thymeleaf:
+    cache: false
+    encoding: UTF-8
+
+# MyBatis配置
+#mybatis:
+#  mapperLocations: classpath*:mapper/**/*Mapper.xml
+
+

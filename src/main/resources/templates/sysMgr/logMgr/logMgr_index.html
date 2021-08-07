@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-日志管理</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <blockquote class="layui-elem-quote layui-text">
+      日志管理
+    </blockquote>
+
+    <form class="layui-form" id="logForm">
+      <div class="layui-form-item">
+        <div class="layui-inline">
+          <label class="layui-form-label">开始时间</label>
+          <div class="layui-input-inline">
+            <input type="text" class="layui-input" name="startTime" id="startTime"
+                   autocomplete="off" lay-verify="time" placeholder="开始时间"/>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <label class="layui-form-label">结束时间</label>
+          <div class="layui-input-inline">
+            <input type="text" class="layui-input" name="endTime" id="endTime"
+                   autocomplete="off" lay-verify="time" placeholder="结束时间"/>
+          </div>
+        </div>
+        <div class="layui-inline">
+          <div class="layui-input-inline">
+            <button class="layui-btn" lay-submit lay-filter="formDemo">
+              查询
+            </button>
+          </div>
+        </div>
+      </div>
+    </form>
+
+    <fieldset class="layui-elem-field layui-field-title">
+      <legend>日志列表</legend>
+    </fieldset>
+
+    <table id="logTable" class="layui-table" lay-filter="logTable"></table>
+
+    <!--<script type="text/html" id="logTableToolBar">
+        <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-primary layui-btn-xs"
+           lay-event="detail">详情</a>
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+    </script>-->
+
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script th:inline="javascript">
+  layui.use(['element', 'laydate', 'table', 'form'], function () {
+    let element = layui.element;
+    let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+
+    laydate.render({
+      elem: '#startTime', type: 'datetime'
+    });
+    laydate.render({
+      elem: '#endTime', type: 'datetime'
+    });
+
+    form.on('submit(formDemo)', function (data) {
+      let startTime = data.field.startTime;
+      let endTime = data.field.endTime;
+      if (startTime > endTime) {
+        layer.msg("时间范围不合法，请重新选择");
+        $("#logForm")[0].reset();
+        layui.form.render();
+        return false;
+      }
+      getLogTableData(startTime, endTime)
+      return false;
+    });
+
+    getLogTableData();
+
+    function getLogTableData(startTime, endTime) {
+      let logUrl = ctx + 'GYFW/PT_XTRZ/getList';
+      if (startTime || endTime) {
+        logUrl += "?"
+        if (startTime) {
+          logUrl += "startTime=" + startTime;
+        }
+        if (endTime) {
+          if (startTime) {
+            logUrl += "&";
+          }
+          logUrl += "endTime=" + startTime;
+        }
+      }
+
+      //获取表格数据
+      table.render({
+        elem: '#logTable',
+        title: '系统日志表',
+        url: logUrl, //数据接口
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {field: 'id', title: 'ID'},
+          {field: 'remark', title: '名称'},
+          {field: 'action_type', title: '操作类型'},
+          {field: 'addtime', title: '时间'},
+          {field: 'user_ip', title: 'ip'},
+          //{toolbar: '#logTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
+    //工具条事件
+    table.on('tool(logTable)', function (obj) {
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'detail') { //查看
+        $("#sys_log_detail_alert", top.document).find(".id-data").text(data.id);
+        $("#sys_log_detail_alert", top.document).find(".remark-data").text(data.remark);
+        $("#sys_log_detail_alert", top.document).find(".action_type-data").text(data.action_type);
+        $("#sys_log_detail_alert", top.document).find(".ip-data").text(data.user_ip);
+        $("#sys_log_detail_alert", top.document).find(".addtime-data").text(data.addtime);
+
+        let index = top.layer.open({
+          type: 1,
+          title: '日志详情',
+          closeBtn: 1,
+          shadeClose: true,
+          content: $("#sys_log_detail_alert", top.document),
+          end: function () {
+            $("#sys_log_detail_alert", top.document).hide();
+            top.layer.clone(index);
+          }
+        });
+      } else if (layEvent === 'del') { //删除
+        layer.msg("删除操作")
+      } else if (layEvent === 'edit') { //编辑
+        layer.msg("编辑操作")
+      } else if (layEvent === 'LAYTABLE_TIPS') {
+        layer.alert('Hi，头部工具栏扩展的右侧图标。');
+      }
+
+    });
+  });
+</script>
+</body>
+</html>

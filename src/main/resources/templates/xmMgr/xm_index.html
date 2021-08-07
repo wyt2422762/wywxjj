@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-小区管理</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <blockquote class="layui-elem-quote layui-text">
+      小区管理
+    </blockquote>
+
+    <button onclick="downloadTemplate()">下载模板</button>
+
+    <br>
+
+    <button type="button" class="layui-btn" id="test1">
+      <i class="layui-icon">&#xe67c;</i>上传文件
+    </button>
+
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script th:inline="javascript">
+  const xtglid = [[${user.fk_xtglid}]];
+  layui.use(['element', 'laydate', 'table', 'form', 'upload'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let upload = layui.upload;
+
+    //文件上传
+    var uploadInst = upload.render({
+      elem: '#test1',//绑定元素
+      url: ctx + 'CZF/XMGL/importData',//上传接口
+      accept: "file",
+      exts: "xls|xlsx", //文件类型
+      done: function (res) {
+        //上传完毕回调
+        top.layer.msg("上传成功");
+      }, error: function () {
+        //请求异常回调
+        top.layer.msg("上传失败");
+      }
+    });
+
+  });
+
+  function downloadTemplate() {
+    $.ajax({
+      url: ctx + "/CZF/XMGL/getImportTemplate",
+      type: "POST",
+      dataType: "json",
+      contentType: "application/json;charset=utf-8",
+      success: function (data) {
+        CommonDownloadUpload.download(data.fileName, false);
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+      }
+    });
+  }
+</script>
+</body>
+</html>

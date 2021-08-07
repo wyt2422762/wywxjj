@@ -1,0 +1,59 @@
+﻿<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{::link},~{})">
+  <title>物业维修基金管理系统登录页</title>
+  <link rel="stylesheet" th:href="@{/static/css/login.css}" media="all">
+</head>
+<body>
+<div class="pane-header">
+  <img th:src="@{/static/image/logo.png}"/>
+</div>
+<div id="pane">
+  <form class="layui-form zyl_pad_01" action="">
+    <div class="pane-content">
+      <div class="userpwd">
+        <img th:src="@{/static/image/icon_lxr.png}"/>
+        <input placeholder="请输入账号" name="userName" lay-verify="required|userName" autocomplete="off"/>
+      </div>
+      <div class="userpwd">
+        <img th:src="@{/static/image/icon_password.png}"/>
+        <input placeholder="请输入密码" type="password" name="password" lay-verify="required|pass"
+               autocomplete="off"/>
+      </div>
+      <!--<div class="userpwd" style="margin-bottom:20px;">
+          <img src="image/icon_yzm2.png"/>
+          <input placeholder="请输入验证码" type="password" name="yzm" style="width:65%;float:left;">
+          <div class="YZM">
+              <img th:src="@{/static/image/icon_yzm2.png}" style="width:80%;height:80%; position:unset;text-align:center;margin-top:5px;margin-left:12px;">
+          </div>
+      </div>-->
+      <button class="login-btn" lay-submit="" lay-filter="login">登&nbsp;录</button>
+    </div>
+  </form>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script th:inline="javascript">
+  layui.use(['form'], function () {
+    let form = layui.form;
+    //监听form提交
+    form.on('submit(login)', function (data) {
+      $.ajax({
+        url: ctx + "login/login",
+        async: false,
+        type: "POST",
+        data: data.field,
+        success: function (data) {
+          window.top.location = ctx;
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.msg(XMLHttpRequest.responseJSON.msg);
+        }
+      });
+      return false;
+    });
+  });
+</script>
+</body>
+</html>
