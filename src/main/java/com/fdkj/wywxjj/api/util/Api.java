@@ -313,6 +313,126 @@ public class Api {
         return getView_pt_xt_mk_models(ptXtMkModel, roleMks);
     }
 
+    /*****************************************字典api*****************************************/
+
+    /**
+     *
+     * @param request req
+     * @param zdm 字典名称
+     * @param pageNo    第几页
+     * @param pageSize  每页显示的条数
+     * @return 字典列表
+     * @throws Exception err
+     */
+    public Page<Zd> getZdList(HttpServletRequest request, String zdm, Integer pageNo, Integer pageSize) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //请求体
+        JSONObject body = new JSONObject();
+        body.put("fk_xtglid", user.getFk_xtglid());
+        if(StringUtils.isNotBlank(zdm)) {
+            body.put("zdm", zdm);
+        }
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+
+        //请求参数
+        Map<String, Object> params = new HashMap<>(4);
+        params.put("page", pageNo == null ? 1 : pageNo);
+        params.put("pageNum", pageSize == null ? 10 : pageSize);
+
+        String url = baseUrl + "/api/CZF/CZF_ZDGL_List?page={page}&pageNum={pageNum}";
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url,
+                        HttpMethod.POST, requestEntity, String.class, params);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("获取字典列表失败，请求url: " + baseUrl + "/api/CZF/CZF_ZDGL_List");
+            logger.error("获取字典列表失败，请求参数: " + params);
+            logger.error("获取字典列表失败，请求体: " + body.toJSONString());
+            logger.error("获取字典列表失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        Page<Zd> page = new Page<>(pageNo == null ? 1 : pageNo, pageSize == null ? 10 : pageSize);
+        Integer totalRecord = jsonObject.getInteger("TotalCount");
+        page.setTotalRecord(totalRecord);
+        List<Zd> dataList = jsonObject.getJSONArray("Results").toJavaList(Zd.class);
+        page.setDataList(dataList);
+
+        return page;
+    }
+
+    /**
+     * 获取字典详情
+     *
+     * @param request req
+     * @param id      房号id
+     * @return 银行详情
+     * @throws Exception err
+     */
+    public Zd getZdDetail(HttpServletRequest request, String id) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(null, headers);
+
+        //请求参数
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("id", id);
+
+        String url = baseUrl + "/api/CZF/CZF_ZDGL_Model?id={id}";
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url,
+                        HttpMethod.POST, requestEntity, String.class, params);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("获取房号详情失败，请求url: " + baseUrl + "/api/CZF/CZF_ZDGL_Model");
+            logger.error("获取房号详情失败，请求参数: " + params);
+            logger.error("获取房号详情失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        return jsonObject.getJSONObject("Results").toJavaObject(Zd.class);
+    }
+
+    /**
+     * 更新添加房号
+     *
+     * @param request req
+     * @param body    请求体
+     */
+    public void aeZd(HttpServletRequest request, JSONObject body) {
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(baseUrl + "/api/CZF/CZF_ZDGL_Update",
+                        HttpMethod.POST, requestEntity, String.class);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("更新添加房号失败，请求url: " + baseUrl + "/api/CZF/CZF_ZDGL_Update");
+            logger.error("更新添加房号失败，请求体: " + body.toJSONString());
+            logger.error("更新添加房号失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+    }
+
     /*****************************************区域api*****************************************/
 
     /**
@@ -1143,7 +1263,7 @@ public class Api {
      * @return 项目(小区)列表
      * @throws Exception err
      */
-    public Page<Xm> getXmList(HttpServletRequest request, String xmmc, Integer pageNo, Integer pageSize) throws Exception {
+    public Page<Xm> getXmList(HttpServletRequest request, String fk_wyid, String xmmc, Integer pageNo, Integer pageSize) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
@@ -1152,6 +1272,9 @@ public class Api {
         body.put("fk_xtglid", user.getFk_xtglid());
         if (StringUtils.isNotBlank(xmmc)) {
             body.put("xmmc", xmmc.trim());
+        }
+        if (StringUtils.isNotBlank(fk_wyid)) {
+            body.put("fk_wyid", fk_wyid.trim());
         }
 
         //组装请求体
@@ -1195,13 +1318,16 @@ public class Api {
      * @return 项目(小区)列表
      * @throws Exception err
      */
-    public List<Xm> getXmAllList(HttpServletRequest request) throws Exception {
+    public List<Xm> getXmAllList(HttpServletRequest request, String fk_wyid) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
+        if (StringUtils.isNotBlank(fk_wyid)) {
+            body.put("fk_wyid", fk_wyid.trim());
+        }
 
         //组装请求体
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
@@ -1319,21 +1445,20 @@ public class Api {
      * 获取楼栋列表(分页)
      *
      * @param request  req
-     * @param cmc     楼栋名称
      * @param pageNo   第几页
      * @param pageSize 每页显示的条数
      * @return 楼栋列表
      * @throws Exception err
      */
-    public Page<Ld> getLdList(HttpServletRequest request, String cmc, Integer pageNo, Integer pageSize) throws Exception {
+    public Page<Ld> getLdList(HttpServletRequest request, String fk_xmxxid, Integer pageNo, Integer pageSize) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if (StringUtils.isNotBlank(cmc)) {
-            body.put("cmc", cmc.trim());
+        if (StringUtils.isNotBlank(fk_xmxxid)) {
+            body.put("fk_xmxxid", fk_xmxxid.trim());
         }
 
         //组装请求体
@@ -1377,13 +1502,16 @@ public class Api {
      * @return 楼栋列表
      * @throws Exception err
      */
-    public List<Ld> getLdAllList(HttpServletRequest request) throws Exception {
+    public List<Ld> getLdAllList(HttpServletRequest request, String fk_xmxxid) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
+        if (StringUtils.isNotBlank(fk_xmxxid)) {
+            body.put("fk_xmxxid", fk_xmxxid.trim());
+        }
 
         //组装请求体
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
@@ -1501,21 +1629,21 @@ public class Api {
      * 获取房号列表(分页)
      *
      * @param request  req
-     * @param cmc     房号名称
+     * @param reqBody  请求体
      * @param pageNo   第几页
      * @param pageSize 每页显示的条数
      * @return 银行列表
      * @throws Exception err
      */
-    public Page<Fh> getFhList(HttpServletRequest request, String cmc, Integer pageNo, Integer pageSize) throws Exception {
+    public Page<Fh> getFhList(HttpServletRequest request, Map<String, Object> reqBody, Integer pageNo, Integer pageSize) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if (StringUtils.isNotBlank(cmc)) {
-            body.put("cmc", cmc.trim());
+        if (reqBody != null && reqBody.size() > 0) {
+            body.putAll(reqBody);
         }
 
         //组装请求体
@@ -1556,16 +1684,20 @@ public class Api {
      * 获取房号列表(全部)
      *
      * @param request req
+     * @param reqBody 请求体
      * @return 房号列表
      * @throws Exception err
      */
-    public List<Fh> getFhAllList(HttpServletRequest request) throws Exception {
+    public List<Fh> getFhAllList(HttpServletRequest request, Map<String, Object> reqBody) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
+        if(reqBody != null && reqBody.size() > 0) {
+            body.putAll(reqBody);
+        }
 
         //组装请求体
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);

@@ -25,7 +25,7 @@ public class ReflectUtils {
 
     private static final String CGLIB_CLASS_SEPARATOR = "$$";
 
-    private static Logger logger = LoggerFactory.getLogger(ReflectUtils.class);
+    private static final Logger logger = LoggerFactory.getLogger(ReflectUtils.class);
 
     /**
      * 调用Getter方法.
@@ -158,7 +158,7 @@ public class ReflectUtils {
                         }
                     } else if (cs[i] == boolean.class || cs[i] == Boolean.class) {
                         args[i] = Convert.toBool(args[i]);
-                    } else if(cs[i] == List.class) {
+                    } else if (cs[i] == List.class) {
                         args[i] = Convert.toList(args[i]);
                     }
                 }
@@ -307,7 +307,6 @@ public class ReflectUtils {
             }
         }
         return clazz;
-
     }
 
     /**

@@ -173,4 +173,41 @@ public class Fh {
      */
     @Excel(name = "合同备案号", cellType = Excel.ColumnType.STRING, prompt = "合同备案号")
     private String htbah;
+
+    /**
+     * 户型
+     */
+    @Excel(name = "户型", cellType = Excel.ColumnType.STRING, prompt = "户型")
+    private String hx;
+
+    /**
+     * 类型
+     */
+    @Excel(name = "房屋类型", cellType = Excel.ColumnType.STRING, prompt = "房屋类型")
+    private String lx;
+
+    /**
+     * 用途
+     */
+    @Excel(name = "房屋用途", cellType = Excel.ColumnType.STRING, prompt = "房屋用途")
+    private String yt;
+
+    /**
+     * 朝向
+     */
+    @Excel(name = "房屋朝向", cellType = Excel.ColumnType.STRING, prompt = "房屋朝向")
+    private String cx;
+
+    /**
+     * 房屋间数
+     */
+    @Excel(name = "房屋间数", cellType = Excel.ColumnType.STRING, prompt = "房屋间数")
+    private String fwjs;
+
+    /**
+     * 装修水平
+     */
+    @Excel(name = "装修水平", cellType = Excel.ColumnType.STRING, prompt = "装修水平")
+    private String zxsp;
+
 }

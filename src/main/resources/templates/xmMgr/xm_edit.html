@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
+  <title>物业维修基金管理系统-添加小区</title>
+  <style>
+    .jb_2 {
+      padding-left: 30px !important;
+    }
+
+    .jb_3 {
+      padding-left: 40px !important;
+    }
+
+    .jb_4 {
+      padding-left: 50px !important;
+    }
+
+    .jb_5 {
+      padding-left: 60px !important;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-tab-item layui-show layui-bg-gray" style="padding: 10px;">
+  <div id="LAY_preview">
+    <form class="layui-form" method="post" id="xm_editForm" lay-filter="xm_editForm" >
+      <div class="layui-form">
+        <table class="layui-table">
+          <tbody>
+          <tr>
+            <th style="white-space: nowrap">小区名称</th>
+            <td>
+              <input type="text" name="xmmc" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">小区地址</th>
+            <td>
+              <input type="text" name="xmdz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">小区类型</th>
+            <td>
+              <input type="text" name="xmlx" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th>所在区域</th>
+            <td>
+              <input type="text" lay-verify="area" id="areas" name="fk_qybm" value="" style="display: none;" />
+            </td>
+            <th style="white-space: nowrap">小区性质</th>
+            <td>
+              <input type="text" name="xmxz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">销售地址</th>
+            <td>
+              <input type="text" name="xsdz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap">计划总投资(万元)</th>
+            <td>
+              <input type="number" min="0" name="jhztz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">建设工程规划许可证</th>
+            <td>
+              <input type="text" name="jzgcghxkz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">建设用地规划许可证</th>
+            <td>
+              <input type="text" name="jsydghxkz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap">施工许可证</th>
+            <td>
+              <input type="text" name="sgxkz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">开工证明</th>
+            <td>
+              <input type="text" name="kgzm" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">商品房预售许可证</th>
+            <td>
+              <input type="text" name="spfysxkz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap">建筑面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" min="0" name="jzmj" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">土地面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" min="0" name="tdmj" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">土地使用权证</th>
+            <td>
+              <input type="text" name="tdsyqz" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap">土地编号</th>
+            <td>
+              <input type="text" name="tdbh" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">土地规划用途</th>
+            <td>
+              <input type="text" name="tdghyt" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">土地使用年限</th>
+            <td>
+              <input type="text" name="tdsynx" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <input type="hidden" name="fk_xtglid"/>
+        <input type="hidden" name="fk_wyid"/>
+        <input type="hidden" name="id"/>
+      </div>
+      <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+    </form>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/xmMgr/xmMgr.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
+
+<script th:inline="javascript">
+  const xtglid = [[${user.fk_xtglid}]];
+  const id = [[${id}]];
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    //let table = layui.table;
+    let cascader = layui.cascader;
+
+    getXmDetail();
+
+    //区域选择
+    cascader.render({
+      elem: $('#areas')[0],
+      multiple: false,
+      showAllLevels: true,
+      props: {
+        label: 'label',
+        value: 'value',
+        children: 'children'
+      },
+      options: AREAS,
+      defaultValue: $("#areas").val()
+    });
+
+    function getXmDetail(){
+      let index = top.layer.load();
+      $.ajax({
+        url: ctx + "/CZF/XMGL/getDetail/" + id,
+        type: "POST",
+        async: false,
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          let data1 = data.data;
+          let r = {};
+          for(let key in data1){
+            console.log(key);
+            let val = data1[key];
+            if(val){
+              r[key] = val;
+            }
+          }
+          //渲染数据
+          form.val("xm_editForm", r);
+
+          top.layer.close(index);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(index);
+          top.layer.msg(XMLHttpRequest.responseJSON.msg?XMLHttpRequest.responseJSON.msg:"操作失败!");
+          window.close();
+        }
+      });
+    }
+
+    form.on('submit(submitBut)', function (data1) {
+      let xm = {};
+      for(let key in data1.field){
+        console.log(key);
+        let val = data1.field[key];
+        if(val){
+          xm[key] = val;
+        }
+      }
+
+      let index = top.layer.getFrameIndex(window.name); //获取窗口索引
+
+      aeXm(xm, index);
+
+      return false;
+    });
+  });
+</script>
+</body>
+</html>

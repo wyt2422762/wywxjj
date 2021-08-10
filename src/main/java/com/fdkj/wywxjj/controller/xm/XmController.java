@@ -26,7 +26,7 @@ import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 
 /**
- * 主页面
+ * 项目(小区)
  *
  * @author wyt
  */
@@ -55,6 +55,57 @@ public class XmController {
     }
 
     /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toAdd")
+    public ModelAndView toAdd(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
+        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        return new ModelAndView("xmMgr/xm_add");
+    }
+
+    /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toEdit/{id}")
+    public ModelAndView toEdit(HttpServletRequest request,
+                               @RequestParam(value = "opts", required = false) List<String> opts,
+                               @PathVariable("id") String id) throws Exception {
+        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        request.setAttribute("id", id);
+        return new ModelAndView("xmMgr/xm_edit");
+    }
+
+    /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toInfo/{id}")
+    public ModelAndView toInfo(HttpServletRequest request,
+                               @RequestParam(value = "opts", required = false) List<String> opts,
+                               @PathVariable("id") String id) throws Exception {
+        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        request.setAttribute("fk_xmxxid", id);
+        return new ModelAndView("xmMgr/xm_info");
+    }
+
+    /**
      * 获取项目(小区)列表(分页)
      *
      * @param request req
@@ -67,9 +118,10 @@ public class XmController {
     @ResponseBody
     public ResponseEntity<CusResponseBody> getXmList(HttpServletRequest request,
                                                      @RequestParam(value = "xmmc", required = false) String xmmc,
+                                                     @RequestParam(value = "fk_wyid", required = false) String fk_wyid,
                                                      @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
-            Page<Xm> xmPage = api.getXmList(request, xmmc, page, limit);
+            Page<Xm> xmPage = api.getXmList(request, fk_wyid, xmmc, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取小区列表成功", xmPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -87,9 +139,10 @@ public class XmController {
      */
     @RequestMapping("getListAll")
     @ResponseBody
-    public ResponseEntity<CusResponseBody> getXmList(HttpServletRequest request) {
+    public ResponseEntity<CusResponseBody> getXmList(HttpServletRequest request,
+                                                     @RequestParam(value = "fk_wyid", required = false) String fk_wyid) {
         try {
-            List<Xm> xmList = api.getXmAllList(request);
+            List<Xm> xmList = api.getXmAllList(request, fk_wyid);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取小区列表成功", xmList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -99,7 +152,7 @@ public class XmController {
         }
     }
 
-    @RequestMapping("getListAll/{id}")
+    @RequestMapping("getDetail/{id}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request, @PathVariable String id) {
         try {

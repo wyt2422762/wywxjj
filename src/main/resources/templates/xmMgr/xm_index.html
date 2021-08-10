@@ -10,14 +10,55 @@
       小区管理
     </blockquote>
 
-    <button onclick="downloadTemplate()">下载模板</button>
+    <fieldset class="layui-elem-field layui-field-title">
+      <legend>小区列表</legend>
+    </fieldset>
 
-    <br>
+    <div style="padding: 10px;">
+      <div style="padding-bottom: 10px;">
+        <div class="layui-inline" style="float:right;">
+          <button th:if="${#lists.contains(opts, 'add')}" id="addXm" class="layui-btn layui-btn-normal"
+                  style="margin-left:15px;">添加小区
+          </button>
+          <button th:if="${#lists.contains(opts, 'import')}" id="importXm" class="layui-btn" style="margin-left:15px;">
+            导入小区
+          </button>
+        </div>
+        <form class="layui-form" id="searchForm">
+          <div class="layui-inline" style="float:left;display:flex;">
+            <input type="text" id="yhmc" name="xmmc" placeholder="请输入小区名称搜索" value=""
+                   autocomplete="off" class="layui-input" style=""/>
+            <button class="layui-btn layui-btn-danger btn_search" lay-submit lay-filter="formDemo1"
+                    style="margin-left:15px;">
+              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+          </div>
+        </form>
+        <div class="clearfix"></div>
+      </div>
 
-    <button type="button" class="layui-btn" id="test1">
-      <i class="layui-icon">&#xe67c;</i>上传文件
-    </button>
+      <table id="xmTable" class="layui-table" lay-filter="xmTable"></table>
 
+      <script type="text/html" id="xmTableToolBar">
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-danger layui-btn-xs"
+           lay-event="del">删除</a>
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-warm" lay-event="info">小区详情</a>
+      </script>
+    </div>
+  </div>
+
+</div>
+
+<div id="dragUpload" style="display: none; padding: 20px;">
+  <div class="layui-upload-drag upload" style="margin: 0 0 15px 25px;">
+    <i class="layui-icon"></i>
+    <p>点击上传，或将文件拖拽到此处</p>
+  </div>
+  <div>
+    <div>提示：仅允许导入“xls”或“xlsx”格式文件！
+      <a href="javascript:void(0);" style="color: #999;" class="downloadTemplate">下载模板</a>
+    </div>
   </div>
 </div>
 
@@ -25,6 +66,8 @@
 
 <script th:inline="javascript">
   const xtglid = [[${user.fk_xtglid}]];
+  const fy_wyid = [[${user.fk_id}]];
+  const opts = [[${opts}]];
   layui.use(['element', 'laydate', 'table', 'form', 'upload'], function () {
     //let element = layui.element;
     //let laydate = layui.laydate;
@@ -32,37 +75,184 @@
     let table = layui.table;
     let upload = layui.upload;
 
+    getXmTableData();
+
+    function getXmTableData(xmmc) {
+      let url = ctx + 'CZF/XMGL/getList';
+      let params = {};
+      if (xmmc) {
+        params['xmmc'] = xmmc
+      }
+      if (fy_wyid) {
+        params['fk_wyid'] = fy_wyid;
+      }
+
+      //获取表格数据
+      table.render({
+        elem: '#xmTable',
+        title: '小区列表',
+        url: url, //数据接口
+        where: params, //请求参数
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {field: 'xmmc', title: '小区名称'},
+          {field: 'xmlx', title: '小区类型'},
+          {field: 'xmdz', title: '小区地址'},
+          {field: 'xmxz', title: '小区性质'},
+          {toolbar: '#xmTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
     //文件上传
-    var uploadInst = upload.render({
-      elem: '#test1',//绑定元素
+    upload.render({
+      elem: '#dragUpload .upload',//绑定元素
       url: ctx + 'CZF/XMGL/importData',//上传接口
       accept: "file",
       exts: "xls|xlsx", //文件类型
       done: function (res) {
         //上传完毕回调
-        top.layer.msg("上传成功");
+        top.layer.msg("导入成功");
+        window.location.reload();
       }, error: function () {
         //请求异常回调
-        top.layer.msg("上传失败");
+        top.layer.msg("导入失败");
       }
+    });
+
+    //导入按钮事件
+    $("#importXm").on('click', function () {
+      let index = layer.open({
+        type: 1,
+        area: ["360px", "260px"],
+        title: "导入小区",
+        shade: 0.1,
+        content: $("#dragUpload")
+      })
+    });
+
+    //下载模板事件
+    $("a.downloadTemplate").on('click', function () {
+      $.ajax({
+        url: ctx + "/CZF/XMGL/getImportTemplate",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          CommonDownloadUpload.download(data.fileName, false);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+        }
+      });
+    });
+
+    //搜索按钮事件
+    form.on('submit(formDemo1)', function (data) {
+      let xmmc = data.field.xmmc;
+      getXmTableData(xmmc);
+      return false;
+    });
+
+    //工具条事件
+    table.on('tool(xmTable)', function (obj) {
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'edit') { //编辑
+        let index = top.layer.open({
+          type: 2,
+          title: '编辑小区',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/XMGL/toEdit/" + data.id,
+          btn: ['保存', '取消'],
+          yes: function (index, layero) {
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#xm_editForm");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          end: function () {
+            top.layer.close(index);
+            window.location.reload();
+          }
+        });
+      } else if (layEvent === 'del') {
+        top.layer.confirm('确定要删除该小区？', {
+          btn: ['确定', '取消'] //按钮
+        }, function () {
+          $.ajax({
+            url: ctx + "/CZF/XMGL/delXm/" + data.id,
+            type: "POST",
+            success: function (data) {
+              top.layer.msg(data.msg);
+              window.location.reload();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+              top.layer.msg(XMLHttpRequest.responseJSON.msg?XMLHttpRequest.responseJSON.msg:"操作失败!");
+            }
+          });
+        }, function () {
+        });
+      } else if (layEvent === 'info') {
+        let url = ctx + "/CZF/XMGL/toInfo/" + data.id;
+        if(opts && opts.length > 0){
+          url = url + "?opts=" + opts.join(',');
+        }
+
+        let index = top.layer.open({
+          type: 2,
+          title: '小区详情(' + data.xmmc + ')',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1200px', '90%'],
+          content: url
+        });
+      }
+    });
+
+    //添加按钮事件
+    $("#addXm").on('click', function () {
+      let index = top.layer.open({
+        type: 2,
+        title: '添加小区',
+        closeBtn: 1,
+        shadeClose: false,
+        area: ['1000px', '80%'],
+        content: ctx + "CZF/XMGL/toAdd",
+        btn: ['保存', '取消'],
+        yes: function (index, layero) {
+          let body = top.layer.getChildFrame('body', index);
+          let frm = $(body).find("form#xm_addForm");
+          $(frm).find("button.sb").click();
+          return false;
+        },
+        cancel: function (index, layero) {
+        },
+        end: function () {
+          top.layer.close(index);
+          window.location.reload();
+        }
+      });
     });
 
   });
-
-  function downloadTemplate() {
-    $.ajax({
-      url: ctx + "/CZF/XMGL/getImportTemplate",
-      type: "POST",
-      dataType: "json",
-      contentType: "application/json;charset=utf-8",
-      success: function (data) {
-        CommonDownloadUpload.download(data.fileName, false);
-      },
-      error: function (XMLHttpRequest, textStatus, errorThrown) {
-        top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
-      }
-    });
-  }
 </script>
 </body>
 </html>

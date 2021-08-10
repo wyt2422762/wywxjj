@@ -1,0 +1,621 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
+  <title>物业维修基金管理系统-小区详情</title>
+  <style>
+    .jb_2 {
+      padding-left: 30px !important;
+    }
+
+    .jb_3 {
+      padding-left: 40px !important;
+    }
+
+    .jb_4 {
+      padding-left: 50px !important;
+    }
+
+    .jb_5 {
+      padding-left: 60px !important;
+    }
+
+    .red .layui-tree-txt{
+      color: red !important;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-tab-item layui-show " style="padding: 10px;">
+  <div id="LAY_preview">
+    <div class="layui-row layui-col-space10">
+
+      <div class="layui-col-md3">
+        <div class="layui-card">
+          <div class="layui-card-header" style="border-left: 3px solid #5FB878;">
+            楼栋列表
+          </div>
+          <div class="layui-card-body">
+            <div id="ldTree"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layui-col-md9">
+        <div class="addBtnDiv">
+          <button th:if="${#lists.contains(opts, 'add')}" id="addLd" class="layui-btn layui-btn-normal"
+                  style="margin-left:15px;">添加楼栋
+          </button>
+          <button th:if="${#lists.contains(opts, 'import')}" id="importLd" class="layui-btn layui-btn-normal"
+                  style="margin-left:15px;">导入楼栋
+          </button>
+
+          <button th:if="${#lists.contains(opts, 'add')}" id="addFh" class="layui-btn layui-btn-normal optFh"
+                  style="margin-left:15px;display: none;">添加房间
+          </button>
+          <button th:if="${#lists.contains(opts, 'import')}" id="importFh" class="layui-btn layui-btn-normal optFh"
+                  style="margin-left:15px;display: none;">导入房间
+          </button>
+        </div>
+
+        <div>
+          <!-- 添加楼栋div -->
+          <div class="addLdDiv" style="display: none;">
+            <form class="layui-form" method="post" id="ld_addForm" lay-filter="ld_addForm">
+              <div class="layui-form">
+                <table class="layui-table">
+                  <tbody>
+                  <tr>
+                    <th style="white-space: nowrap">幢号</th>
+                    <td>
+                      <input type="text" name="ch" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">幢名称</th>
+                    <td>
+                      <input type="text" name="cmc" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">总层数</th>
+                    <td>
+                      <input type="number" name="zcs" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">单元数</th>
+                    <td>
+                      <input type="number" name="dys" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">地上层数</th>
+                    <td>
+                      <input type="number" name="dscs" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">地下层数</th>
+                    <td>
+                      <input type="number" name="dxcs" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">建筑面积(m<sup>2</sup>)</th>
+                    <td>
+                      <input type="number" name="zjzmj" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">非建筑面积(m<sup>2</sup>)</th>
+                    <td>
+                      <input type="number" name="fzzmj" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">住宅面积(m<sup>2</sup>)</th>
+                    <td>
+                      <input type="number" name="zzjzmj" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">套内面积(m<sup>2</sup>)</th>
+                    <td>
+                      <input type="number" name="zztnmj" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+                <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+                <input type="hidden" name="fk_xmxxid" th:value="${fk_xmxxid}"/>
+                <button lay-submit lay-filter="submitBut_ld" class="layui-btn layui-btn-normal">保存</button>
+                <button lay-filter="cancel" class="cancel layui-btn layui-btn-primary layui-border">取消</button>
+              </div>
+            </form>
+          </div>
+
+          <!-- 楼栋详情div -->
+          <div class="editLdDiv" style="display: none;">
+
+            <div class="layui-tab layui-tab-card">
+              <ul class="layui-tab-title">
+                <li class="layui-this">基本信息</li>
+                <li>房间信息</li>
+              </ul>
+              <div class="layui-tab-content">
+                <div class="layui-tab-item layui-show">
+                  <form class="layui-form" method="post" id="ld_editForm" lay-filter="ld_editForm">
+                    <div class="layui-form">
+                      <table class="layui-table">
+                        <tbody>
+                        <tr>
+                          <th style="white-space: nowrap">幢号</th>
+                          <td>
+                            <input type="text" name="ch" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                          <th style="white-space: nowrap">幢名称</th>
+                          <td>
+                            <input type="text" name="cmc" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th style="white-space: nowrap">总层数</th>
+                          <td>
+                            <input type="number" name="zcs" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                          <th style="white-space: nowrap">单元数</th>
+                          <td>
+                            <input type="number" name="dys" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th style="white-space: nowrap">地上层数</th>
+                          <td>
+                            <input type="number" name="dscs" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                          <th style="white-space: nowrap">地下层数</th>
+                          <td>
+                            <input type="number" name="dxcs" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th style="white-space: nowrap">建筑面积(m<sup>2</sup>)</th>
+                          <td>
+                            <input type="number" name="zjzmj" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                          <th style="white-space: nowrap">非建筑面积(m<sup>2</sup>)</th>
+                          <td>
+                            <input type="number" name="fzzmj" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                        </tr>
+                        <tr>
+                          <th style="white-space: nowrap">住宅面积(m<sup>2</sup>)</th>
+                          <td>
+                            <input type="number" name="zzjzmj" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                          <th style="white-space: nowrap">套内面积(m<sup>2</sup>)</th>
+                          <td>
+                            <input type="number" name="zztnmj" lay-verify="required" placeholder="" class="layui-input"/>
+                          </td>
+                        </tr>
+                        </tbody>
+                      </table>
+                      <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+                      <input type="hidden" name="fk_xmxxid" th:value="${fk_xmxxid}"/>
+                      <input type="hidden" name="id" />
+                      <button lay-submit lay-filter="submitBut_ld_edit" class="layui-btn layui-btn-normal">保存</button>
+                    </div>
+                  </form>
+                </div>
+                <div class="layui-tab-item">
+                  <table id="fhTable" class="layui-table" lay-filter="fhTable"></table>
+                  <script type="text/html" id="fhTableToolBar">
+                    <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+                    <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-danger layui-btn-xs"
+                       lay-event="del">删除</a>
+                  </script>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- 添加房号div -->
+          <div class="addFhDiv" style="display: none;">
+            <form class="layui-form" method="post" id="fh_addForm" lay-filter="fh_addForm">
+              <div class="layui-form">
+                <table class="layui-table">
+                  <tbody>
+                  <tr>
+                    <th style="white-space: nowrap">房号</th>
+                    <td>
+                      <input type="text" name="fh" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">房屋类型</th>
+                    <td>
+                      <input type="text" name="lx" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">所在楼层</th>
+                    <td>
+                      <input type="number" name="szlc" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">所在单元</th>
+                    <td>
+                      <input type="number" name="szdy" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">户型</th>
+                    <td>
+                      <input type="text" name="hx" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">房屋间数</th>
+                    <td>
+                      <input type="number" name="fwjs" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">建筑面积(m<sup>2</sup>)</th>
+                    <td>
+                      <input type="number" name="scmj_jzmj" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">套内面积(m<sup>2</sup>)</th>
+                    <td>
+                      <input type="number" name="scmj_tnmj" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">公摊面积(m<sup>2</sup>)</th>
+                    <td>
+                      <input type="number" name="scmj_gtmj" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">房屋用途</th>
+                    <td>
+                      <input type="text" name="yt" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">房屋朝向</th>
+                    <td>
+                      <input type="text" name="cx" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">装修水平</th>
+                    <td>
+                      <input type="text" name="zxsp" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">房屋状态</th>
+                    <td>
+                      <input type="text" name="fjzt" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">业主名称</th>
+                    <td>
+                      <input type="text" name="yzmc" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">业主证件号</th>
+                    <td>
+                      <input type="text" name="yzzjh" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">业主联系电话</th>
+                    <td>
+                      <input type="text" name="yzlxdh" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap">业主地址</th>
+                    <td>
+                      <input type="text" name="yzdz" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap">合同备案号</th>
+                    <td>
+                      <input type="text" name="htbah" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  </tbody>
+                </table>
+                <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+                <input type="hidden" name="fk_xmxxid" th:value="${fk_xmxxid}"/>
+                <input type="hidden" name="fk_ldxxid" />
+                <input type="hidden" name="id" />
+                <button lay-submit lay-filter="submitBut_fh" class="layui-btn layui-btn-normal">保存</button>
+                <button lay-filter="cancel" class="cancel layui-btn layui-btn-primary layui-border">取消</button>
+              </div>
+            </form>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div id="dragUpload_ld" style="display: none; padding: 20px;">
+  <div class="layui-upload-drag upload" style="margin: 0 0 15px 25px;">
+    <i class="layui-icon"></i>
+    <p>点击上传，或将文件拖拽到此处</p>
+  </div>
+  <div>
+    <div>提示：仅允许导入“xls”或“xlsx”格式文件！
+      <a href="javascript:void(0);" style="color: #999;" class="downloadTemplate_ld">下载模板</a>
+    </div>
+  </div>
+</div>
+
+<div id="dragUpload_fh" style="display: none; padding: 20px;">
+  <div class="layui-upload-drag upload" style="margin: 0 0 15px 25px;">
+    <i class="layui-icon"></i>
+    <p>点击上传，或将文件拖拽到此处</p>
+  </div>
+  <div>
+    <div>提示：仅允许导入“xls”或“xlsx”格式文件！
+      <a href="javascript:void(0);" style="color: #999;" class="downloadTemplate_fh">下载模板</a>
+    </div>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/xmMgr/ldMgr.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/xmMgr/fhMgr.js}"></script>
+
+<script th:inline="javascript">
+  const xtglid = [[${user.fk_xtglid}]];
+  const fk_xmxxid = [[${fk_xmxxid}]];
+  var fk_ldxxid = null;
+  var uploadUrl = null;
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).use(['element', 'laydate', 'table', 'form', 'tree', 'upload'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let tree = layui.tree;
+    let upload = layui.upload;
+
+    getInitData();
+
+    //获取楼栋信息
+    function getInitData() {
+      let url = ctx + 'CZF/LDGL/getListAll/' + fk_xmxxid;
+
+      $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        async: false,
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          let ldList = data.data;
+          if (ldList && ldList.length > 0) {
+            let treeDatas = [];
+            for (let i in ldList) {
+              let ld = ldList[i];
+              let treeData = {};
+              treeData.id = ld.id;
+              treeData.title = ld.cmc;
+              treeData.orgData = ld;
+              treeDatas.push(treeData);
+            }
+
+            tree.render({
+              elem: '#ldTree',  //绑定元素
+              data: treeDatas,
+              click: function(obj){
+                $(obj.elem[0]).addClass("red").siblings().removeClass("red");
+                fk_ldxxid = obj.data.id;
+                $("button.optFh").show();
+                $("#ld_addForm")[0].reset();
+                $("#ld_editForm")[0].reset();
+                //渲染数据
+                form.val("ld_editForm", obj.data.orgData);
+                //获取表格数据
+                table.render({
+                  elem: '#fhTable',
+                  title: '房间列表',
+                  url: ctx + "/CZF/FHGL/getList/" + fk_xmxxid + "/" + obj.data.id, //数据接口
+                  page: {
+                    layout: ['prev', 'page', 'next', 'skip', 'count']
+                  },
+                  // page: true,
+                  limit: 10,
+                  //limits: [10, 20, 50],
+                  cols: [[ //表头
+                    {field: 'fh', title: '房号'},
+                    {field: 'szgnq', title: '类型'},
+                    {field: 'szlc', title: '楼层'},
+                    {field: 'szdy', title: '单元'},
+                    {field: 'scmj_jzmj', title: '建筑面积'},
+                    {field: 'scmj_tnmj', title: '套内面积'},
+                    {field: 'scmj_tnmj', title: '公摊面积'},
+                    {field: 'fjzt', title: '状态'},
+                    {toolbar: '#fhTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+                  ]],
+                  parseData: function (res) { //res 即为原始返回的数据
+                    return {
+                      "code": res.success ? 0 : 1, //解析接口状态
+                      "msg": res.msg, //解析提示文本
+                      "count": res.data.totalRecord, //解析数据长度
+                      "data": res.data.dataList //解析数据列表
+                    };
+                  }
+                });
+
+                $("div.editLdDiv").show().siblings().hide();
+              }
+            });
+          }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+        }
+      });
+
+    }
+
+    //工具条事件（房号列表）
+    table.on('tool(fhTable)', function (obj) {
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'edit') { //编辑
+        //清空楼栋表单
+        $("#fh_addForm")[0].reset();
+        layui.form.render();
+
+        //渲染数据
+        form.val("fh_addForm", data);
+
+        $("div.addFhDiv").show().siblings().hide();
+      }
+    });
+
+    //添加楼栋按钮点击
+    $("#addLd").on("click", function () {
+      //清空楼栋表单
+      $("#ld_addForm")[0].reset();
+      layui.form.render();
+      $("div.addLdDiv").show().siblings().hide();
+    });
+
+    //添加楼栋取消按钮
+    $("#ld_addForm button.cancel").on("click", function () {
+      $("#ld_addForm")[0].reset();
+      layui.form.render();
+      $("div.addLdDiv").hide();
+    });
+
+    //添加楼栋保存按钮
+    form.on('submit(submitBut_ld)', function (data) {
+      let ld = {};
+      for (let key in data.field) {
+        let val = data.field[key];
+        if (val) {
+          ld[key] = val;
+        }
+      }
+      //添加、编辑楼栋
+      aeLd(ld);
+    });
+
+    //编辑楼栋保存按钮
+    form.on('submit(submitBut_ld_edit)', function (data) {
+      let ld = {};
+      for (let key in data.field) {
+        let val = data.field[key];
+        if (val) {
+          ld[key] = val;
+        }
+      }
+      //添加、编辑楼栋
+      aeLd(ld);
+    });
+
+    //下载模板事件(楼栋)
+    $("a.downloadTemplate_ld").on('click', function () {
+      $.ajax({
+        url: ctx + "/CZF/LDGL/getImportTemplate",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          CommonDownloadUpload.download(data.fileName, false);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+        }
+      });
+    });
+
+    //导入按钮事件(楼栋)
+    $("#importLd").on('click', function () {
+      renderUpload(ctx + 'CZF/LDGL/importData');
+      layer.open({
+        type: 1,
+        area: ["360px", "260px"],
+        title: "导入楼栋",
+        shade: 0.1,
+        content: $("#dragUpload_ld")
+      })
+    });
+
+    //添加房号按钮点击
+    $("#addFh").on("click", function () {
+      //清空楼栋表单
+      $("#fh_addForm")[0].reset();
+      layui.form.render();
+
+      //渲染数据
+      form.val("fh_addForm", {
+        "fk_ldxxid": fk_ldxxid
+      });
+
+      $("div.addFhDiv").show().siblings().hide();
+    });
+
+    //添加房间保存按钮
+    form.on('submit(submitBut_fh)', function (data) {
+      let fh = {};
+      for (let key in data.field) {
+        let val = data.field[key];
+        if (val) {
+          fh[key] = val;
+        }
+      }
+      //添加、编辑楼栋
+      aeFh(fh);
+    });
+
+    //下载模板事件(房间)
+    $("a.downloadTemplate_fh").on('click', function () {
+      $.ajax({
+        url: ctx + "/CZF/FHGL/getImportTemplate",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          CommonDownloadUpload.download(data.fileName, false);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+        }
+      });
+    });
+
+    //导入按钮事件(房间)
+    $("#importFh").on('click', function () {
+      renderUpload(ctx + 'CZF/FHGL/importData');
+      layer.open({
+        type: 1,
+        area: ["360px", "260px"],
+        title: "导入房间",
+        shade: 0.1,
+        content: $("#dragUpload_fh")
+      })
+    });
+
+    //文件上传
+    function renderUpload(url){
+      uploadUrl = url;
+      upload.render({
+        elem: '.upload',//绑定元素
+        url: uploadUrl,//上传接口
+        accept: "file",
+        data: {
+          "fk_xmxxid": fk_xmxxid,
+          "fk_ldxxid": fk_ldxxid
+        },
+        exts: "xls|xlsx", //文件类型
+        done: function (res) {
+          //上传完毕回调
+          top.layer.msg("导入成功");
+          window.location.reload();
+        }, error: function () {
+          //请求异常回调
+          top.layer.msg("导入失败");
+        }
+      });
+    }
+
+  });
+</script>
+</body>
+</html>
