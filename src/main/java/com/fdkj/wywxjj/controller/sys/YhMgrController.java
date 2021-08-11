@@ -73,7 +73,27 @@ public class YhMgrController {
         }
     }
 
-
+    /**
+     * 获取银行详情
+     *
+     * @param request req
+     * @param id      银行id
+     * @return res
+     */
+    @RequestMapping("getDetail/{id}")
+    @ResponseBody
+    public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request,
+                                                     @PathVariable("id") String id) {
+        try {
+            Yh yh = api.getYhDetail(request, id);
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取银行详情成功", yh);
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("获取银行详情失败", e);
+            throw new BusinessException("获取银行详情失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
 
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {

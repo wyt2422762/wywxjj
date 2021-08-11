@@ -73,6 +73,28 @@ public class WyGsMgrController {
         }
     }
 
+    /**
+     * 获取物业详情
+     *
+     * @param request req
+     * @param id      物业公司id
+     * @return res
+     */
+    @RequestMapping("getDetail/{id}")
+    @ResponseBody
+    public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request,
+                                                     @PathVariable("id") String id) {
+        try {
+            WyGs wyGs = api.getWyGsDetail(request, id);
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取物业公司详情成功", wyGs);
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("获取物业公司详情失败", e);
+            throw new BusinessException("获取物业公司详情失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
+
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
         //1. 当前登陆用户

@@ -50,10 +50,10 @@ public class ZdController {
     }
 
     /**
-     * 获取银行列表
+     * 获取字典列表
      *
      * @param request req
-     * @param zdm    字典名称
+     * @param zdm     字典名称
      * @param page    第几页
      * @param limit   每页显示多少条
      * @return res
@@ -61,8 +61,8 @@ public class ZdController {
     @RequestMapping("getList")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
-                                                       @RequestParam(value = "zdm", required = false) String zdm,
-                                                       @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
+                                                   @RequestParam(value = "zdm", required = false) String zdm,
+                                                   @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             Page<Zd> yhPage = api.getZdList(request, zdm, page, limit);
             //构造返回数据
@@ -73,6 +73,29 @@ public class ZdController {
             throw new BusinessException("获取字典列表失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
         }
     }
+
+    /**
+     * 获取字典详情
+     *
+     * @param request req
+     * @param id      字典id
+     * @return res
+     */
+    @RequestMapping("getDetail/{id}")
+    @ResponseBody
+    public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request,
+                                                     @PathVariable("id") String id) {
+        try {
+            Zd zd = api.getZdDetail(request, id);
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取字典详情成功", zd);
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("获取字典详情失败", e);
+            throw new BusinessException("获取字典详情失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
+
 
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
@@ -86,7 +109,7 @@ public class ZdController {
                                @PathVariable("id") String id) throws Exception {
         //1. 当前登陆用户
         request.setAttribute("user", api.getUserFromCookie(request));
-        //2. 对应的银行信息
+        //2. 对应的字典信息
         Zd zd = api.getZdDetail(request, id);
         request.setAttribute("zd", zd);
         return new ModelAndView("sysMgr/zdMgr/zdMgr_edit");
