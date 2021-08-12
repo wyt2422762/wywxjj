@@ -99,10 +99,11 @@
 <div th:replace="/common/footer::footer()"></div>
 
 <script th:inline="javascript">
-  layui.use(['element', 'layer', 'form'], function () {
+  layui.use(['element', 'layer', 'form', 'upload'], function () {
     let element = layui.element;
     let layer = layui.layer;
     let form = layui.form;
+    let upload = layui.upload;
 
     let admin = {
       tabsPage: {},
@@ -111,17 +112,25 @@
         return $("#LAY_app_body").find('.layui-tabsbody-item').eq(index || 0);
       },
       //切换页面标签主体
-      tabsBodyChange: function (index, options) {
-        admin.tabsBody(index).addClass("layui-show").siblings().removeClass("layui-show");
-        admin.rollPage('auto', index);
+      tabsBodyChange: function (id, options) {
+        $("#LAY_app_body").find('.layui-tabsbody-item').removeClass("layui-show");
+        $("#LAY_app_body").find('.layui-tabsbody-item.' + id).addClass("layui-show");
+        //admin.rollPage('auto', index);
       },
       //打开新的标签页
       openTabsPage: function (obj) {
-        let title = $(obj).html();
+        /*let title = $(obj).html();
         let id = $(obj).attr("data-id");
         let url = ctx + $(obj).attr("data-url");
         let data_an = $(obj).attr("data-an");
-        let data_opts = $(obj).attr("data-opts");
+        let data_opts = $(obj).attr("data-opts");*/
+
+        let title = obj.title;
+        let id = obj["data-id"];
+        let url = obj["data-url"];
+        let data_an = obj["data-an"];
+        let data_opts = obj["data-opts"];
+
         let tabs = $('#LAY_app_tabsheader>li');
 
         //声明一个是否点击过的标志 默认是false点击过
@@ -146,7 +155,7 @@
         } else {
           //没找到 没点过
           $("#LAY_app_body").append([
-            '<div class="layui-tabsbody-item layui-show">',
+            '<div class="layui-tabsbody-item layui-show ' + id +'">',
             '<iframe scrolling="no" data-an="' + data_an + '" class="menu-iframe" frameborder="no" border="0" tab-id="' + id + '" style="width: 100%;height: 100%;" src="' + url + '?opts=' + data_opts + '"></iframe>',
             '</div>'].join(''));
           admin.tabsPage.index = tabs.length;
@@ -162,12 +171,13 @@
       //同步路由
       setThisRouter: function (othis) {
         let layid = othis.attr('lay-id'), attr = othis.attr('lay-attr'), index = othis.index();
-        admin.tabsBodyChange(index, {
+        admin.tabsBodyChange(layid, {
           url: attr
         });
       },
       //左右滚动tab标签
       rollPage: function (type, index) {
+        debugger;
         let tabsHeader = $('#LAY_app_tabsheader')
           , liItem = tabsHeader.children('li')
           , scrollWidth = tabsHeader.prop('scrollWidth')
@@ -235,6 +245,7 @@
       },
       //关闭当前标签页
       closeThisTabs: function () {
+        debugger;
         if (!admin.tabsPage.index) return;
         $('#LAY_app_tabsheader>li').eq(admin.tabsPage.index).find('.layui-tab-close').trigger('click');
       },
@@ -266,14 +277,23 @@
       }
     };
 
+    layui.admin = admin;
+
     //头部菜单点击
     $("body").on('click', ".menuItem", function () {
       let othis = $(this), id = othis.attr("data-id");
+
+      let obj = {};
+      obj["data-id"] = id;
+      obj["data-url"] = ctx + othis.attr("data-url");
+      obj["data-opts"] = othis.attr("data-opts");
+      obj["title"] = othis.html();
+
       admin.tabsPage.elem = othis;
-      admin.openTabsPage(othis);
+      admin.openTabsPage(obj);
       //定位当前tabs
       element.tabChange('menuTab', id);
-      admin.tabsBodyChange(admin.tabsPage.index, {});
+      admin.tabsBodyChange(id, {});
     });
 
     //标签页标题点击

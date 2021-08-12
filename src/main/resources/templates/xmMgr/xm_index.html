@@ -4,6 +4,9 @@
   <title>物业维修基金管理系统-小区管理</title>
 </head>
 <body>
+
+<input type="hidden" id="opts" th:value="${optsStr}" />
+
 <div class="layui-tab-item layui-show">
   <div id="LAY_preview">
     <blockquote class="layui-elem-quote layui-text">
@@ -43,7 +46,8 @@
         <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
         <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-danger layui-btn-xs"
            lay-event="del">删除</a>
-        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-warm" lay-event="info">小区详情</a>
+        <!--<a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-warm" lay-event="info">小区详情</a>-->
+        <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="info1">详情</a>
       </script>
     </div>
   </div>
@@ -104,6 +108,7 @@
           {field: 'xmlx', title: '小区类型'},
           {field: 'xmdz', title: '小区地址'},
           {field: 'xmxz', title: '小区性质'},
+          {field: 'xmlx', title: '小区类型'},
           {toolbar: '#xmTableToolBar', align: 'center', fixed: 'right', title: '操作'}
         ]],
         parseData: function (res) { //res 即为原始返回的数据
@@ -123,12 +128,17 @@
       url: ctx + 'CZF/XMGL/importData',//上传接口
       accept: "file",
       exts: "xls|xlsx", //文件类型
+      before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+        top.layer.load(); //上传loading
+      },
       done: function (res) {
         //上传完毕回调
+        top.layer.closeAll('loading'); //关闭loading
         top.layer.msg("导入成功");
         window.location.reload();
       }, error: function () {
         //请求异常回调
+        top.layer.closeAll('loading'); //关闭loading
         top.layer.msg("导入失败");
       }
     });
@@ -224,6 +234,17 @@
           area: ['1200px', '90%'],
           content: url
         });
+      } else if ((layEvent === 'info1')) {
+        let admin = top.layui.admin;
+        let obj = {};
+        obj["data-id"] = "xm-info-" + data.id;
+        obj["data-url"] = ctx + "/CZF/XMGL/toInfo1/" + data.id;
+        obj["data-opts"] = $("#opts").val();
+        obj["title"] = data.xmmc;
+        admin.openTabsPage(obj);
+        //定位当前tabs
+        top.layui.element.tabChange('menuTab', obj["data-id"]);
+        admin.tabsBodyChange(obj["data-id"], {});
       }
     });
 

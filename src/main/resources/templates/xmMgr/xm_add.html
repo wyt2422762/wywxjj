@@ -28,88 +28,114 @@
         <table class="layui-table">
           <tbody>
           <tr>
-            <th style="white-space: nowrap">小区名称</th>
+            <th style="white-space: nowrap;">小区名称</th>
             <td>
               <input type="text" name="xmmc" lay-verify="required" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">小区地址</th>
+            <th style="white-space: nowrap;">小区地址</th>
             <td>
               <input type="text" name="xmdz" lay-verify="required" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">小区类型</th>
+            <th style="white-space: nowrap;">小区类型</th>
             <td>
-              <input type="text" name="xmlx" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="xmlx" lay-verify="" placeholder="" class="layui-input"/>
             </td>
           </tr>
           <tr>
             <th>所在区域</th>
             <td>
-              <input type="text" lay-verify="area" id="areas" name="fk_qybm" value="" style="display: none;" />
+              <input type="text" lay-verify="area" id="areas" name="fk_qybm" value="" style="display: none;"/>
             </td>
-            <th style="white-space: nowrap">小区性质</th>
+            <th style="white-space: nowrap;">小区性质</th>
             <td>
-              <input type="text" name="xmxz" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="xmxz" lay-verify="" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">销售地址</th>
+            <th style="white-space: nowrap;">销售地址</th>
             <td>
-              <input type="text" name="xsdz" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="xsdz" lay-verify="" placeholder="" class="layui-input"/>
             </td>
           </tr>
           <tr>
-            <th style="white-space: nowrap">计划总投资(万元)</th>
+            <th style="white-space: nowrap;">计划总投资(万元)</th>
             <td>
-              <input type="number" min="0" name="jhztz" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="number" min="0" name="jhztz" lay-verify="cnumber" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">建设工程规划许可证</th>
+            <th style="white-space: nowrap;">建设工程规划许可证</th>
             <td>
-              <input type="text" name="jzgcghxkz" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="jzgcghxkz" lay-verify="" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">建设用地规划许可证</th>
+            <th style="white-space: nowrap;">建设用地规划许可证</th>
             <td>
-              <input type="text" name="jsydghxkz" lay-verify="required" placeholder="" class="layui-input"/>
-            </td>
-          </tr>
-          <tr>
-            <th style="white-space: nowrap">施工许可证</th>
-            <td>
-              <input type="text" name="sgxkz" lay-verify="required" placeholder="" class="layui-input"/>
-            </td>
-            <th style="white-space: nowrap">开工证明</th>
-            <td>
-              <input type="text" name="kgzm" lay-verify="required" placeholder="" class="layui-input"/>
-            </td>
-            <th style="white-space: nowrap">商品房预售许可证</th>
-            <td>
-              <input type="text" name="spfysxkz" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="jsydghxkz" lay-verify="" placeholder="" class="layui-input"/>
             </td>
           </tr>
           <tr>
-            <th style="white-space: nowrap">建筑面积(m<sup>2</sup>)</th>
+            <th style="white-space: nowrap;">施工许可证</th>
             <td>
-              <input type="number" min="0" name="jzmj" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="sgxkz" lay-verify="" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">土地面积(m<sup>2</sup>)</th>
+            <th style="white-space: nowrap;">开工证明</th>
             <td>
-              <input type="number" min="0" name="tdmj" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="kgzm" lay-verify="" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">土地使用权证</th>
+            <th style="white-space: nowrap;">商品房预售许可证</th>
             <td>
-              <input type="text" name="tdsyqz" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="spfysxkz" lay-verify="" placeholder="" class="layui-input"/>
             </td>
           </tr>
           <tr>
-            <th style="white-space: nowrap">土地编号</th>
+            <th style="white-space: nowrap;">建筑面积(m<sup>2</sup>)</th>
             <td>
-              <input type="text" name="tdbh" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="number" min="0" name="jzmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">土地规划用途</th>
+            <th style="white-space: nowrap;">土地面积(m<sup>2</sup>)</th>
             <td>
-              <input type="text" name="tdghyt" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="number" min="0" name="tdmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
             </td>
-            <th style="white-space: nowrap">土地使用年限</th>
+            <th style="white-space: nowrap;">土地使用权证</th>
             <td>
-              <input type="text" name="tdsynx" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="tdsyqz" lay-verify="" placeholder="" class="layui-input"/>
             </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">土地编号</th>
+            <td>
+              <input type="text" name="tdbh" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">土地规划用途</th>
+            <td>
+              <input type="text" name="tdghyt" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">土地使用年限</th>
+            <td>
+              <input type="text" name="tdsynx" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">开发商名称</th>
+            <td>
+              <input type="text" name="kfsmc" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">开发商法人</th>
+            <td>
+              <input type="text" name="kfsfr" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">开发商营业执照</th>
+            <td>
+              <input type="text" name="kfszz" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">开发商联系电话</th>
+            <td>
+              <input type="text" name="kfsdh" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">开发商地址</th>
+            <td>
+              <input type="text" name="kfsdz" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;"></th>
+            <td></td>
           </tr>
           </tbody>
         </table>
@@ -156,9 +182,9 @@
 
     form.on('submit(submitBut)', function (data1) {
       let xm = {};
-      for(let key in data1.field){
+      for (let key in data1.field) {
         let val = data1.field[key];
-        if(val){
+        if (val) {
           xm[key] = val;
         }
       }
@@ -169,6 +195,15 @@
 
       return false;
     });
+
+    form.verify({
+      cnumber: function (value, item) {
+        if (value && isNaN(value)) {
+          return "只能输入数字";
+        }
+      }
+    });
+
   });
 </script>
 </body>

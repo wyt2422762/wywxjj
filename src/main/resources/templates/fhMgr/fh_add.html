@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
+  <title>物业维修基金管理系统-添加房间</title>
+  <style>
+    .jb_2 {
+      padding-left: 30px !important;
+    }
+
+    .jb_3 {
+      padding-left: 40px !important;
+    }
+
+    .jb_4 {
+      padding-left: 50px !important;
+    }
+
+    .jb_5 {
+      padding-left: 60px !important;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-tab-item layui-show layui-bg-gray" style="padding: 10px;">
+  <div id="LAY_preview">
+    <form class="layui-form" method="post" id="fh_addForm">
+      <div class="layui-form">
+        <table class="layui-table">
+          <tbody>
+          <tr>
+            <th style="white-space: nowrap;">房号</th>
+            <td>
+              <input type="text" name="fh" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">房屋类型</th>
+            <td>
+              <input type="text" name="lx" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">所在楼层</th>
+            <td>
+              <input type="number" name="szlc" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">所在单元</th>
+            <td>
+              <input type="number" name="szdy" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">户型</th>
+            <td>
+              <input type="text" name="hx" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">房屋间数</th>
+            <td>
+              <input type="number" name="fwjs" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">建筑面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" name="scmj_jzmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">套内面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" name="scmj_tnmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">公摊面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" name="scmj_gtmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">房屋用途</th>
+            <td>
+              <input type="text" name="yt" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">房屋朝向</th>
+            <td>
+              <input type="text" name="cx" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">装修水平</th>
+            <td>
+              <input type="text" name="zxsp" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">房屋状态</th>
+            <td>
+              <!-- <input type="text" name="fjzt" lay-verify="required" placeholder="" class="layui-input"/> -->
+              <select name="fjzt" lay-verify="required" lay-filter="fjzt">
+                <option value="未出售" selected>未出售</option>
+                <option value="已出售">已出售</option>
+              </select>
+            </td>
+            <th style="white-space: nowrap;">业主名称</th>
+            <td>
+              <input type="text" name="yzmc" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">业主证件号</th>
+            <td>
+              <input type="text" name="yzzjh" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">业主联系电话</th>
+            <td>
+              <input type="text" name="yzlxdh" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">业主地址</th>
+            <td>
+              <input type="text" name="yzdz" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">合同备案号</th>
+            <td>
+              <input type="text" name="htbah" lay-verify="" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+        <input type="hidden" name="fk_xmxxid" th:value="${xm.id}"/>
+        <input type="hidden" name="fk_ldxxid" th:value="${ld.id}"/>
+      </div>
+      <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+    </form>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/xmMgr/fhMgr.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
+
+<script th:inline="javascript">
+  const xtglid = [[${user.fk_xtglid}]];
+  const fy_xmxxid = [[${xm.id}]];
+  const fy_ldxxid = [[${ld.id}]];
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    //let table = layui.table;
+    //let cascader = layui.cascader;
+
+    form.verify({
+      cnumber: function (value, item) {
+        if(value && isNaN(value)){
+          return "只能输入数字";
+        }
+      }
+    });
+
+    form.on('submit(submitBut)', function (data) {
+      let fh = {};
+      for (let key in data.field) {
+        let val = data.field[key];
+        if (val) {
+          fh[key] = val;
+        }
+      }
+
+      let index = top.layer.getFrameIndex(window.name); //获取窗口索引
+
+      //添加、编辑房间
+      aeFh(fh, index);
+
+      return false;
+    });
+  });
+</script>
+</body>
+</html>

@@ -23,6 +23,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -51,6 +52,10 @@ public class XmController {
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
         request.setAttribute("user", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
+        if(opts != null && !opts.isEmpty()){
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
         return new ModelAndView("xmMgr/xm_index");
     }
 
@@ -66,6 +71,10 @@ public class XmController {
     public ModelAndView toAdd(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
         request.setAttribute("user", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
+        if(opts != null && !opts.isEmpty()){
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
         return new ModelAndView("xmMgr/xm_add");
     }
 
@@ -83,6 +92,10 @@ public class XmController {
                                @PathVariable("id") String id) throws Exception {
         request.setAttribute("user", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
+        if(opts != null && !opts.isEmpty()){
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
         request.setAttribute("id", id);
         return new ModelAndView("xmMgr/xm_edit");
     }
@@ -101,8 +114,35 @@ public class XmController {
                                @PathVariable("id") String id) throws Exception {
         request.setAttribute("user", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
+        if(opts != null && !opts.isEmpty()){
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
         request.setAttribute("fk_xmxxid", id);
         return new ModelAndView("xmMgr/xm_info");
+    }
+
+    /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toInfo1/{id}")
+    public ModelAndView toInfo1(HttpServletRequest request,
+                               @RequestParam(value = "opts", required = false) List<String> opts,
+                               @PathVariable("id") String id) throws Exception {
+        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        if(opts != null && !opts.isEmpty()){
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
+        Xm xm = api.getXmDetail(request, id);
+        request.setAttribute("xm", xm);
+        return new ModelAndView("xmMgr/xm_info1");
     }
 
     /**

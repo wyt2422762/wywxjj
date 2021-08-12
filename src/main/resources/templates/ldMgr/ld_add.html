@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
+  <title>物业维修基金管理系统-添加楼栋</title>
+  <style>
+    .jb_2 {
+      padding-left: 30px !important;
+    }
+
+    .jb_3 {
+      padding-left: 40px !important;
+    }
+
+    .jb_4 {
+      padding-left: 50px !important;
+    }
+
+    .jb_5 {
+      padding-left: 60px !important;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-tab-item layui-show layui-bg-gray" style="padding: 10px;">
+  <div id="LAY_preview">
+    <form class="layui-form" method="post" id="ld_addForm">
+      <div class="layui-form">
+        <table class="layui-table">
+          <tbody>
+          <tr>
+            <th style="white-space: nowrap;">幢号</th>
+            <td>
+              <input type="text" name="ch" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">幢名称</th>
+            <td>
+              <input type="text" name="cmc" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">总层数</th>
+            <td>
+              <input type="number" name="zcs" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">单元数</th>
+            <td>
+              <input type="number" name="dys" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">地上层数</th>
+            <td>
+              <input type="number" name="dscs" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap;">地下层数</th>
+            <td>
+              <input type="number" name="dxcs" lay-verify="cnumber" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">建筑面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" name="zjzmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">非建筑面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" name="fzzmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap">住宅面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" name="zzjzmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
+            </td>
+            <th style="white-space: nowrap">套内面积(m<sup>2</sup>)</th>
+            <td>
+              <input type="number" name="zztnmj" lay-verify="cnumber" placeholder="" class="layui-input"/>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+        <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+        <input type="hidden" name="fk_xmxxid" th:value="${xm.id}"/>
+      </div>
+      <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+    </form>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/xmMgr/ldMgr.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
+
+<script th:inline="javascript">
+  const xtglid = [[${user.fk_xtglid}]];
+  const fy_xmxxid = [[${xm.id}]];
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    //let table = layui.table;
+    //let cascader = layui.cascader;
+
+    form.verify({
+      cnumber: function (value, item) {
+        if(value && isNaN(value)){
+          return "只能输入数字";
+        }
+      }
+    });
+
+    form.on('submit(submitBut)', function (data) {
+      let ld = {};
+      for (let key in data.field) {
+        let val = data.field[key];
+        if (val) {
+          ld[key] = val;
+        }
+      }
+
+      let index = top.layer.getFrameIndex(window.name); //获取窗口索引
+
+      //添加、编辑楼栋
+      aeLd(ld, index);
+
+      return false;
+    });
+  });
+</script>
+</body>
+</html>

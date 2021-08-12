@@ -205,6 +205,36 @@ public class Xm {
     private String tdsyqz;
 
     /**
+     * 开发商名称
+     */
+    @Excel(name = "开发商名称", cellType = Excel.ColumnType.STRING, prompt = "开发商名称")
+    private String kfsmc;
+
+    /**
+     * 开发商法人
+     */
+    @Excel(name = "开发商法人", cellType = Excel.ColumnType.STRING, prompt = "开发商法人")
+    private String kfsfr;
+
+    /**
+     * 开发商联系电话
+     */
+    @Excel(name = "开发商联系电话", cellType = Excel.ColumnType.STRING, prompt = "开发商联系电话")
+    private String kfsdh;
+
+    /**
+     * 开发商地址
+     */
+    @Excel(name = "开发商地址", cellType = Excel.ColumnType.STRING, prompt = "开发商地址")
+    private String kfsdz;
+
+    /**
+     * 开发商营业执照
+     */
+    @Excel(name = "开发商营业执照", cellType = Excel.ColumnType.STRING, prompt = "开发商营业执照")
+    private String kfszz;
+
+    /**
      * 物业公司ID
      */
     private String fk_wyid;

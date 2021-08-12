@@ -20,6 +20,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -36,6 +37,31 @@ public class LdController {
 
     @Autowired
     private Api api;
+
+    /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toAdd/{fk_xmxxid}")
+    public ModelAndView toAdd(HttpServletRequest request,
+                              @PathVariable("fk_xmxxid") String fk_xmxxid,
+                              @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
+        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        if(opts != null && !opts.isEmpty()){
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
+
+        Xm xm = api.getXmDetail(request, fk_xmxxid);
+        request.setAttribute("xm", xm);
+
+        return new ModelAndView("ldMgr/ld_add");
+    }
 
     /**
      * 获取楼栋列表(分页)

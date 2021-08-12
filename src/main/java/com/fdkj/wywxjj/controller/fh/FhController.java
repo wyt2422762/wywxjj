@@ -12,6 +12,7 @@ import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
 import com.fdkj.wywxjj.utils.poi.ExcelUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
@@ -40,6 +42,65 @@ public class FhController {
     private Api api;
 
     /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toAdd/{fk_xmxxid}/{fk_ldxxid}")
+    public ModelAndView toAdd(HttpServletRequest request,
+                              @PathVariable("fk_xmxxid") String fk_xmxxid,
+                              @PathVariable("fk_ldxxid") String fk_ldxxid,
+                              @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
+        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        if (opts != null && !opts.isEmpty()) {
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
+
+        Xm xm = api.getXmDetail(request, fk_xmxxid);
+        request.setAttribute("xm", xm);
+        Ld ld = api.getLdDetail(request, fk_ldxxid);
+        request.setAttribute("ld", ld);
+
+        return new ModelAndView("fhMgr/fh_add");
+    }
+
+    /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toEdit/{fk_xmxxid}/{fk_ldxxid}/{id}")
+    public ModelAndView toAdd(HttpServletRequest request,
+                              @PathVariable("fk_xmxxid") String fk_xmxxid,
+                              @PathVariable("fk_ldxxid") String fk_ldxxid,
+                              @PathVariable("id") String id,
+                              @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
+        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        if (opts != null && !opts.isEmpty()) {
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
+
+        Xm xm = api.getXmDetail(request, fk_xmxxid);
+        request.setAttribute("xm", xm);
+        Ld ld = api.getLdDetail(request, fk_ldxxid);
+        request.setAttribute("ld", ld);
+
+        request.setAttribute("id", id);
+
+        return new ModelAndView("fhMgr/fh_edit");
+    }
+
+    /**
      * 获取房号列表(分页)
      *
      * @param request req
@@ -50,9 +111,9 @@ public class FhController {
     @RequestMapping("getList/{fk_xmxxid}/{fk_ldxxid}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
-                                                     @PathVariable("fk_xmxxid") String fk_xmxxid,
-                                                     @PathVariable("fk_ldxxid") String fk_ldxxid,
-                                                     @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
+                                                   @PathVariable("fk_xmxxid") String fk_xmxxid,
+                                                   @PathVariable("fk_ldxxid") String fk_ldxxid,
+                                                   @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             Map<String, Object> reqBody = new HashMap<>();
             reqBody.put("fk_xmxxid", fk_xmxxid);
@@ -77,8 +138,8 @@ public class FhController {
     @RequestMapping("getListAll/{fk_xmxxid}/{fk_ldxxid}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
-                                                     @PathVariable(value = "fk_xmxxid") String fk_xmxxid,
-                                                     @PathVariable(value = "fk_ldxxid") String fk_ldxxid) {
+                                                   @PathVariable(value = "fk_xmxxid") String fk_xmxxid,
+                                                   @PathVariable(value = "fk_ldxxid") String fk_ldxxid) {
         try {
             Map<String, Object> reqBody = new HashMap<>();
             reqBody.put("fk_xmxxid", fk_xmxxid);
@@ -144,7 +205,7 @@ public class FhController {
     }
 
     /**
-     * 导入楼栋
+     * 导入房间
      *
      * @param request req
      * @param file    文件
@@ -153,8 +214,8 @@ public class FhController {
     @RequestMapping("/importData")
     @ResponseBody
     public ResponseEntity<CusResponseBody> importData(HttpServletRequest request, MultipartFile file,
-                                                      @RequestParam("fk_xmxxid")String fk_xmxxid,
-                                                      @RequestParam("fk_ldxxid")String fk_ldxxid) {
+                                                      @RequestParam("fk_xmxxid") String fk_xmxxid,
+                                                      @RequestParam("fk_ldxxid") String fk_ldxxid) {
         try {
             //登录用户
             User user = api.getUserFromCookie(request);

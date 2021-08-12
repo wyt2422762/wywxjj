@@ -22,6 +22,14 @@
     .red .layui-tree-txt{
       color: red !important;
     }
+
+    span.lpb {
+      border: 1px solid #eee;
+      margin: 5px;
+      padding: 5px;
+      cursor: pointer;
+    }
+
   </style>
 </head>
 <body>
@@ -65,51 +73,51 @@
                 <table class="layui-table">
                   <tbody>
                   <tr>
-                    <th style="white-space: nowrap">幢号</th>
+                    <th style="white-space: nowrap;">幢号</th>
                     <td>
                       <input type="text" name="ch" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
-                    <th style="white-space: nowrap">幢名称</th>
+                    <th style="white-space: nowrap;">幢名称</th>
                     <td>
                       <input type="text" name="cmc" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
                   </tr>
                   <tr>
-                    <th style="white-space: nowrap">总层数</th>
+                    <th style="white-space: nowrap;">总层数</th>
                     <td>
                       <input type="number" name="zcs" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
-                    <th style="white-space: nowrap">单元数</th>
+                    <th style="white-space: nowrap;">单元数</th>
                     <td>
                       <input type="number" name="dys" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
                   </tr>
                   <tr>
-                    <th style="white-space: nowrap">地上层数</th>
+                    <th style="white-space: nowrap;">地上层数</th>
                     <td>
                       <input type="number" name="dscs" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
-                    <th style="white-space: nowrap">地下层数</th>
+                    <th style="white-space: nowrap;">地下层数</th>
                     <td>
                       <input type="number" name="dxcs" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
                   </tr>
                   <tr>
-                    <th style="white-space: nowrap">建筑面积(m<sup>2</sup>)</th>
+                    <th style="white-space: nowrap;">建筑面积(m<sup>2</sup>)</th>
                     <td>
                       <input type="number" name="zjzmj" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
-                    <th style="white-space: nowrap">非建筑面积(m<sup>2</sup>)</th>
+                    <th style="white-space: nowrap;">非建筑面积(m<sup>2</sup>)</th>
                     <td>
                       <input type="number" name="fzzmj" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
                   </tr>
                   <tr>
-                    <th style="white-space: nowrap">住宅面积(m<sup>2</sup>)</th>
+                    <th style="white-space: nowrap;">住宅面积(m<sup>2</sup>)</th>
                     <td>
                       <input type="number" name="zzjzmj" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
-                    <th style="white-space: nowrap">套内面积(m<sup>2</sup>)</th>
+                    <th style="white-space: nowrap;">套内面积(m<sup>2</sup>)</th>
                     <td>
                       <input type="number" name="zztnmj" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
@@ -139,27 +147,27 @@
                       <table class="layui-table">
                         <tbody>
                         <tr>
-                          <th style="white-space: nowrap">幢号</th>
+                          <th style="white-space: nowrap;">幢号</th>
                           <td>
                             <input type="text" name="ch" lay-verify="required" placeholder="" class="layui-input"/>
                           </td>
-                          <th style="white-space: nowrap">幢名称</th>
+                          <th style="white-space: nowrap;">幢名称</th>
                           <td>
                             <input type="text" name="cmc" lay-verify="required" placeholder="" class="layui-input"/>
                           </td>
                         </tr>
                         <tr>
-                          <th style="white-space: nowrap">总层数</th>
+                          <th style="white-space: nowrap;">总层数</th>
                           <td>
                             <input type="number" name="zcs" lay-verify="required" placeholder="" class="layui-input"/>
                           </td>
-                          <th style="white-space: nowrap">单元数</th>
+                          <th style="white-space: nowrap;">单元数</th>
                           <td>
                             <input type="number" name="dys" lay-verify="required" placeholder="" class="layui-input"/>
                           </td>
                         </tr>
                         <tr>
-                          <th style="white-space: nowrap">地上层数</th>
+                          <th style="white-space: nowrap;">地上层数</th>
                           <td>
                             <input type="number" name="dscs" lay-verify="required" placeholder="" class="layui-input"/>
                           </td>
@@ -198,12 +206,7 @@
                   </form>
                 </div>
                 <div class="layui-tab-item">
-                  <table id="fhTable" class="layui-table" lay-filter="fhTable"></table>
-                  <script type="text/html" id="fhTableToolBar">
-                    <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
-                    <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-danger layui-btn-xs"
-                       lay-event="del">删除</a>
-                  </script>
+                  <div id="lpb" style="overflow-x: auto;"></div>
                 </div>
               </div>
             </div>
@@ -326,6 +329,7 @@
   </div>
 </div>
 
+<!-- 楼栋导入弹出框 -->
 <div id="dragUpload_ld" style="display: none; padding: 20px;">
   <div class="layui-upload-drag upload" style="margin: 0 0 15px 25px;">
     <i class="layui-icon"></i>
@@ -338,6 +342,7 @@
   </div>
 </div>
 
+<!-- 房间导入弹出框 -->
 <div id="dragUpload_fh" style="display: none; padding: 20px;">
   <div class="layui-upload-drag upload" style="margin: 0 0 15px 25px;">
     <i class="layui-icon"></i>
@@ -375,7 +380,6 @@
     //获取楼栋信息
     function getInitData() {
       let url = ctx + 'CZF/LDGL/getListAll/' + fk_xmxxid;
-
       $.ajax({
         url: url,
         type: "POST",
@@ -383,6 +387,9 @@
         async: false,
         contentType: "application/json;charset=utf-8",
         success: function (data) {
+
+          debugger;
+
           let ldList = data.data;
           if (ldList && ldList.length > 0) {
             let treeDatas = [];
@@ -406,37 +413,8 @@
                 $("#ld_editForm")[0].reset();
                 //渲染数据
                 form.val("ld_editForm", obj.data.orgData);
-                //获取表格数据
-                table.render({
-                  elem: '#fhTable',
-                  title: '房间列表',
-                  url: ctx + "/CZF/FHGL/getList/" + fk_xmxxid + "/" + obj.data.id, //数据接口
-                  page: {
-                    layout: ['prev', 'page', 'next', 'skip', 'count']
-                  },
-                  // page: true,
-                  limit: 10,
-                  //limits: [10, 20, 50],
-                  cols: [[ //表头
-                    {field: 'fh', title: '房号'},
-                    {field: 'szgnq', title: '类型'},
-                    {field: 'szlc', title: '楼层'},
-                    {field: 'szdy', title: '单元'},
-                    {field: 'scmj_jzmj', title: '建筑面积'},
-                    {field: 'scmj_tnmj', title: '套内面积'},
-                    {field: 'scmj_tnmj', title: '公摊面积'},
-                    {field: 'fjzt', title: '状态'},
-                    {toolbar: '#fhTableToolBar', align: 'center', fixed: 'right', title: '操作'}
-                  ]],
-                  parseData: function (res) { //res 即为原始返回的数据
-                    return {
-                      "code": res.success ? 0 : 1, //解析接口状态
-                      "msg": res.msg, //解析提示文本
-                      "count": res.data.totalRecord, //解析数据长度
-                      "data": res.data.dataList //解析数据列表
-                    };
-                  }
-                });
+
+                buildDetailTable(obj.data.orgData, fk_xmxxid);
 
                 $("div.editLdDiv").show().siblings().hide();
               }
@@ -604,12 +582,17 @@
           "fk_ldxxid": fk_ldxxid
         },
         exts: "xls|xlsx", //文件类型
+        before: function(obj){ //obj参数包含的信息，跟 choose回调完全一致，可参见上文。
+          top.layer.load(); //上传loading
+        },
         done: function (res) {
           //上传完毕回调
+          top.layer.closeAll('loading'); //关闭loading
           top.layer.msg("导入成功");
           window.location.reload();
         }, error: function () {
           //请求异常回调
+          top.layer.closeAll('loading'); //关闭loading
           top.layer.msg("导入失败");
         }
       });
