@@ -32,6 +32,7 @@ layui.define(['jquery', 'laytpl'], function (e) {
   var selected = []
 
   var Cascader = function (opts) {
+    debugger;
     var _s = this;
     _s.config = $.extend({}, _s.config, opts);
     _s.render();
@@ -55,13 +56,20 @@ layui.define(['jquery', 'laytpl'], function (e) {
       value: 'value',
       children: 'children'
     },
-    debounce: 300
+    debounce: 300,
+    readonly: false
   };
 
   Cascader.prototype.render = function () {
-    var _s = this, _e = this.config.elem, _default = this.config.defaultValue;
-    $(_e).parent().find(`.${sys.class.container}`).remove(), $(_e).hide().after(tpl(sys.template.main).render({ cls: sys.class, opts: _s.config }));
-    _s.renderData([]), _s.eventRegister(), _s.showLabel();
+    var _s = this, _e = this.config.elem, _default = this.config.defaultValue, _readonly = this.config.readonly;
+    $(_e).parent().find(`.${sys.class.container}`).remove();
+    $(_e).hide().after(tpl(sys.template.main).render({ cls: sys.class, opts: _s.config }));
+    _s.renderData([]);
+    debugger;
+    if(!_readonly) {
+      _s.eventRegister();
+    }
+    _s.showLabel();
     if(_default && _default.length > 0){
       var _ds = _default.split(",");
       _s.onSelect(_ds[0]);

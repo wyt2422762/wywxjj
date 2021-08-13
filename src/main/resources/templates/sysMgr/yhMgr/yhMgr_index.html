@@ -10,10 +10,6 @@
       银行管理
     </blockquote>
 
-    <fieldset class="layui-elem-field layui-field-title">
-      <legend>银行列表</legend>
-    </fieldset>
-
     <div style="padding: 10px;">
       <div style="padding-bottom: 10px;">
         <div class="layui-inline" style="float:right;">
@@ -21,7 +17,7 @@
         </div>
         <form class="layui-form" id="searchForm">
           <div class="layui-inline" style="float:left;display:flex;">
-            <input type="text" id="yhmc" name="yhmc" placeholder="请输入银行名称搜索" value=""
+            <input type="text" id="yxmc" name="yxmc" placeholder="请输入银行名称搜索" value=""
                    autocomplete="off" class="layui-input" style=""/>
             <button class="layui-btn layui-btn-danger btn_search" lay-submit lay-filter="formDemo1"
                     style="margin-left:15px;">
@@ -46,7 +42,7 @@
 <div th:replace="/common/footer::footer()"></div>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
+  const cuser = [[${cuser}]];
   layui.use(['element', 'laydate', 'table', 'form'], function () {
     //let element = layui.element;
     //let laydate = layui.laydate;
@@ -58,15 +54,20 @@
     function getYhTableData(yxmc) {
       let logUrl = ctx + '/CZF/YHGL/getList';
 
+      let params = {};
       if (yxmc) {
-        logUrl += "?yxmc=" + yxmc
+        params['yxmc'] = yxmc;
       }
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
 
       //获取表格数据
       table.render({
         elem: '#yhTable',
         title: '银行列表',
         url: logUrl, //数据接口
+        where: params,
         page: {
           layout: ['prev', 'page', 'next', 'skip', 'count']
         },
@@ -94,8 +95,8 @@
 
     //搜索按钮事件
     form.on('submit(formDemo1)', function (data) {
-      let yhmc = data.field.yhmc;
-      getYhTableData(yhmc);
+      let yxmc = data.field.yxmc;
+      getYhTableData(yxmc);
       return false;
     });
 

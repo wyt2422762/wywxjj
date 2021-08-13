@@ -13,10 +13,6 @@
       小区管理
     </blockquote>
 
-    <fieldset class="layui-elem-field layui-field-title">
-      <legend>小区列表</legend>
-    </fieldset>
-
     <div style="padding: 10px;">
       <div style="padding-bottom: 10px;">
         <div class="layui-inline" style="float:right;">
@@ -69,8 +65,7 @@
 <div th:replace="/common/footer::footer()"></div>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
-  const fy_wyid = [[${user.fk_id}]];
+  const cuser = [[${cuser}]];
   const opts = [[${opts}]];
   layui.use(['element', 'laydate', 'table', 'form', 'upload'], function () {
     //let element = layui.element;
@@ -87,9 +82,12 @@
       if (xmmc) {
         params['xmmc'] = xmmc
       }
-      if (fy_wyid) {
-        params['fk_wyid'] = fy_wyid;
+      if (cuser.fk_id) {
+        params['fk_wyid'] = cuser.fk_id;
       }
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
 
       //获取表格数据
       table.render({

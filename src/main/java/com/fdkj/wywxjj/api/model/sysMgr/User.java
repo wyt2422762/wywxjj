@@ -24,7 +24,7 @@ public class User {
     private String lxdh;
     private String lxr;
 
-    private String RoleType;
-    private String YHType;
+    private String roleType;
+    private String yhType;
     private String fk_id;
 }

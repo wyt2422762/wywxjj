@@ -75,14 +75,14 @@
         <tr>
           <th>所在区域</th>
           <td colspan="2">
-            <input type="text" lay-verify="area" id="areas" name="fk_qybm" value="" style="display: none;"/>
+            <input type="text" lay-verify="required|area" id="areas" name="fk_qybm" th:value="${cuser.fk_qybm}" style="display: none;"/>
           </td>
           <td></td>
         </tr>
         </tbody>
       </table>
-      <input type="hidden" name="RoleType" class="layui-input" th:value="1"/>
-      <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+      <input type="hidden" name="roleType" class="layui-input" th:value="1"/>
+      <input type="hidden" name="fk_xtglid" th:value="${cuser.fk_xtglid}"/>
     </div>
     <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
   </form>
@@ -94,7 +94,9 @@
 <script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
+  const xtglid = [[${cuser.fk_xtglid}]];
+  const cYhType = [[${cuser.yhType}]];
+  const qybm = [[${cuser.fk_qybm}]];
   //用户类型
   let YHType = "物业科";
   layui.config({
@@ -119,7 +121,8 @@
         children: 'children'
       },
       options: AREAS,
-      defaultValue: null
+      defaultValue: qybm
+      // readonly: (cYhType == '物业科' || cYhType == '物业公司' || cYhType == '银行') ? true : false
     });
 
     form.verify({
@@ -174,9 +177,9 @@
       user['lxdh'] = data1.field.lxdh;
       user['lxr'] = data1.field.lxr;
       user['password'] = data1.field.password;
-      user['RoleType'] = "1";
+      user['roleType'] = "1";
       user['username'] = data1.field.username;
-      user['YHType'] = YHType;
+      user['yHType'] = YHType;
       if (YHType === "银行") {
         user['fk_id'] = data1.field.fk_id_yh;
       } else if (YHType === "物业公司") {

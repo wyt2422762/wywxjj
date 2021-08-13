@@ -48,7 +48,7 @@
           <tr>
             <th>所在区域</th>
             <td>
-              <input type="text" lay-verify="area" id="areas" name="fk_qybm" value="" style="display: none;" />
+              <input type="text" lay-verify="area" id="areas" name="fk_qybm" th:value="${cuser.fk_qybm}" style="display: none;" />
             </td>
             <th>网点名称</th>
             <td>
@@ -57,7 +57,7 @@
           </tr>
           </tbody>
         </table>
-        <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+        <input type="hidden" name="fk_xtglid" th:value="${cuser.fk_xtglid}"/>
       </div>
       <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
     </form>
@@ -70,7 +70,9 @@
 <script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
+  const xtglid = [[${cuser.fk_xtglid}]];
+  const cYhType = [[${cuser.yhType}]];
+  const qybm = [[${cuser.fk_qybm}]];
   layui.config({
     base: ctx + 'static/js/layuiExts/'
   }).extend({
@@ -93,7 +95,8 @@
         children: 'children'
       },
       options: AREAS,
-      defaultValue: null
+      defaultValue: qybm,
+      // readonly: (cYhType == '物业科' || cYhType == '物业公司' || cYhType == '银行') ? true : false
     });
 
     form.on('submit(submitBut)', function (data1) {

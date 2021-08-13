@@ -31,18 +31,18 @@
                    class="layui-input" th:value="${user.username}"/>
           </td>
           <!-- 选择物业公司或者银行 -->
-          <th class="fk_id_other" th:style="'display:' + @{(${user.YHType} != '物业科' ? 'none' : '')}"></th>
-          <td class="fk_id_other" th:style="'display:' + @{(${user.YHType} != '物业科' ? 'none' : '')}"></td>
-          <th class="fk_id_wy" th:style="'display:' + @{(${user.YHType} != '物业公司' ? 'none' : '')}">请选择物业公司</th>
-          <td class="fk_id_wy" th:style="'display:' + @{(${user.YHType} != '物业公司' ? 'none' : '')}">
+          <th class="fk_id_other" th:style="'display:' + @{(${user.yhType} != '物业科' ? 'none' : '')}"></th>
+          <td class="fk_id_other" th:style="'display:' + @{(${user.yhType} != '物业科' ? 'none' : '')}"></td>
+          <th class="fk_id_wy" th:style="'display:' + @{(${user.yhType} != '物业公司' ? 'none' : '')}">请选择物业公司</th>
+          <td class="fk_id_wy" th:style="'display:' + @{(${user.yhType} != '物业公司' ? 'none' : '')}">
             <select name="fk_id_wy" lay-verify="fk_id" lay-filter="fk_id_wy">
               <option value="">请选择物业公司</option>
               <option th:each="wyGs,stat:${wyGsList}" th:value="${wyGs.id}"
                       th:text="${wyGs.qymc}" th:selected="${wyGs.id == user.fk_id}"></option>
             </select>
           </td>
-          <th class="fk_id_yh" th:style="'display:' + @{(${user.YHType} != '银行' ? 'none' : '')}">请选择银行</th>
-          <td class="fk_id_yh" th:style="'display:' + @{(${user.YHType} != '银行' ? 'none' : '')}">
+          <th class="fk_id_yh" th:style="'display:' + @{(${user.yhType} != '银行' ? 'none' : '')}">请选择银行</th>
+          <td class="fk_id_yh" th:style="'display:' + @{(${user.yhType} != '银行' ? 'none' : '')}">
             <select name="fk_id_yh" lay-verify="fk_id" lay-filter="fk_id_yh">
               <option value="">请选择银行</option>
               <option th:each="yh,stat:${yhList}" th:value="${yh.id}"
@@ -76,14 +76,14 @@
         </tr>
         <tr>
           <th>所在区域</th>
-          <td>
-            <input type="text" lay-verify="area" id="areas" name="fk_qybm" th:value="${user.fk_qybm}"
-                   style="display: none;"/>
+          <td colspan="2">
+            <input type="text" lay-verify="required|area" id="areas" name="fk_qybm" th:value="${user.fk_qybm}" style="display: none;"/>
           </td>
-          <td colspan="2"></td>
+          <td></td>
         </tr>
         </tbody>
       </table>
+      <input type="hidden" name="roleType" class="layui-input" th:value="1"/>
       <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}">
       <input type="hidden" name="id" th:value="${user.id}">
     </div>
@@ -97,10 +97,10 @@
 <script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
+  const cYhType = [[${cuser.yhType}]];
   const qybm = [[${user.fk_qybm}]];
   //用户类型
-  let YHType = [[${user.YHType}]];
+  let YHType = [[${user.yhType}]];
 
   layui.config({
     base: ctx + 'static/js/layuiExts/'
@@ -125,6 +125,7 @@
       },
       options: AREAS,
       defaultValue: qybm
+      // readonly: (cYhType == '物业科' || cYhType == '物业公司' || cYhType == '银行') ? true : false
     });
 
     form.verify({
@@ -174,15 +175,15 @@
     form.on('submit(submitBut)', function (data1) {
       let user = {};
       user['id'] = data1.field.id;
-      user['fk_xtglid'] = xtglid;
+      user['fk_xtglid'] = data1.field.fk_xtglid;
       user['fk_jsid'] = data1.field.fk_jsid;
       user['is_lock'] = !!data1.field.is_lock;
       user['lxdh'] = data1.field.lxdh;
       user['lxr'] = data1.field.lxr;
       user['password'] = data1.field.password;
-      user['RoleType'] = "1";
+      user['roleType'] = "1";
       user['username'] = data1.field.username;
-      user['YHType'] = YHType;
+      user['yhType'] = YHType;
       if (YHType === "银行") {
         user['fk_id'] = data1.field.fk_id_yh;
       } else if (YHType === "物业公司") {

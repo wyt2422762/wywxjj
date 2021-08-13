@@ -154,7 +154,8 @@
 <script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
+  const xtglid = [[${cuser.fk_xtglid}]];
+  const cYhType = [[${cuser.yhType}]];
   const id = [[${id}]];
   layui.config({
     base: ctx + 'static/js/layuiExts/'
@@ -181,6 +182,7 @@
       },
       options: AREAS,
       defaultValue: $("#areas").val()
+      // readonly: (cYhType == '物业科' || cYhType == '物业公司' || cYhType == '银行') ? true : false
     });
 
     function getXmDetail() {

@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 银行管理
@@ -43,7 +45,7 @@ public class YhMgrController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/yhMgr/yhMgr_index");
     }
@@ -52,7 +54,7 @@ public class YhMgrController {
      * 获取银行列表
      *
      * @param request req
-     * @param qymc    角色名称
+     * @param yxmc    银行名称
      * @param page    第几页
      * @param limit   每页显示多少条
      * @return res
@@ -60,10 +62,15 @@ public class YhMgrController {
     @RequestMapping("getList")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getWyGsList(HttpServletRequest request,
-                                                       @RequestParam(value = "qymc", required = false) String qymc,
+                                                       @RequestParam(value = "yxmc", required = false) String yxmc,
+                                                       @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
                                                        @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
-            Page<Yh> yhPage = api.getYhList(request, qymc, page, limit);
+            Map<String, String> reqBody = new HashMap<>();
+            if (StringUtils.isNotBlank(yxmc)) {
+                reqBody.put("yxmc", yxmc);
+            }
+            Page<Yh> yhPage = api.getYhList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取银行列表成功", yhPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -98,7 +105,7 @@ public class YhMgrController {
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         return new ModelAndView("sysMgr/yhMgr/yhMgr_add");
     }
 
@@ -106,7 +113,7 @@ public class YhMgrController {
     public ModelAndView toEdit(HttpServletRequest request,
                                @PathVariable("id") String id) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         //2. 对应的银行信息
         Yh yh = api.getYhDetail(request, id);
         request.setAttribute("yh", yh);

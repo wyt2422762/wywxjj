@@ -210,4 +210,10 @@ public class Fh {
     @Excel(name = "装修水平", cellType = Excel.ColumnType.STRING, prompt = "装修水平")
     private String zxsp;
 
+    /**
+     * 装修水平
+     */
+    @Excel(name = "合同金额(元)", cellType = Excel.ColumnType.NUMERIC, prompt = "合同金额(元)")
+    private String htje;
+
 }

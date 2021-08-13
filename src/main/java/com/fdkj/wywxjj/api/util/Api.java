@@ -316,11 +316,10 @@ public class Api {
     /*****************************************字典api*****************************************/
 
     /**
-     *
-     * @param request req
-     * @param zdm 字典名称
-     * @param pageNo    第几页
-     * @param pageSize  每页显示的条数
+     * @param request  req
+     * @param zdm      字典名称
+     * @param pageNo   第几页
+     * @param pageSize 每页显示的条数
      * @return 字典列表
      * @throws Exception err
      */
@@ -331,7 +330,7 @@ public class Api {
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if(StringUtils.isNotBlank(zdm)) {
+        if (StringUtils.isNotBlank(zdm)) {
             body.put("zdm", zdm);
         }
 
@@ -701,25 +700,21 @@ public class Api {
      * 获取用户管理列表
      *
      * @param request  req
-     * @param userId   用户id
-     * @param username 用户名
+     * @param reqBody  请求体
      * @param pageNo   第几页
      * @param pageSize 每页显示多少条
      * @return 用户管理列表
      * @throws Exception err
      */
-    public Page<User> getUserList(HttpServletRequest request, String userId, String username, Integer pageNo, Integer pageSize) throws Exception {
+    public Page<User> getUserList(HttpServletRequest request, Map<String, String> reqBody, Integer pageNo, Integer pageSize) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if (StringUtils.isNotBlank(userId)) {
-            body.put("id", userId.trim());
-        }
-        if (StringUtils.isNotBlank(username)) {
-            body.put("username", username.trim());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
         }
 
         //组装请求体
@@ -885,21 +880,21 @@ public class Api {
      * 获取物业公司列表(分页)
      *
      * @param request  req
-     * @param qymc     企业名称
+     * @param reqBody  请求体
      * @param pageNo   第几页
      * @param pageSize 每页显示的条数
      * @return 物业公司列表
      * @throws Exception err
      */
-    public Page<WyGs> getWyGsList(HttpServletRequest request, String qymc, Integer pageNo, Integer pageSize) throws Exception {
+    public Page<WyGs> getWyGsList(HttpServletRequest request, Map<String, String> reqBody, Integer pageNo, Integer pageSize) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if (StringUtils.isNotBlank(qymc)) {
-            body.put("qymc", qymc.trim());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
         }
 
         //组装请求体
@@ -940,16 +935,20 @@ public class Api {
      * 获取物业公司列表(全部)
      *
      * @param request req
+     * @param reqBody 请求体
      * @return 物业公司列表
      * @throws Exception err
      */
-    public List<WyGs> getWyGsAllList(HttpServletRequest request) throws Exception {
+    public List<WyGs> getWyGsAllList(HttpServletRequest request, Map<String, String> reqBody) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
+        }
 
         //组装请求体
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
@@ -1071,21 +1070,21 @@ public class Api {
      * 获取银行列表(分页)
      *
      * @param request  req
-     * @param yhmc     银行名称
+     * @param reqBody  请求体
      * @param pageNo   第几页
      * @param pageSize 每页显示的条数
      * @return 银行列表
      * @throws Exception err
      */
-    public Page<Yh> getYhList(HttpServletRequest request, String yhmc, Integer pageNo, Integer pageSize) throws Exception {
+    public Page<Yh> getYhList(HttpServletRequest request, Map<String, String> reqBody, Integer pageNo, Integer pageSize) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if (StringUtils.isNotBlank(yhmc)) {
-            body.put("yxmc", yhmc.trim());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
         }
 
         //组装请求体
@@ -1126,16 +1125,20 @@ public class Api {
      * 获取银行列表(全部)
      *
      * @param request req
+     * @param reqBody 请求体
      * @return 银行列表
      * @throws Exception err
      */
-    public List<Yh> getYhAllList(HttpServletRequest request) throws Exception {
+    public List<Yh> getYhAllList(HttpServletRequest request, Map<String, String> reqBody) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
+        }
 
         //组装请求体
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
@@ -1257,24 +1260,21 @@ public class Api {
      * 获取小区列表(分页)
      *
      * @param request  req
-     * @param xmmc     项目(小区)名称
+     * @param reqBody  请求体
      * @param pageNo   第几页
      * @param pageSize 每页显示的条数
      * @return 项目(小区)列表
      * @throws Exception err
      */
-    public Page<Xm> getXmList(HttpServletRequest request, String fk_wyid, String xmmc, Integer pageNo, Integer pageSize) throws Exception {
+    public Page<Xm> getXmList(HttpServletRequest request, Map<String, String> reqBody, Integer pageNo, Integer pageSize) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if (StringUtils.isNotBlank(xmmc)) {
-            body.put("xmmc", xmmc.trim());
-        }
-        if (StringUtils.isNotBlank(fk_wyid)) {
-            body.put("fk_wyid", fk_wyid.trim());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
         }
 
         //组装请求体
@@ -1318,15 +1318,15 @@ public class Api {
      * @return 项目(小区)列表
      * @throws Exception err
      */
-    public List<Xm> getXmAllList(HttpServletRequest request, String fk_wyid) throws Exception {
+    public List<Xm> getXmAllList(HttpServletRequest request, Map<String, String> reqBody) throws Exception {
         User user = getUserFromCookie(request);
         //请求头
         HttpHeaders headers = getHttpHeaders(request);
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if (StringUtils.isNotBlank(fk_wyid)) {
-            body.put("fk_wyid", fk_wyid.trim());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
         }
 
         //组装请求体
@@ -1695,7 +1695,7 @@ public class Api {
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if(reqBody != null && reqBody.size() > 0) {
+        if (reqBody != null && reqBody.size() > 0) {
             body.putAll(reqBody);
         }
 

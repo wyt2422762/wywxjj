@@ -10,10 +10,6 @@
       物业公司管理
     </blockquote>
 
-    <fieldset class="layui-elem-field layui-field-title">
-      <legend>物业公司列表</legend>
-    </fieldset>
-
     <div style="padding: 10px;">
       <div style="padding-bottom: 10px;">
         <div class="layui-inline" style="float:right;">
@@ -46,7 +42,7 @@
 <div th:replace="/common/footer::footer()"></div>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
+  const cuser = [[${cuser}]];
   layui.use(['element', 'laydate', 'table', 'form'], function () {
     //let element = layui.element;
     //let laydate = layui.laydate;
@@ -58,8 +54,12 @@
     function getWyGsTableData(qymc) {
       let logUrl = ctx + '/PTXT/WYGSGL/getList';
 
+      let params = {};
       if (qymc) {
-        logUrl += "?qymc=" + qymc
+        params['qymc'] = qymc;
+      }
+      if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
       }
 
       //获取表格数据
@@ -67,6 +67,7 @@
         elem: '#wyGsTable',
         title: '物业公司列表',
         url: logUrl, //数据接口
+        where: params,
         page: {
           layout: ['prev', 'page', 'next', 'skip', 'count']
         },
@@ -75,7 +76,9 @@
         //limits: [10, 20, 50],
         cols: [[ //表头
           {field: 'qymc', title: '企业名称'},
-          {field: 'clsj', title: '成立时间'},
+          {field: 'clsj', title: '成立时间', templet: function(d){
+              return d.clsj ? d.clsj.substr(0, 10) : "";
+          }},
           {field: 'frdb', title: '法人代表'},
           {field: 'lxdh', title: '联系电话'},
           {field: 'bgdz', title: '办公地址'},

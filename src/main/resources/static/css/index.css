@@ -1,3 +1,7 @@
+body {
+  overflow: hidden !important;
+}
+
 /*头部区域样式*/
 
 /*.layui-nav .layui-nav-child dd.layui-this a, .layui-nav-child dd.layui-this {
@@ -201,4 +205,3 @@
 }
 
 /*内容区域样式*/
-

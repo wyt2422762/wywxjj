@@ -23,8 +23,9 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 项目(小区)
@@ -50,7 +51,7 @@ public class XmController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -69,7 +70,7 @@ public class XmController {
      */
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -90,7 +91,7 @@ public class XmController {
     public ModelAndView toEdit(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -112,7 +113,7 @@ public class XmController {
     public ModelAndView toInfo(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -134,7 +135,7 @@ public class XmController {
     public ModelAndView toInfo1(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -159,9 +160,20 @@ public class XmController {
     public ResponseEntity<CusResponseBody> getXmList(HttpServletRequest request,
                                                      @RequestParam(value = "xmmc", required = false) String xmmc,
                                                      @RequestParam(value = "fk_wyid", required = false) String fk_wyid,
+                                                     @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
                                                      @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
-            Page<Xm> xmPage = api.getXmList(request, fk_wyid, xmmc, page, limit);
+            Map<String, String> reqBody = new HashMap<>();
+            if(StringUtils.isNotBlank(xmmc)){
+                reqBody.put("xmmc", xmmc);
+            }
+            if(StringUtils.isNotBlank(fk_wyid)){
+                reqBody.put("fk_wyid", fk_wyid);
+            }
+            if(StringUtils.isNotBlank(fk_qybm)){
+                reqBody.put("fk_qybm", fk_qybm);
+            }
+            Page<Xm> xmPage = api.getXmList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取小区列表成功", xmPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -180,9 +192,17 @@ public class XmController {
     @RequestMapping("getListAll")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getXmList(HttpServletRequest request,
-                                                     @RequestParam(value = "fk_wyid", required = false) String fk_wyid) {
+                                                     @RequestParam(value = "fk_wyid", required = false) String fk_wyid,
+                                                     @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
         try {
-            List<Xm> xmList = api.getXmAllList(request, fk_wyid);
+            Map<String, String> reqBody = new HashMap<>();
+            if(StringUtils.isNotBlank(fk_wyid)){
+                reqBody.put("fk_wyid", fk_wyid);
+            }
+            if(StringUtils.isNotBlank(fk_qybm)){
+                reqBody.put("fk_qybm", fk_qybm);
+            }
+            List<Xm> xmList = api.getXmAllList(request, reqBody);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取小区列表成功", xmList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -233,6 +253,7 @@ public class XmController {
             User user = api.getUserFromCookie(request);
             //物业公司id
             String fk_id = user.getFk_id();
+            String fk_qybm = user.getFk_qybm();
             if (StringUtils.isBlank(fk_id)) {
                 throw new BusinessException("物业公司id为空", HttpStatus.INTERNAL_SERVER_ERROR.value());
             }
@@ -247,6 +268,7 @@ public class XmController {
                 xmList.forEach(xm -> {
                     xm.setFk_xtglid(fk_xtglid);
                     xm.setFk_wyid(fk_id);
+                    xm.setFk_qybm(fk_qybm);
                 });
                 JSONArray jsonArray = JSONArray.parseArray(JSON.toJSONString(xmList));
                 api.importXm(request, jsonArray);

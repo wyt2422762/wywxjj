@@ -141,7 +141,7 @@
                         </tr>
                         </tbody>
                       </table>
-                      <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+                      <input type="hidden" name="fk_xtglid" th:value="${xm.fk_xtglid}"/>
                       <input type="hidden" name="fk_xmxxid" th:value="${fk_xmxxid}"/>
                       <input type="hidden" name="id"/>
                       <button th:if="${#lists.contains(opts, 'update')}" lay-submit lay-filter="submitBut_ld_edit" class="layui-btn layui-btn-normal">保存</button>
@@ -195,7 +195,7 @@
 <script type="text/javascript" th:src="@{/static/js/xmMgr/fhMgr.js}"></script>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
+  const xtglid = [[${cuser.fk_xtglid}]];
   const fk_xmxxid = [[${xm.id}]];
   var fk_ldxxid = null;
   var uploadUrl = null;

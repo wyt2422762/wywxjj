@@ -52,13 +52,13 @@
           <tr>
             <th>所在区域</th>
             <td>
-              <input type="text" lay-verify="area" id="areas" name="fk_qybm" th:value="${wyGs.fk_qybm}"
+              <input type="text" lay-verify="required|area" id="areas" name="fk_qybm" th:value="${wyGs.fk_qybm}"
                      style="display: none;"/>
             </td>
             <th>成立时间</th>
             <td>
               <input type="text" name="clsj" id="clsj" placeholder=""
-                     class="layui-input" th:value="${wyGs.clsj}"/>
+                     class="layui-input" th:value="${#strings.substring(wyGs.clsj, 0, 10)}"/>
             </td>
           </tr>
           <tr>
@@ -84,7 +84,7 @@
           </tr>
           </tbody>
         </table>
-        <input type="hidden" name="fk_xtglid" th:value="${user.fk_xtglid}"/>
+        <input type="hidden" name="fk_xtglid" th:value="${wyGs.fk_xtglid}"/>
         <input type="hidden" name="id" th:value="${wyGs.id}">
       </div>
       <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
@@ -98,7 +98,7 @@
 <script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
 
 <script th:inline="javascript">
-  const xtglid = [[${user.fk_xtglid}]];
+  const cYhType = [[${cuser.yhType}]];
   const qybm = [[${wyGs.fk_qybm}]];
   layui.config({
     base: ctx + 'static/js/layuiExts/'
@@ -128,6 +128,7 @@
       },
       options: AREAS,
       defaultValue: qybm
+      // readonly: (cYhType == '物业科' || cYhType == '物业公司' || cYhType == '银行') ? true : false
     });
 
     //表单验证
@@ -143,7 +144,7 @@
       let wyGs = {};
       wyGs['id'] = data1.field.id;
       wyGs['qymc'] = data1.field.qymc;
-      wyGs['fk_xtglid'] = xtglid;
+      wyGs['fk_xtglid'] = data1.field.fk_xtglid;
       if (data1.field.clsj) {
         wyGs['clsj'] = data1.field.clsj;
       }

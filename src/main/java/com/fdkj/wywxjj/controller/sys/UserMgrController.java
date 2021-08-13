@@ -9,6 +9,7 @@ import com.fdkj.wywxjj.api.util.Api;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 用户管理
@@ -37,7 +40,7 @@ public class UserMgrController {
 
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/userMgr/userMgr_index");
     }
@@ -54,11 +57,19 @@ public class UserMgrController {
     @RequestMapping("getList")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getUserMgrList(HttpServletRequest request,
-                                                          @RequestParam(value = "userId", required = false) String userId,
                                                           @RequestParam(value = "username", required = false) String username,
+                                                          @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
                                                           @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
-            Page<User> userPage = api.getUserList(request, userId, username, page, limit);
+            Map<String, String> reqBody = new HashMap<>();
+            if(StringUtils.isNotBlank(username)){
+                reqBody.put("username", username);
+            }
+            if(StringUtils.isNotBlank(fk_qybm)){
+                reqBody.put("fk_qybm", fk_qybm);
+            }
+
+            Page<User> userPage = api.getUserList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取用户列表成功", userPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -70,34 +81,52 @@ public class UserMgrController {
 
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
-        //1. 获取角色信息
+        //1. 当前登陆用户
+        User cuser = api.getUserFromCookie(request);
+        request.setAttribute("cuser", cuser);
+        //2. 获取角色信息
         List<Role> allRoleList = api.getAllRoleList(request);
         request.setAttribute("roleList", allRoleList);
-        //2. 获取银行信息
-        List<Yh> yhAllList = api.getYhAllList(request);
+        //3. 获取银行信息
+        Map<String, String> reqBody_yh = new HashMap<>();
+        if(StringUtils.isNotBlank(cuser.getFk_qybm())){
+            reqBody_yh.put("fk_qybm", cuser.getFk_qybm());
+        }
+        List<Yh> yhAllList = api.getYhAllList(request, reqBody_yh);
         request.setAttribute("yhList", yhAllList);
-        //3. 获取物业公司信息
-        List<WyGs> wyGsAllList = api.getWyGsAllList(request);
+        //4. 获取物业公司信息
+        Map<String, String> reqBody_wy = new HashMap<>();
+        if(StringUtils.isNotBlank(cuser.getFk_qybm())){
+            reqBody_wy.put("fk_qybm", cuser.getFk_qybm());
+        }
+        List<WyGs> wyGsAllList = api.getWyGsAllList(request, reqBody_wy);
         request.setAttribute("wyGsList", wyGsAllList);
-        //4. 当前登陆用户
-        request.setAttribute("user", api.getUserFromCookie(request));
         return new ModelAndView("sysMgr/userMgr/userMgr_add");
     }
 
     @RequestMapping("toEdit/{id}")
     public ModelAndView toEdit(HttpServletRequest request,
                                @PathVariable("id") String id) throws Exception {
-        //1. 获取角色信息
+        //1. 当前登陆用户
+        User cuser = api.getUserFromCookie(request);
+        request.setAttribute("cuser", cuser);
+        //2. 获取角色信息
         List<Role> allRoleList = api.getAllRoleList(request);
         request.setAttribute("roleList", allRoleList);
-        //2. 获取银行信息
-        List<Yh> yhAllList = api.getYhAllList(request);
+        //3. 获取银行信息
+        Map<String, String> reqBody_yh = new HashMap<>();
+        if(StringUtils.isNotBlank(cuser.getFk_qybm())){
+            reqBody_yh.put("fk_qybm", cuser.getFk_qybm());
+        }
+        List<Yh> yhAllList = api.getYhAllList(request, reqBody_yh);
         request.setAttribute("yhList", yhAllList);
-        //3. 获取物业公司信息
-        List<WyGs> wyGsAllList = api.getWyGsAllList(request);
+        //4. 获取物业公司信息
+        Map<String, String> reqBody_wy = new HashMap<>();
+        if(StringUtils.isNotBlank(cuser.getFk_qybm())){
+            reqBody_wy.put("fk_qybm", cuser.getFk_qybm());
+        }
+        List<WyGs> wyGsAllList = api.getWyGsAllList(request, reqBody_wy);
         request.setAttribute("wyGsList", wyGsAllList);
-        //4. 当前登陆用户
-        request.setAttribute("user", api.getUserFromCookie(request));
         //5. 对应的用户信息
         User user = api.getUserDetail(request, id);
         request.setAttribute("user", user);

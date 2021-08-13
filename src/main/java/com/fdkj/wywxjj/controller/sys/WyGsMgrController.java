@@ -17,7 +17,9 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 物业公司管理
@@ -43,7 +45,7 @@ public class WyGsMgrController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/wyGsMgr/wyGsMgr_index");
     }
@@ -61,9 +63,18 @@ public class WyGsMgrController {
     @ResponseBody
     public ResponseEntity<CusResponseBody> getWyGsList(HttpServletRequest request,
                                                        @RequestParam(value = "qymc", required = false) String qymc,
+                                                       @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
                                                        @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
-            Page<WyGs> wyGsPage = api.getWyGsList(request, qymc, page, limit);
+            Map<String, String> reqBody = new HashMap<>();
+            if(StringUtils.isNotBlank(qymc)){
+                reqBody.put("qymc", qymc);
+            }
+            if(StringUtils.isNotBlank(fk_qybm)){
+                reqBody.put("fk_qybm", fk_qybm);
+            }
+
+            Page<WyGs> wyGsPage = api.getWyGsList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取物业公司列表成功", wyGsPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -98,7 +109,7 @@ public class WyGsMgrController {
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         return new ModelAndView("sysMgr/wyGsMgr/wyGsMgr_add");
     }
 
@@ -106,7 +117,7 @@ public class WyGsMgrController {
     public ModelAndView toEdit(HttpServletRequest request,
                                @PathVariable("id") String id) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("cuser", api.getUserFromCookie(request));
         //2. 对应的物业公司信息
         WyGs wyGs = api.getWyGsDetail(request, id);
         request.setAttribute("wyGs", wyGs);
