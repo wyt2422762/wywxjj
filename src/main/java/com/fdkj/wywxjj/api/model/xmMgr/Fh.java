@@ -123,7 +123,7 @@ public class Fh {
     /**
      * 实测面积_套内面 decimal
      */
-    @Excel(name = "实测面积_套内面", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_套内面")
+    @Excel(name = "实测面积_套内面积", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_套内面积")
     private String scmj_tnmj;
 
     /**
@@ -135,7 +135,7 @@ public class Fh {
     /**
      * 实测面积_其中阳台面 decimal
      */
-    @Excel(name = "实测面积_其中阳台面", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_其中阳台面")
+    @Excel(name = "实测面积_其中阳台面积", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_其中阳台面积")
     private String scmj_qzytmj;
 
     /**
