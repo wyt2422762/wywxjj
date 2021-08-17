@@ -70,6 +70,9 @@ public class YhMgrController {
             if (StringUtils.isNotBlank(yxmc)) {
                 reqBody.put("yxmc", yxmc);
             }
+            if(StringUtils.isNotBlank(fk_qybm)){
+                reqBody.put("fk_qybm", fk_qybm);
+            }
             Page<Yh> yhPage = api.getYhList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取银行列表成功", yhPage);

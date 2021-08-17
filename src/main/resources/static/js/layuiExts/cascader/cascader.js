@@ -32,7 +32,6 @@ layui.define(['jquery', 'laytpl'], function (e) {
   var selected = []
 
   var Cascader = function (opts) {
-    debugger;
     var _s = this;
     _s.config = $.extend({}, _s.config, opts);
     _s.render();
@@ -65,7 +64,6 @@ layui.define(['jquery', 'laytpl'], function (e) {
     $(_e).parent().find(`.${sys.class.container}`).remove();
     $(_e).hide().after(tpl(sys.template.main).render({ cls: sys.class, opts: _s.config }));
     _s.renderData([]);
-    debugger;
     if(!_readonly) {
       _s.eventRegister();
     }

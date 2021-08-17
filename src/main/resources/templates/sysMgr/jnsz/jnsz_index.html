@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
+  <title>物业维修基金管理系统-缴纳设置</title>
+  <style>
+    .layui-form-label {
+      width: 120px !important;
+    }
+  </style>
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <blockquote class="layui-elem-quote layui-text">
+      缴纳设置
+    </blockquote>
+
+    <div style="margin-top: 50px;">
+
+      <div class="layui-row layui-col-space5">
+        <div class="layui-col-md3" style="padding-top: 15px;">
+          <form class="layui-form" method="post" id="jnsz_form" lay-filter="jnsz_form">
+            <!-- 区域 -->
+            <div class="layui-form-item">
+              <label class="layui-form-label">区域</label>
+              <div class="layui-input-inline">
+                <input type="text" lay-verify="required|area" id="areas" name="fk_qybm" th:value="${cuser.fk_qybm}"
+                       style="display: none;"/>
+              </div>
+            </div>
+
+            <div class="layui-form-item">
+              <label class="layui-form-label">缴纳方式</label>
+              <div class="layui-input-inline">
+                <select name="jnfs" lay-filter="jnfs" lay-verify="required">
+                  <option value="按合同总价缴纳" selected>按合同总价缴纳</option>
+                  <option value="按建筑面积缴纳">按建筑面积缴纳</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="layui-form-item jnbz-ht">
+              <label class="layui-form-label">缴纳标准</label>
+              <div class="layui-input-inline">
+                <select name="jnbz-ht" lay-filter="jnbz-ht" lay-verify="required">
+                  <option value="按统一标准缴纳" selected>按统一标准缴纳</option>
+                  <option value="不固定">不固定</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="layui-form-item jnbz-jz" style="display: none;">
+              <label class="layui-form-label">缴纳标准</label>
+              <div class="layui-input-inline">
+                <select name="jnbz-jz" lay-filter="jnbz-jz" lay-verify="required">
+                  <option value="按统一标准缴纳" selected>按统一标准缴纳</option>
+                  <option value="按面积大小缴纳">按面积大小缴纳</option>
+                  <option value="按楼层高低缴纳">按楼层高低缴纳</option>
+                  <option value="不固定">不固定</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="layui-form-item jnbl">
+              <label class="layui-form-label">缴纳比例(%)</label>
+              <div class="layui-input-inline">
+                <input type="number" name="jnbl" lay-verify="cRequired|cnumber" autocomplete="off" placeholder="请输入比例"
+                       class="layui-input"/>
+              </div>
+            </div>
+
+            <div class="layui-form-item jnje" style="display: none;">
+              <label class="layui-form-label">缴纳金额(元/m<sup>2</sup>)</label>
+              <div class="layui-input-inline">
+                <input type="number" name="jnje" lay-verify="cRequired|cnumber" autocomplete="off" placeholder="请输入金额"
+                       class="layui-input"/>
+              </div>
+            </div>
+
+            <input type="hidden" name="fk_xtglid" th:value="${cuser.fk_xtglid}"/>
+            <input type="hidden" name="id" autocomplete="off" class="layui-input"/>
+
+            <div class="layui-form-item btn" style="text-align: center;">
+              <button lay-submit lay-filter="submitBtn" class="sb layui-btn">保存</button>
+              <button lay-submit lay-filter="reloadBtn" class="sb layui-btn layui-btn-primary">重新加载</button>
+            </div>
+          </form>
+        </div>
+        <div class="layui-col-md9">
+          <div class="jnsz-ls" style="display:none;">
+            <table class="layui-table" lay-filter="lsTables" id="lsTables" style="margin-top: 0;"></table>
+
+            <script type="text/html" id="toolBar">
+              <a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+            </script>
+
+            <button id="newBtn" type="button" class="layui-btn layui-btn-primary"><i class="layui-icon"></i>新增</button>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+  const cYhType = [[${cuser.yhType}]];
+  const opts = [[${opts}]];
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    tableEdit: 'tableEdit/tableEdit',
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'tableEdit', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let tableEdit = layui.tableEdit;
+    let cascader = layui.cascader;
+
+    let jnfs = "按合同总价缴纳";
+    let jnbz = "按统一标准缴纳";
+
+    //表格数据
+    //按面积
+    let tableData_mj = [];
+    //按楼层
+    let tableData_lc = [];
+    //按楼层
+    let tableData = null;
+
+    getData();
+
+    //区域选择
+    cascader.render({
+      elem: $('#areas')[0],
+      multiple: false,
+      showAllLevels: true,
+      props: {
+        label: 'label',
+        value: 'value',
+        children: 'children'
+      },
+      options: AREAS,
+      defaultValue: $("#areas").val()
+      // readonly: (cYhType == '物业科' || cYhType == '物业公司' || cYhType == '银行') ? true : false
+    });
+
+    //表单验证
+    form.verify({
+      cnumber: function (value, item) {
+        if (value && isNaN(value)) {
+          return "只能输入数字";
+        }
+      },
+      cRequired: function (value, item) {
+        debugger;
+        if (!value) {
+          if (item.name === 'jnbl' && $("input[name='jnfs']").val() === "按合同总价缴纳") {
+            return "缴纳比例不能为空";
+          } else if (item.name === 'jnje' && $("input[name='jnfs']").val() === "按建筑面颊缴纳") {
+            if ($("input[name='jnbz-jz']").val() === "按面积大小缴纳" || $("input[name='jnbz-jz']").val() === "按楼层高低缴纳") {
+              return "缴纳金额不能为空";
+            }
+          }
+        }
+      }
+    });
+
+    //缴纳方式变化
+    form.on("select(jnfs)", function (obj) {
+      let val = obj.value;
+      jnfs = val;
+      //判断那些内容要显示
+      if ("按合同总价缴纳" === val) {
+        $("div.jnbz-ht").show();
+        $("div.jnbz-jz").hide();
+        $("div.jnbl").show();
+        $("div.jnje").hide();
+        $("input[name='jnje']").val("");
+      } else if ("按建筑面积缴纳" === val) {
+        $("div.jnbz-ht").hide();
+        $("div.jnbz-jz").show();
+        $("div.jnbl").hide();
+        $("div.jnje").show();
+        $("input[name='jnbl']").val("");
+      }
+      //显示表格
+      showLs();
+    });
+
+    //显示表格
+    function showLs() {
+      if ("按建筑面积缴纳" === jnfs && ("按面积大小缴纳" === jnbz || "按楼层高低缴纳" === jnbz)) {
+        let label = '';
+        if ("按面积大小缴纳" === jnbz) {
+          label = '面积';
+          buildTable('面积');
+        } else if ("按楼层高低缴纳" === jnbz) {
+          label = '楼层';
+          buildTable('楼层');
+        }
+        $("input[name='jnje']").val("").attr("readonly", true);
+        $("div.jnsz-ls").show();
+      } else {
+        $("input[name='jnje']").attr("readonly", false);
+        $("div.jnsz-ls").hide();
+      }
+    }
+
+    //缴纳标准变化(按合同总价缴纳)
+    form.on("select(jnbz-ht)", function (obj) {
+      let val = obj.value;
+      jnbz = val;
+      //显示表格
+      showLs();
+    });
+
+    //缴纳标准变化(按建筑面积缴纳)
+    form.on("select(jnbz-jz)", function (obj) {
+      let val = obj.value;
+      jnbz = val;
+      //判断那些内容要显示
+      if ("按面积大小缴纳" === val || "按楼层高低缴纳" === val) {
+        $("div.jnsz-ls").show();
+      } else {
+        $("div.jnsz-ls").hide();
+      }
+      //显示表格
+      showLs();
+    });
+
+    //表单提交
+    form.on('submit(submitBtn)', function (data) {
+      let jnsz = {};
+      let id = data.field.id;
+      if (id) {
+        jnsz['id'] = id;
+      }
+      let fk_xtglid = data.field.fk_xtglid;
+      if (fk_xtglid) {
+        jnsz['fk_xtglid'] = fk_xtglid;
+      }
+      jnsz['fk_qybm'] = data.field.fk_qybm;
+      let jnfs = data.field.jnfs;
+      jnsz['jnfs'] = jnfs;
+      if (jnfs === "按合同总价缴纳") {
+        jnsz['jnbz'] = data.field['jnbz-ht'];
+        jnsz['jnbl'] = data.field.jnbl;
+      } else if (jnfs === "按建筑面积缴纳") {
+        jnsz['jnbz'] = data.field['jnbz-jz'];
+        if (jnbz === '按统一标准缴纳' || jnbz === '不固定') {
+          jnsz['jnje'] = data.field.jnje;
+        }
+      }
+
+      let submitData = {};
+      submitData['model'] = jnsz;
+      if (jnfs === "按建筑面积缴纳" && (jnbz === '按面积大小缴纳' || jnbz === '按楼层高低缴纳')) {
+        submitData['list'] = tableData;
+      } else {
+        submitData['list'] = [];
+      }
+
+      //数据校验
+      if (jnfs === "按建筑面积缴纳" && (jnbz === '按面积大小缴纳' || jnbz === '按楼层高低缴纳')) {
+        //table数据校验
+        if (!tableData || tableData.length <= 0) {
+          top.layer.msg("请输入缴纳标准");
+          return false;
+        }
+      }
+
+      debugger;
+
+      let index = top.layer.load();
+      $.ajax({
+        url: ctx + "/CZF/JNSZ/aeJnsz",
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        data: JSON.stringify(submitData),
+        success: function (data) {
+          top.layer.close(index);
+          top.layer.msg(data.msg);
+          let ifr = $("div.layui-tab div.layui-tab-content div.layui-show iframe", window.top.document)[0];
+          $(ifr).attr('src', $(ifr).attr('src'));
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(index);
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          window.location.reload();
+        }
+      });
+
+      return false;
+    });
+
+    //表单提交
+    form.on('submit(reloadBtn)', function (data) {
+      window.location.reload();
+      return false;
+    });
+
+    //渲染表格
+    function buildTable(type) {
+      let start = null;
+      let end = null;
+
+      if (!type) {
+        //默认按面积
+        type = "面积";
+      }
+
+      if (type === '面积') {
+        tableData = tableData_mj
+        start = "qsmj";
+        end = "jsmj";
+      } else {
+        tableData = tableData_lc
+        start = "qslc";
+        end = "jslc";
+      }
+
+      let cols = table.render({
+        elem: '#lsTables',
+        title: '详细列表',
+        cols: [[ //表头
+          {
+            field: start, title: '起始' + type, event: 'start', config: {
+              type: 'input', verify: {
+                "regx": function (data) {
+                  return !(!data || isNaN(data));
+                }, msg: "请输入数字"
+              }
+            }
+          },
+          {
+            field: end, title: '结束' + type, event: 'end', config: {
+              type: 'input', verify: {
+                "regx": function (data) {
+                  return !(!data || isNaN(data));
+                }, msg: "请输入数字"
+              }
+            }
+          },
+          {
+            field: 'jnje', title: '缴纳金额(元/m<sup>2</sup>)', event: 'val', config: {
+              type: 'input', verify: {
+                "regx": function (data) {
+                  return !(!data || isNaN(data));
+                }, msg: "请输入数字"
+              }
+            }
+          },
+          {toolbar: '#toolBar', align: 'center', fixed: 'right', title: '操作'}
+        ]],
+        data: tableData
+      }).config.cols;
+
+      /**
+       * 参数cols是table.render({})中的cols属性值
+       * aop代理是基于event点击事件进行操作的，
+       * 因此cols中务必开启event点击事件！
+       **/
+      let aopTable = tableEdit.aopObj(cols); //获取一个aop对象
+
+      /**
+       * 注意：
+       * 1、 aopTable.on('tool(xxx)',function (obj) {})
+       * 2、 table.on('tool(yyy)',function (obj) {})
+       * 如果1中的xxx与2中的yyy字符串相同时，
+       * 不能同时用，用了会造成后调用者覆盖前调用者。
+       * 应该直接用1来代替2，因为1中包含了2中的事件。
+       * 如果不相同，则可以同时使用。
+       **/
+      aopTable.on('tool(lsTables)', function (obj) {
+        debugger;
+        let rowIndex = $(obj.tr).attr("data-index");
+        if (obj.event === 'start' || obj.event === 'end' || obj.event === 'val') {
+          let field = obj.field; //单元格字段
+          let value = obj.value; //修改后的值
+          let data = obj.data; //当前行旧数据
+          let event = obj.event; //当前单元格事件属性值
+          let update = {};
+          update[field] = value;
+          //把value更新到行中
+          obj.update(update);
+        } else if (obj.event === 'del') {
+          obj.del();
+          tableData.splice(rowIndex, 1);
+          table.reload('lsTables');
+        }
+      });
+    }
+
+    //添加表格行
+    $("#newBtn").on('click', function () {
+      debugger;
+      //判断缴纳标准
+      let jsbz = $("select[name = 'jnbz-jz']").val();
+      if (jsbz === "按面积大小缴纳") {
+        tableData.push({qsmj: "3", jsmj: "3", jnje: "3"});
+        table.reload('lsTables', {
+          data: tableData
+        });
+      } else if (jsbz === "按楼层高低缴纳") {
+        tableData.push({qslc: "3", jslc: "3", jnje: "3"});
+        table.reload('lsTables', {
+          data: tableData
+        });
+      }
+    });
+
+    //获取数据
+    function getData() {
+      let url = ctx + 'CZF/JNSZ/getList';
+
+      let params = {};
+      if (cuser.fk_id) {
+        params['fk_wyid'] = cuser.fk_id;
+      }
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+
+      let index = top.layer.load();
+      $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        async: false,
+        data: params,
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          top.layer.close(index);
+          debugger;
+          let val = data.data
+          //判断数据类型
+          if (val) {
+            jnfs = val['jnfs'];
+            jnbz = val['jnbz'];
+            debugger;
+            //表单赋值
+            form.val("jnsz_form", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
+              "jnfs": val['jnfs'],
+              "jnbz-ht": val['jnfs'] === '按合同总价缴纳' ? val['jnbz'] : '按统一标准缴纳',
+              "jnbz-jz": val['jnfs'] === '按建筑面积缴纳' ? val['jnbz'] : '按统一标准缴纳',
+              "jnbl": val["jnbl"],
+              "jnje": val["jnje"],
+              "id": val["id"],
+              "fk_qybm": val["fk_qybm"],
+            });
+            //form.render();
+
+            //判断那些内容要显示
+            if ("按合同总价缴纳" === val['jnfs']) {
+              $("div.jnbz-ht").show();
+              $("div.jnbz-jz").hide();
+              $("div.jnbl").show();
+              $("div.jnje").hide();
+            } else if ("按建筑面积缴纳" === val['jnfs']) {
+              $("div.jnbz-ht").hide();
+              $("div.jnbz-jz").show();
+              $("div.jnbl").hide();
+              $("div.jnje").show();
+            }
+
+            //表格数据
+            let list = val.list;
+            if (list && list.length > 0) {
+              if ("按面积大小缴纳" === val['jnbz']) {
+                tableData_mj = list;
+              } else if ("按楼层高低缴纳" === val['jnbz']) {
+                tableData_lc = list;
+              }
+            }
+
+            showLs();
+          } else {
+            //无数据
+            buildTable();
+          }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(index);
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+        }
+      });
+    }
+
+  });
+</script>
+
+</body>
+</html>
