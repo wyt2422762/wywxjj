@@ -1,6 +1,7 @@
 package com.fdkj.wywxjj.api.model.xmMgr;
 
 import com.fdkj.wywxjj.annotation.Excel;
+import com.fdkj.wywxjj.api.model.zhMgr.Zh;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -215,5 +216,10 @@ public class Fh {
      */
     @Excel(name = "合同金额(元)", cellType = Excel.ColumnType.NUMERIC, prompt = "合同金额(元)")
     private String htje;
+
+    /**
+     * 账户
+     */
+    private Zh zh;
 
 }

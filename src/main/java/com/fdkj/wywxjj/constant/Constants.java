@@ -134,4 +134,34 @@ public class Constants {
      * 小程序token前缀（护工）
      */
     public static final String MP_NURSE_KEY = "mp_nurse_key";
+
+    /**
+     * 记账类别
+     */
+    public static class Jzlb {
+        /**
+         * 资金初缴
+         */
+        public static final String ZJCJ = "资金初缴";
+        /**
+         * 缴费
+         */
+        public static final String JF = "缴费";
+        /**
+         * 资金结息
+         */
+        public static final String ZJJX = "资金结息";
+        /**
+         * 预付返款
+         */
+        public static final String YFFK = "预付返款";
+        /**
+         * 维修支出
+         */
+        public static final String WXZC = "维修支出";
+        /**
+         * 销户退款
+         */
+        public static final String XHTK = "销户退款";
+    }
 }

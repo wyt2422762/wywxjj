@@ -7,6 +7,8 @@ import com.fdkj.wywxjj.api.model.sysMgr.*;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import com.fdkj.wywxjj.api.model.xmMgr.Ld;
 import com.fdkj.wywxjj.api.model.xmMgr.Xm;
+import com.fdkj.wywxjj.api.model.zhMgr.Zh;
+import com.fdkj.wywxjj.api.model.zhMgr.Zh_his;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
 import org.apache.commons.lang3.StringUtils;
@@ -1671,10 +1673,24 @@ public class Api {
         }
 
         //构造返回信息
+        List<Fh> dataList = null;
+        JSONArray results = jsonObject.getJSONArray("Results");
+        if (results != null && results.size() > 0) {
+            dataList = new ArrayList<>();
+            for (int i = 0; i < results.size(); i++) {
+                JSONObject jsonObject1 = results.getJSONObject(i);
+                Zh zh = jsonObject1.toJavaObject(Zh.class);
+                Fh fh = jsonObject1.getObject("m", Fh.class);
+                if (StringUtils.isNotBlank(zh.getNo()) && StringUtils.isNotBlank(zh.getZt())) {
+                    fh.setZh(zh);
+                }
+                dataList.add(fh);
+            }
+        }
+
         Page<Fh> page = new Page<>(pageNo == null ? 1 : pageNo, pageSize == null ? 10 : pageSize);
         Integer totalRecord = jsonObject.getInteger("TotalCount");
         page.setTotalRecord(totalRecord);
-        List<Fh> dataList = jsonObject.getJSONArray("Results").toJavaList(Fh.class);
         page.setDataList(dataList);
 
         return page;
@@ -1717,7 +1733,22 @@ public class Api {
             throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
-        return jsonObject.getJSONArray("Results").toJavaList(Fh.class);
+        JSONArray results = jsonObject.getJSONArray("Results");
+        if (results != null && results.size() > 0) {
+            List<Fh> list = new ArrayList<>();
+            for (int i = 0; i < results.size(); i++) {
+                JSONObject jsonObject1 = results.getJSONObject(i);
+                Zh zh = jsonObject1.toJavaObject(Zh.class);
+                Fh fh = jsonObject1.getObject("m", Fh.class);
+                if (StringUtils.isNotBlank(zh.getNo()) && StringUtils.isNotBlank(zh.getZt())) {
+                    fh.setZh(zh);
+                }
+                list.add(fh);
+            }
+            return list;
+        } else {
+            return null;
+        }
     }
 
     /**
@@ -1810,7 +1841,6 @@ public class Api {
     }
 
     /*****************************************缴纳设置api*****************************************/
-
 
     /**
      * 获取缴纳设置列表(分页)
@@ -1940,12 +1970,11 @@ public class Api {
         //构造返回信息
         Jnsz jnsz = jsonObject.getJSONObject("Results").getObject("model", Jnsz.class);
         List<Jnsz_ls> jnsz_ls = jsonObject.getJSONObject("Results").getJSONArray("list").toJavaList(Jnsz_ls.class);
-        if(jnsz_ls != null && !jnsz_ls.isEmpty()) {
+        if (jnsz_ls != null && !jnsz_ls.isEmpty()) {
             jnsz.setList(jnsz_ls);
         }
         return jnsz;
     }
-
 
     /**
      * 更新添加缴纳设置
@@ -1968,6 +1997,128 @@ public class Api {
             logger.error("更新添加缴纳设置失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_JNSZ_Update");
             logger.error("更新添加缴纳设置失败，请求体: " + body.toJSONString());
             logger.error("更新添加缴纳设置失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+    }
+
+    /*****************************************缴纳设置api*****************************************/
+
+    /**
+     * 获取账户列表(分页)
+     *
+     * @param request  req
+     * @param pageNo   第几页
+     * @param pageSize 每页显示的条数
+     * @return 楼栋列表
+     * @throws Exception err
+     */
+    public Page<Zh> getZhList(HttpServletRequest request, Map<String, String> reqBody, Integer pageNo, Integer pageSize) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //请求体
+        JSONObject body = new JSONObject();
+        body.put("fk_xtglid", user.getFk_xtglid());
+        body.putAll(reqBody);
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+
+        //请求参数
+        Map<String, Object> params = new HashMap<>(4);
+        params.put("page", pageNo == null ? 1 : pageNo);
+        params.put("pageNum", pageSize == null ? 10 : pageSize);
+
+        String url = baseUrl + "/api/CZF/WYWXJJ_ZH_List?page={page}&pageNum={pageNum}";
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url,
+                        HttpMethod.POST, requestEntity, String.class, params);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("获取楼栋列表失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_ZH_List");
+            logger.error("获取楼栋列表失败，请求参数: " + params);
+            logger.error("获取楼栋列表失败，请求体: " + body.toJSONString());
+            logger.error("获取楼栋列表失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        Page<Zh> page = new Page<>(pageNo == null ? 1 : pageNo, pageSize == null ? 10 : pageSize);
+        Integer totalRecord = jsonObject.getInteger("TotalCount");
+        page.setTotalRecord(totalRecord);
+        List<Zh> dataList = jsonObject.getJSONArray("Results").toJavaList(Zh.class);
+        page.setDataList(dataList);
+        return page;
+    }
+
+    /**
+     * 获取缴纳设置详情
+     *
+     * @param request req
+     * @param id      账户id
+     * @return 账户详情
+     * @throws Exception err
+     */
+    public Zh getZhDetail(HttpServletRequest request, String id) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(null, headers);
+
+        //请求参数
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("id", id);
+
+        String url = baseUrl + "/api/CZF/WYWXJJ_ZH_Model?id={id}";
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url,
+                        HttpMethod.POST, requestEntity, String.class, params);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("获取缴纳设置详情失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_ZH_Model");
+            logger.error("获取缴纳设置详情失败，请求参数: " + params);
+            logger.error("获取缴纳设置详情失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        Zh zh = jsonObject.getJSONObject("Results").getObject("model", Zh.class);
+        List<Zh_his> zh_his = jsonObject.getJSONObject("Results").getJSONArray("list").toJavaList(Zh_his.class);
+        if (zh_his != null && !zh_his.isEmpty()) {
+            zh.setList(zh_his);
+        }
+        return zh;
+    }
+
+    /**
+     * 更新添加账户
+     *
+     * @param request req
+     * @param body    请求体
+     */
+    public void aeZh(HttpServletRequest request, JSONObject body) {
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(baseUrl + "/api/CZF/WYWXJJ_ZH_Update",
+                        HttpMethod.POST, requestEntity, String.class);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("更新添加账户失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_ZH_Update");
+            logger.error("更新添加账户失败，请求体: " + body.toJSONString());
+            logger.error("更新添加账户失败，返回内容: " + responseEntityBody);
             throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
+  <title>物业维修基金管理系统-开户</title>
+  <style>
+    .jb_2 {
+      padding-left: 30px !important;
+    }
+
+    .jb_3 {
+      padding-left: 40px !important;
+    }
+
+    .jb_4 {
+      padding-left: 50px !important;
+    }
+
+    .jb_5 {
+      padding-left: 60px !important;
+    }
+
+    .red .layui-tree-txt{
+      color: red !important;
+    }
+
+    span.lpb {
+      border: 1px solid #eee;
+      margin: 5px;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .border-green {
+      border-color: #00FF00 ! important;
+    }
+  </style>
+</head>
+<body style="min-height: 500px;">
+
+<input type="hidden" id="opts" th:value="${optsStr}"/>
+
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <blockquote class="layui-elem-quote layui-text" th:text="'开户-' + ${xm.xmmc}"></blockquote>
+
+    <div class="layui-row layui-col-space10">
+
+      <div class="layui-col-md2">
+        <div class="layui-card">
+          <div class="layui-card-header" style="border-left: 3px solid #5FB878;">
+            楼栋列表
+          </div>
+          <div class="layui-card-body">
+            <div id="ldTree"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="layui-col-md10">
+        <div>
+          <table id="fhTable" class="layui-table" lay-filter="fhTable"></table>
+          <script type="text/html" id="fh_zhTpl">
+            {{#  if(d.zh){ }}
+              已开户
+            {{#  } else { }}
+              未开户
+            {{#  } }}
+          </script>
+          <script type="text/html" id="fhTableToolBar">
+            {{#  if(d.fjzt === "已出售" && !d.zh){ }}
+            <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="kh">开户</a>
+            {{#  } else { }}
+            {{#  } }}
+          </script>
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/xmMgr/ldMgr.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/xmMgr/fhMgr.js}"></script>
+
+<script th:inline="javascript">
+  const xtglid = [[${cuser.fk_xtglid}]];
+  const fk_xmxxid = [[${xm.id}]];
+  var fk_ldxxid = null;
+  var uploadUrl = null;
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).use(['element', 'laydate', 'table', 'form', 'tree', 'upload'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let tree = layui.tree;
+    let upload = layui.upload;
+
+    getInitData();
+
+    form.verify({
+      cnumber: function (value, item) {
+        if(value && isNaN(value)){
+          return "只能输入数字";
+        }
+      }
+    });
+
+    //表格操作事件
+    table.on('tool(fhTable)', function (obj) {
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'kh') { //开户
+        //1. 首先判断是否设置了缴纳信息
+        let url = ctx + 'CZF/JNSZ/getList';
+        let params = {};
+        /*if (cuser.fk_id) {
+          params['fk_wyid'] = cuser.fk_id;
+        }*/
+        /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+          params['fk_qybm'] = cuser['fk_qybm'];
+        }*/
+
+        let index = top.layer.load();
+        $.ajax({
+          url: url,
+          type: "POST",
+          dataType: "json",
+          async: false,
+          data: params,
+          contentType: "application/json;charset=utf-8",
+          success: function (data1) {
+            top.layer.close(index);
+
+            let jnsz = data1.data;
+            if(!jnsz){
+              top.layer.msg("请先设置缴纳设置");
+              return false;
+            } else {
+              //打开弹窗
+              let index = top.layer.open({
+                type: 2,
+                title: '开户',
+                closeBtn: 1,
+                shadeClose: false,
+                area: ['1000px', '80%'],
+                content: ctx + "CZF/ZHKH/toActKh/" + data.id,
+                btn: ['保存', '取消'],
+                yes: function (index, layero) {
+                  let body = top.layer.getChildFrame('body', index);
+                  let frm = $(body).find("form#zh_khForm");
+                  $(frm).find("button.sb").click();
+                  return false;
+                },
+                cancel: function (index, layero) {
+                },
+                end: function () {
+                  top.layer.close(index);
+                  window.location.reload();
+                }
+              });
+            }
+
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            top.layer.close(index);
+            top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          }
+        });
+      }
+
+    });
+
+    //获取楼栋信息
+    function getInitData() {
+      let url = ctx + 'CZF/LDGL/getListAll/' + fk_xmxxid;
+      $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        async: false,
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          let ldList = data.data;
+          if (ldList && ldList.length > 0) {
+            let treeDatas = [];
+            for (let i in ldList) {
+              let ld = ldList[i];
+              let treeData = {};
+              treeData.id = ld.id;
+              treeData.title = ld.cmc;
+              treeData.orgData = ld;
+              treeDatas.push(treeData);
+            }
+
+            tree.render({
+              elem: '#ldTree',  //绑定元素
+              data: treeDatas,
+              click: function (obj) {
+                $(obj.elem[0]).addClass("red").siblings().removeClass("red");
+                fk_ldxxid = obj.data.id;
+
+                getFhData(fk_xmxxid, fk_ldxxid);
+
+              }
+            });
+          }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+        }
+      });
+    }
+
+    //获取房号信息table
+    function getFhData(fk_xmxxid, fk_ldxxid){
+      table.render({
+        elem: '#fhTable',
+        title: '房间列表',
+        url: ctx + "/CZF/FHGL/getList/" + fk_xmxxid + "/" + fk_ldxxid,
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {field: 'fh', title: '房号'},
+          {field: 'szlc', title: '所在楼层'},
+          {field: 'szdy', title: '所在单元'},
+          {field: 'fjzt', title: '房间状态'},
+          {field: 'yzmc', title: '业主名称'},
+          {field: 'yzzjh', title: '业主证件号码'},
+          {field: 'yzlxdh', title: '业主联系电话'},
+          {templet: '#fh_zhTpl', title: '是否已开户'},
+          {toolbar: '#fhTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
+
+
+  });
+</script>
+</body>
+</html>

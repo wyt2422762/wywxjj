@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-账户管理</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <blockquote class="layui-elem-quote layui-text">
+      账户管理
+    </blockquote>
+
+    <div style="padding: 10px;">
+      <div style="padding-bottom: 10px;">
+        <form class="layui-form" id="searchForm">
+          <div class="layui-inline" style="float:left;display:flex;">
+            <input type="text" id="no" name="no" placeholder="请输入账号搜索" value=""
+                   autocomplete="off" class="layui-input" style=""/>
+            <button class="layui-btn layui-btn-danger btn_search" lay-submit lay-filter="formDemo1"
+                    style="margin-left:15px;">
+              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+          </div>
+        </form>
+        <div class="clearfix"></div>
+      </div>
+
+      <table id="zhTable" class="layui-table" lay-filter="zhTable"></table>
+
+      <script type="text/html" id="zhTableToolBar">
+        <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn  layui-btn-normal layui-btn-xs"
+           lay-event="update">修改</a>
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-warm" lay-event="jf">缴费</a>
+        <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+      </script>
+
+    </div>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/citys.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+  const xtglid = [[${cuser.fk_xtglid}]];
+  const cYhType = [[${cuser.yhType}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+
+    getTableData();
+
+    function getTableData(no) {
+      let url = ctx + 'CZF/ZHGL/getList';
+      let params = {};
+      if (no) {
+        params['no'] = xmmc
+      }
+      if (cuser.yhType === "银行" && cuser.fk_id) {
+        params['fk_yhid'] = cuser.fk_id;
+      }
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+              params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+
+      //获取表格数据
+      table.render({
+        elem: '#zhTable',
+        title: '小区列表',
+        url: url, //数据接口
+        where: params, //请求参数
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {field: 'no', title: '账号'},
+          {field: 'yzmc', title: '账户名称'},
+          {field: 'money', title: '账户金额'},
+          {field: 'khrq', title: '开户日期'},
+          {field: 'zt', title: '账户状态'},
+          {toolbar: '#zhTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
+    //工具条事件
+    table.on('tool(zhTable)', function (obj) {
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'mx') { //明细
+        let index = top.layer.open({
+          type: 2,
+          title: '账户明细',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/ZHGL/toInfo/" + data.id,
+          end: function () {
+            top.layer.close(index);
+          }
+        });
+      } else if (layEvent === 'update') { //编辑
+        let index = top.layer.open({
+          type: 2,
+          title: '账户修改',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/ZHGL/toEdit/" + data.id,
+          btn: ['保存', '取消'],
+          yes: function (index, layero) {
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#zh_Form");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          end: function () {
+            top.layer.close(index);
+            window.location.reload();
+          }
+        });
+      } else if (layEvent === 'jf') { //缴费
+        let index = top.layer.open({
+          type: 2,
+          title: '账户缴费',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/ZHGL/toJf/" + data.id,
+          btn: ['保存', '取消'],
+          yes: function (index, layero) {
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#zh_jfForm");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          end: function () {
+            top.layer.close(index);
+            window.location.reload();
+          }
+        });
+      }
+    });
+
+  });
+</script>
+</body>
+</html>

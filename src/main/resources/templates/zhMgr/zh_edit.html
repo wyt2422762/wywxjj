@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-账户详情</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show" style="padding: 10px;">
+  <div id="LAY_preview">
+    <fieldset class="layui-elem-field layui-field-title">
+      <legend>账户信息</legend>
+    </fieldset>
+
+    <!-- 账户信息 -->
+    <form class="layui-form" method="post" id="zh_Form" lay-filter="zh_Form">
+      <div class="layui-form">
+        <table class="layui-table">
+          <tbody>
+            <tr>
+              <th style="white-space: nowrap;">账号</th>
+              <td>
+                <input type="text" name="no" lay-verify="required" placeholder="" class="layui-input"/>
+              </td>
+              <th style="white-space: nowrap;">账户名称</th>
+              <td>
+                <input type="text" readonly name="yzmc" placeholder="" class="layui-input"/>
+              </td>
+              <th style="white-space: nowrap;">证件号码</th>
+              <td>
+                <input type="text" readonly name="yzzjh" placeholder="" class="layui-input"/>
+              </td>
+            </tr>
+            <tr>
+              <th style="white-space: nowrap;">账号金额(元)</th>
+              <td>
+                <input type="number" readonly name="money" placeholder="" class="layui-input"/>
+              </td>
+              <th style="white-space: nowrap;">开户日期</th>
+              <td>
+                <input type="text" readonly name="khrq" placeholder="" class="layui-input"/>
+              </td>
+              <th style="white-space: nowrap;">账号状态</th>
+              <td>
+                <input type="text" readonly name="zt" placeholder="" class="layui-input"/>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <input type="hidden" name="fk_xtglid" />
+      <input type="hidden" name="fk_qybm" />
+      <input type="hidden" name="fk_yhid" />
+      <input type="hidden" name="fk_fhxxid" />
+      <input type="hidden" name="id" />
+
+      <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+    </form>
+
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+      <legend>账户明细</legend>
+    </fieldset>
+
+    <!-- 账户明细 -->
+    <div style="max-height: 300px;">
+      <table id="zhMxTable" class="layui-table" lay-filter="zhMxTable"></table>
+    </div>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/zhMgr/zhMgr.js}"></script>
+
+<script th:inline="javascript">
+  const xtglid = [[${cuser.fk_xtglid}]];
+  const cYhType = [[${cuser.yhType}]];
+  const fy_wyid = [[${cuser.fk_id}]];
+  const qybm = [[${cuser.fk_qybm}]];
+  const id = [[${id}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+
+    getInitData();
+
+    function getInitData() {
+      let index = top.layer.load();
+      $.ajax({
+        url: ctx + "/CZF/ZHGL/getDetail/" + id,
+        type: "POST",
+        async: false,
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          debugger;
+          let zh = data.data;
+          if(zh.zt === '0') {
+            zh[''] = "正常";
+          }
+          top.layer.close(index);
+
+          //渲染表单数据
+          form.val("zh_Form", zh);
+
+          //渲染table数据
+          table.render({
+            elem: '#zhMxTable',
+            title: '明细列表',
+            page: false,
+            data: zh.list,
+            cols: [[ //表头
+              {field: 'jzrq', title: '记账日期'},
+              {field: 'czlx', title: '操作类型'},
+              {field: 'sr', title: '收入(元)'},
+              {field: 'zc', title: '支出(元)'},
+              {field: 'zhye', title: '账户余额(元)'}
+            ]]
+          });
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(index);
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          window.close();
+        }
+      });
+    }
+
+
+    form.on('submit(submitBut)', function (data1) {
+      let zh = {};
+      for (let key in data1.field) {
+        console.log(key);
+        let val = data1.field[key];
+        if (val) {
+          zh[key] = val;
+        }
+      }
+
+      let data = {};
+      data.model = zh;
+
+      let index = top.layer.getFrameIndex(window.name); //获取窗口索引
+
+      aeZh(data, index);
+
+      return false;
+    });
+  });
+</script>
+</body>
+</html>

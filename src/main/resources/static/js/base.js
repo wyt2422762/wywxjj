@@ -59,7 +59,7 @@ const CommonDownloadUpload = {
 
 //日期相关方法
 const TIME = {
-  parseTime: function parseTime(time, pattern) {
+  parseTime: function (time, pattern) {
     if (arguments.length === 0 || !time) {
       return null;
     }
@@ -99,7 +99,8 @@ const TIME = {
       return value || 0;
     })
     return time_str;
-  }
+  },
+
 }
 
 const STRING = {
