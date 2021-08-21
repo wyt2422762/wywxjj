@@ -13,11 +13,26 @@
     <div style="padding: 10px;">
       <div style="padding-bottom: 10px;">
         <form class="layui-form" id="searchForm">
-          <div class="layui-inline" style="float:left;display:flex;">
-            <input type="text" id="no" name="no" placeholder="请输入账号搜索" value=""
-                   autocomplete="off" class="layui-input" style=""/>
-            <button class="layui-btn layui-btn-danger btn_search" lay-submit lay-filter="formDemo1"
-                    style="margin-left:15px;">
+          <!-- 账号 -->
+          <div class="layui-inline">
+            <div class="layui-input-inline">
+              <input type="text" id="no" name="no" placeholder="请输入账号搜索" value=""
+                     autocomplete="off" class="layui-input" style=""/>
+            </div>
+          </div>
+          <!-- 账号状态 -->
+          <div class="layui-inline">
+            <div class="layui-input-inline">
+              <select name="zt" id="zt" placeholder="请选择账号状态">
+                <option value="">请选择账号状态</option>
+                <option value="正常">正常</option>
+                <option value="已销户">已销户</option>
+              </select>
+            </div>
+          </div>
+          <!-- 搜索按钮 -->
+          <div class="layui-inline">
+            <button class="layui-btn layui-btn-danger btn_search" lay-submit lay-filter="formDemo1">
               <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
             </button>
           </div>
@@ -29,10 +44,14 @@
 
       <script type="text/html" id="zhTableToolBar">
         <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
-        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn  layui-btn-normal layui-btn-xs"
-           lay-event="update">修改</a>
-        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-warm" lay-event="jf">缴费</a>
-        <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+        {{#  if(d.zt == '正常'){ }}
+          <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn  layui-btn-normal layui-btn-xs"
+             lay-event="update">过户</a>
+          <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-warm"
+             lay-event="jf">缴费</a>
+          <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-danger"
+             lay-event="xh">销户</a>
+        {{#  } }}
       </script>
 
     </div>
@@ -60,11 +79,14 @@
 
     getTableData();
 
-    function getTableData(no) {
+    function getTableData(no, zt) {
       let url = ctx + 'CZF/ZHGL/getList';
       let params = {};
       if (no) {
-        params['no'] = xmmc
+        params['no'] = no;
+      }
+      if(zt) {
+        params['zt'] = zt;
       }
       if (cuser.yhType === "银行" && cuser.fk_id) {
         params['fk_yhid'] = cuser.fk_id;
@@ -72,6 +94,15 @@
       /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
               params['fk_qybm'] = cuser['fk_qybm'];
       }*/
+
+      //搜索按钮事件
+      form.on('submit(formDemo1)', function (data) {
+        debugger;
+        let no = data.field.no;
+        let zt = data.field.zt;
+        getTableData(no, zt);
+        return false;
+      });
 
       //获取表格数据
       table.render({
@@ -125,7 +156,7 @@
       } else if (layEvent === 'update') { //编辑
         let index = top.layer.open({
           type: 2,
-          title: '账户修改',
+          title: '账户过户',
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
@@ -154,6 +185,26 @@
           yes: function (index, layero) {
             let body = top.layer.getChildFrame('body', index);
             let frm = $(body).find("form#zh_jfForm");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          end: function () {
+            top.layer.close(index);
+            window.location.reload();
+          }
+        });
+      } else if (layEvent === 'xh') { //销户
+        let index = top.layer.open({
+          type: 2,
+          title: '账户销户',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/ZHGL/toXh/" + data.id,
+          btn: ['保存', '取消'],
+          yes: function (index, layero) {
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#zh_xhForm");
             $(frm).find("button.sb").click();
             return false;
           },

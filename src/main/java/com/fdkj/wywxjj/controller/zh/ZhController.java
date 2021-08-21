@@ -2,6 +2,12 @@ package com.fdkj.wywxjj.controller.zh;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.fdkj.wywxjj.api.model.sysMgr.User;
+import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
+import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
+import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
+import com.fdkj.wywxjj.api.model.wf.bus.XhSqWf;
+import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh_his;
 import com.fdkj.wywxjj.api.util.Api;
@@ -9,6 +15,7 @@ import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
+import com.fdkj.wywxjj.service.WorkflowService;
 import com.fdkj.wywxjj.utils.DateUtils;
 import com.fdkj.wywxjj.utils.math.BigDecimalUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -22,7 +29,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.math.BigDecimal;
 import java.util.*;
 
 /**
@@ -38,6 +44,8 @@ public class ZhController {
 
     @Autowired
     private Api api;
+    @Autowired
+    private WorkflowService workflowService;
 
     /**
      * 跳转到
@@ -129,6 +137,29 @@ public class ZhController {
     }
 
     /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @param id      账户id
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toXh/{id}")
+    public ModelAndView toXh(HttpServletRequest request,
+                             @RequestParam(value = "opts", required = false) List<String> opts,
+                             @PathVariable("id") String id) throws Exception {
+        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        if (opts != null && !opts.isEmpty()) {
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
+        request.setAttribute("id", id);
+        return new ModelAndView("zhMgr/zh_xh");
+    }
+
+    /**
      * 获取账户列表
      *
      * @param request req
@@ -145,8 +176,8 @@ public class ZhController {
                                                    @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
                                                    @RequestParam(value = "fk_yhid", required = false) String fk_yhid,
                                                    @RequestParam(value = "no", required = false) String no,
+                                                   @RequestParam(value = "zt", required = false) String zt,
                                                    @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
-
         try {
             Map<String, String> reqBody = new HashMap<>();
             if (StringUtils.isNotBlank(fk_yhid)) {
@@ -154,6 +185,9 @@ public class ZhController {
             }
             if (StringUtils.isNotBlank(no)) {
                 reqBody.put("no", no);
+            }
+            if (StringUtils.isNotBlank(zt)) {
+                reqBody.put("zt", zt);
             }
             if (StringUtils.isNotBlank(fk_qybm)) {
                 reqBody.put("fk_qybm", fk_qybm);
@@ -246,25 +280,25 @@ public class ZhController {
             String money = zhDetail.getMoney();
             String add = BigDecimalUtil.add(money, jfje).toPlainString();
             zhDetail.setMoney(add);
+            zhDetail.setXfrq(DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()));
 
             List<Zh_his> list = zhDetail.getList();
             Zh_his zh_his = new Zh_his();
-            zh_his.setCzlx(Constants.Jzlb.JF);
+            zh_his.setCzlx(Constants.JzLb.JF);
             zh_his.setSr(jfje);
             zh_his.setZhye(add);
             zh_his.setFk_zhid(zhDetail.getId());
             zh_his.setJzrq(DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()));
 
-            List<Zh_his> list1 = zhDetail.getList();
-            if(list1 == null){
-                list1 = new ArrayList<>();
+            if (list == null) {
+                list = new ArrayList<>();
             }
-            list1.add(zh_his);
+            list.add(zh_his);
 
             JSONObject jsonObject = new JSONObject();
-            jsonObject.put("model", (JSONObject)JSONObject.toJSON(zhDetail));
+            jsonObject.put("model", (JSONObject) JSONObject.toJSON(zhDetail));
 
-            JSONArray ja = (JSONArray)JSONArray.toJSON(list1);
+            JSONArray ja = (JSONArray) JSONArray.toJSON(list);
             for (int i = 0; i < ja.size(); i++) {
                 JSONObject jsonObject1 = ja.getJSONObject(i);
                 jsonObject1.remove("id");
@@ -280,6 +314,74 @@ public class ZhController {
         } catch (Exception e) {
             log.error("账户缴费失败", e);
             throw new BusinessException("账户缴费失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
+
+    /**
+     * 提交销户申请
+     *
+     * @param request req
+     * @param id      账户id
+     * @param xhsq    销户申请
+     * @return res
+     */
+    @RequestMapping("xh/{id}")
+    @ResponseBody
+    public ResponseEntity<CusResponseBody> xh(HttpServletRequest request,
+                                              @PathVariable String id,
+                                              @RequestBody Xhsq xhsq) {
+        try {
+            //登录用户
+            User cuser = api.getUserFromCookie(request);
+            //1. 获取账户信息
+            Zh zhDetail = api.getZhDetail(request, id);
+            // 2. 启动流程，获取启动结点信息
+            WorkflowNode startNode = workflowService.getWorkflowStartNode(request, Constants.WorkflowId.XH);
+            // 3. 获取启动结点的下一个结点
+            WorkflowNode nextNode = workflowService.getWorkflowNextNode(request, Constants.WorkflowId.XH, startNode.getId());
+            // 4. 构造流程实例
+            WorkflowInstant wfi = new WorkflowInstant();
+            wfi.setFk_dqjdid(nextNode.getId())
+                    .setFk_qybm(zhDetail.getFk_qybm())
+                    .setFk_xtglid(zhDetail.getFk_xtglid())
+                    .setFk_wfid(Constants.WorkflowId.XH)
+                    .setFk_yhid(cuser.getId())
+                    .setLx("销户")
+                    .setZt(Constants.WorkflowStatus.SHZ)
+                    .setFqr(cuser.getUsername())
+                    .setFqsj(DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()));
+            // 5. 构造流程历史
+            WorkflowHistory wfh = new WorkflowHistory();
+            wfh.setFk_qybm(zhDetail.getFk_qybm())
+                    .setFk_xtglid(zhDetail.getFk_xtglid())
+                    .setFk_jdid(startNode.getId())
+                    .setFk_yhid(cuser.getFk_id())
+                    .setSpr(cuser.getUsername())
+                    .setSpsj(DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()))
+                    .setCzmc(Constants.WorkflowOpt.START).setLx("销户");
+
+            JSONObject json = new JSONObject();
+            json.put("WYWXJJ_XHSQModel", (JSONObject)JSONObject.toJSON(xhsq));
+            json.put("WYWXJJ_ZHModel", (JSONObject)JSONObject.toJSON(zhDetail));
+            json.put("WYWXJJ_WORKFLOW_SLModel", (JSONObject)JSONObject.toJSON(wfi));
+            json.put("WYWXJJ_WORKFLOW_HISModel", (JSONObject)JSONObject.toJSON(wfh));
+
+            XhSqWf xhSqWf = new XhSqWf();
+            xhSqWf.setWYWXJJ_XHSQModel(xhsq)
+                    .setWYWXJJ_ZHModel(zhDetail)
+                    .setWYWXJJ_WORKFLOW_SLModel(wfi)
+                    .setWYWXJJ_WORKFLOW_HISModel(wfh);
+
+            JSONObject jsonObject = (JSONObject) JSONObject.toJSON(xhSqWf);
+
+            api.submitXhSq(request, json);
+
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("销户申请提交成功");
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("销户申请提交成功失败", e);
+            throw new BusinessException("销户申请提交成功失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
         }
     }
 }

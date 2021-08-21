@@ -15,29 +15,41 @@
       <table class="layui-table">
         <tbody>
         <tr>
-          <th>房号</th><td th:text="${fh.fh}"></td>
-          <th>所在楼层</th><td th:text="${fh.szlc}"></td>
-          <th>所在单元</th><td th:text="${fh.szdy}"></td>
-          <th>建筑面积(m<sup>2</sup>)</th><td th:text="${fh.scmj_jzmj}"></td>
+          <th>房号</th>
+          <td th:text="${fh.fh}"></td>
+          <th>所在楼层</th>
+          <td th:text="${fh.szlc}"></td>
+          <th>所在单元</th>
+          <td th:text="${fh.szdy}"></td>
+          <th>建筑面积(m<sup>2</sup>)</th>
+          <td th:text="${fh.scmj_jzmj}"></td>
         </tr>
         <tr>
-          <th>业主名称</th><td th:text="${fh.yzmc}"></td>
-          <th>业主证件号码</th><td th:text="${fh.yzzjh}"></td>
-          <th>业主联系电话</th><td th:text="${fh.yzlxdh}"></td>
-          <th>业主地址</th><td th:text="${fh.yzdz}"></td>
+          <th>业主名称</th>
+          <td th:text="${fh.yzmc}"></td>
+          <th>业主证件号码</th>
+          <td th:text="${fh.yzzjh}"></td>
+          <th>业主联系电话</th>
+          <td th:text="${fh.yzlxdh}"></td>
+          <th>业主地址</th>
+          <td th:text="${fh.yzdz}"></td>
         </tr>
         <tr>
-          <th>合同备案号</th><td th:text="${fh.htbah}"></td>
-          <th>合同金额(元)</th><td th:text="${fh.htje}"></td>
-          <th></th><td></td>
-          <th></th><td></td>
+          <th>合同备案号</th>
+          <td th:text="${fh.htbah}"></td>
+          <th>合同金额(元)</th>
+          <td th:text="${fh.htje}"></td>
+          <th></th>
+          <td></td>
+          <th></th>
+          <td></td>
         </tr>
         </tbody>
       </table>
     </div>
 
     <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-      <legend>账户信息</legend>
+      <legend>开户信息</legend>
     </fieldset>
 
     <!-- 账户信息 -->
@@ -52,15 +64,21 @@
             </td>
             <th style="white-space: nowrap;">账户名称</th>
             <td>
-              <input type="text" name="yzmc" lay-verify="required" placeholder="" class="layui-input"/>
+              <input type="text" name="yzmc" lay-verify="required" placeholder="" class="layui-input"
+                     th:value="${fh.yzmc}"/>
             </td>
-            <th style="white-space: nowrap;">开户银行</th>
+            <th style="white-space: nowrap;">证件号码</th>
             <td>
-              <input type="text" name="yhmc" readonly placeholder="" class="layui-input" th:value="${yh.yxmc}"/>
-              <input type="hidden" name="fk_yhid" placeholder="" class="layui-input" th:value="${yh.id}"/>
+              <input type="text" name="yzzjh" lay-verify="required" placeholder="" class="layui-input"
+                     th:value="${fh.yzzjh}"/>
             </td>
           </tr>
           <tr>
+            <th style="white-space: nowrap;">联系电话</th>
+            <td>
+              <input type="text" name="lxdh" lay-verify="required" placeholder="" class="layui-input"
+                     th:value="${fh.yzlxdh}"/>
+            </td>
             <th style="white-space: nowrap;">
               缴纳标准(
               <span th:if="${jnsz.jnfs} == '按合同总价缴纳' ">%</span>
@@ -78,11 +96,15 @@
                      class="layui-input" th:value="${money}" readonly
               />
             </td>
-            <!--<th style="white-space: nowrap;">开户时间</th>
+          </tr>
+          <tr>
+            <th style="white-space: nowrap;">开户银行</th>
             <td>
-              <input type="text" class="layui-input" name="khrq" id="khrq"
-                     autocomplete="off" lay-verify="required|time" placeholder="开户时间"/>
-            </td>-->
+              <input type="text" name="yhmc" readonly placeholder="" class="layui-input" th:value="${yh.yxmc}"/>
+              <input type="hidden" name="fk_yhid" placeholder="" class="layui-input" th:value="${yh.id}"/>
+            </td>
+            <th style="white-space: nowrap;"></th><td></td>
+            <th style="white-space: nowrap;"></th><td></td>
           </tr>
           </tbody>
         </table>
@@ -128,7 +150,7 @@
 
     form.on('submit(submitBut)', function (data) {
       debugger;
-      let data1= {};
+      let data1 = {};
 
       let zh = {};
       for (let key in data.field) {

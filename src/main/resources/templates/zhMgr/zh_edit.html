@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/common/header::header(~{::title},~{},~{})">
-  <title>物业维修基金管理系统-账户详情</title>
+  <title>物业维修基金管理系统-账户编辑</title>
 </head>
 <body>
 <div class="layui-tab-item layui-show" style="padding: 10px;">
@@ -13,7 +13,7 @@
     <!-- 账户信息 -->
     <form class="layui-form" method="post" id="zh_Form" lay-filter="zh_Form">
       <div class="layui-form">
-        <table class="layui-table">
+        <table class="layui-table" lay-size="sm">
           <tbody>
             <tr>
               <th style="white-space: nowrap;">账号</th>
@@ -22,11 +22,15 @@
               </td>
               <th style="white-space: nowrap;">账户名称</th>
               <td>
-                <input type="text" readonly name="yzmc" placeholder="" class="layui-input"/>
+                <input type="text" name="yzmc" placeholder="" class="layui-input"/>
               </td>
               <th style="white-space: nowrap;">证件号码</th>
               <td>
-                <input type="text" readonly name="yzzjh" placeholder="" class="layui-input"/>
+                <input type="text" name="yzzjh" placeholder="" class="layui-input"/>
+              </td>
+              <th style="white-space: nowrap;">联系电话</th>
+              <td>
+                <input type="text" name="lxdh" placeholder="" class="layui-input"/>
               </td>
             </tr>
             <tr>
@@ -34,14 +38,15 @@
               <td>
                 <input type="number" readonly name="money" placeholder="" class="layui-input"/>
               </td>
-              <th style="white-space: nowrap;">开户日期</th>
-              <td>
-                <input type="text" readonly name="khrq" placeholder="" class="layui-input"/>
-              </td>
               <th style="white-space: nowrap;">账号状态</th>
               <td>
                 <input type="text" readonly name="zt" placeholder="" class="layui-input"/>
               </td>
+              <th style="white-space: nowrap;">开户日期</th>
+              <td colspan="2">
+                <input type="text" readonly name="khrq" placeholder="" class="layui-input"/>
+              </td>
+              <td></td>
             </tr>
           </tbody>
         </table>
@@ -62,7 +67,7 @@
 
     <!-- 账户明细 -->
     <div style="max-height: 300px;">
-      <table id="zhMxTable" class="layui-table" lay-filter="zhMxTable"></table>
+      <table id="zhMxTable" class="layui-table" lay-filter="zhMxTable" lay-size="sm"></table>
     </div>
   </div>
 </div>

@@ -138,7 +138,7 @@ public class Constants {
     /**
      * 记账类别
      */
-    public static class Jzlb {
+    public static class JzLb {
         /**
          * 资金初缴
          */
@@ -163,5 +163,76 @@ public class Constants {
          * 销户退款
          */
         public static final String XHTK = "销户退款";
+    }
+
+    /**
+     * 流程结点类型
+     */
+    public static class WorkflowNodeType {
+        /**
+         * 启动
+         */
+        public static final String QD = "启动";
+        /**
+         * 结束
+         */
+        public static final String JS = "结束";
+    }
+
+    /**
+     * 流程定义id
+     */
+    public static class WorkflowId {
+        /**
+         * 销户
+         */
+        public static final String XH = "0A0204F1-E899-43E9-AC5E-B6E47C03393B";
+
+    }
+
+    /**
+     * 流程状态
+     */
+    public static class WorkflowStatus {
+        /**
+         * 审核中
+         */
+        public static final String SHZ = "审核中";
+        /**
+         * 已审核
+         */
+        public static final String YSH = "已审核";
+
+    }
+
+    /**
+     * 流程操作
+     */
+    public static class WorkflowOpt {
+        /**
+         * 提交申请
+         */
+        public static final String START = "提交申请";
+
+        /**
+         * 初审
+         */
+        public static final String CS = "初审";
+
+        /**
+         * 中审
+         */
+        public static final String ZS = "中审";
+
+        /**
+         * 终审
+         */
+        public static final String ZZS = "终审";
+
+        /**
+         * 结束
+         */
+        public static final String END = "结束";
+
     }
 }

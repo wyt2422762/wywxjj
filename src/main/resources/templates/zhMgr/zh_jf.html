@@ -28,20 +28,25 @@
               <td>
                 <input type="text" readonly name="yzzjh" placeholder="" class="layui-input"/>
               </td>
+              <th style="white-space: nowrap;">联系电话</th>
+              <td>
+                <input type="text" readonly name="lxdh" placeholder="" class="layui-input"/>
+              </td>
             </tr>
             <tr>
               <th style="white-space: nowrap;">账号金额(元)</th>
               <td>
                 <input type="number" readonly name="money" placeholder="" class="layui-input"/>
               </td>
-              <th style="white-space: nowrap;">开户日期</th>
-              <td>
-                <input type="text" readonly name="khrq" placeholder="" class="layui-input"/>
-              </td>
               <th style="white-space: nowrap;">账号状态</th>
               <td>
                 <input type="text" readonly name="zt" placeholder="" class="layui-input"/>
               </td>
+              <th style="white-space: nowrap;">开户日期</th>
+              <td colspan="2">
+                <input type="text" readonly name="khrq" placeholder="" class="layui-input"/>
+              </td>
+              <td></td>
             </tr>
           </tbody>
         </table>
@@ -71,14 +76,14 @@
     <!-- 缴费 -->
     <form class="layui-form" method="post" id="zh_jfForm" lay-filter="zh_jfForm">
       <div>
-        <table class="layui-table">
+        <table class="layui-table" style="table-layout:fixed;">
           <tbody>
           <tr>
             <th style="white-space: nowrap;">缴费金额(元)</th>
-            <td>
+            <td colspan="2">
               <input type="number" id="jfje" name="jfje" lay-verify="required" placeholder="" class="layui-input"/>
             </td>
-            <th></th><td></td>
+            <td></td><td></td>
           </tr>
           </tbody>
         </table>

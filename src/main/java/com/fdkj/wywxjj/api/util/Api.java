@@ -2122,4 +2122,29 @@ public class Api {
             throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
+
+    /**
+     * 销户申请提交
+     * @param request req
+     * @param body 请求体
+     */
+    public void submitXhSq(HttpServletRequest request, JSONObject body){
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(baseUrl + "/api/CZF/WYWXJJ_TJXHSQ",
+                        HttpMethod.POST, requestEntity, String.class);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("提交销户申请失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_TJXHSQ");
+            logger.error("提交销户申请失败，请求体: " + body.toJSONString());
+            logger.error("提交销户申请失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+    }
+
 }
