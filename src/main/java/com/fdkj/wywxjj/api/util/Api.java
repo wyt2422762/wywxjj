@@ -7,6 +7,7 @@ import com.fdkj.wywxjj.api.model.sysMgr.*;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import com.fdkj.wywxjj.api.model.xmMgr.Ld;
 import com.fdkj.wywxjj.api.model.xmMgr.Xm;
+import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh_his;
 import com.fdkj.wywxjj.error.BusinessException;
@@ -1888,8 +1889,7 @@ public class Api {
         }
 
         //构造返回信息
-        Jnsz jnsz = jsonObject.getJSONArray("Results").getJSONObject(0).getObject("m", Jnsz.class);
-        return jnsz;
+        return jsonObject.getJSONArray("Results").getJSONObject(0).getObject("m", Jnsz.class);
     }
 
     /**
@@ -2001,7 +2001,7 @@ public class Api {
         }
     }
 
-    /*****************************************缴纳设置api*****************************************/
+    /*****************************************账户api*****************************************/
 
     /**
      * 获取账户列表(分页)
@@ -2145,6 +2145,45 @@ public class Api {
             logger.error("提交销户申请失败，返回内容: " + responseEntityBody);
             throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
+    }
+
+    /**
+     * 获取缴纳设置详情
+     *
+     * @param request req
+     * @param id      账户id
+     * @return 账户详情
+     * @throws Exception err
+     */
+    public Xhsq getXhsqDetail(HttpServletRequest request, String id) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(null, headers);
+
+        //请求参数
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("id", id);
+
+        String url = baseUrl + "/api/CZF/WYWXJJ_XHSQ_Model?id={id}";
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url,
+                        HttpMethod.POST, requestEntity, String.class, params);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("获取销户申请详情失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_XHSQ_Model");
+            logger.error("获取销户申请详情失败，请求参数: " + params);
+            logger.error("获取销户申请详情失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        return jsonObject.getJSONObject("Results").toJavaObject(Xhsq.class);
     }
 
 }

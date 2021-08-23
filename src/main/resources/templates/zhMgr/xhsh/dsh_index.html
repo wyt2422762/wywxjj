@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-销户审核-待审核</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show" style="padding: 10px;">
+  <div id="LAY_preview">
+    <fieldset class="layui-elem-field layui-field-title">
+      <legend>待审核信息</legend>
+    </fieldset>
+
+    <!-- 待审核列表 -->
+    <div style="padding: 10px;">
+      <table id="dshTable" class="layui-table" lay-filter="dshTable"></table>
+    </div>
+
+  </div>
+</div>
+
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/zhMgr/zhMgr.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+
+    getTableData();
+
+    //获取待审核列表
+    function getTableData() {
+      let params = {};
+      let url = ctx + 'CZF/XHSH/getPendingReviewList';
+      //获取表格数据
+      table.render({
+        elem: '#dshTable',
+        title: '待审核列表',
+        url: url, //数据接口
+        where: params, //请求参数
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {templet: '<div>{{d.data.zh.no}}</div>', title: '账号'},
+          {templet: '<div>{{d.data.xhsq}}</div>', title: '销户申请'},
+          {templet: '<div>{{d.data.xhyy}}</div>', title: '销户原因'},
+          {templet: '<div>{{d.data.zjhm}}</div>', title: '证件号码'},
+          {templet: '<div>{{d.data.lxdh}}</div>', title: '联系电话'},
+          {templet: '<div>{{d.data.sqrq}}</div>', title: '申请日期'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
+  });
+</script>
+</body>
+</html>

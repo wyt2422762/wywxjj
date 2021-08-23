@@ -6,7 +6,6 @@ import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
-import com.fdkj.wywxjj.api.model.wf.bus.XhSqWf;
 import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh_his;
@@ -18,6 +17,7 @@ import com.fdkj.wywxjj.model.base.Page;
 import com.fdkj.wywxjj.service.WorkflowService;
 import com.fdkj.wywxjj.utils.DateUtils;
 import com.fdkj.wywxjj.utils.math.BigDecimalUtil;
+import com.fdkj.wywxjj.utils.uuid.IdUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -240,7 +240,7 @@ public class ZhController {
         try {
             String khrq = zh.getJSONObject("model").getString("khrq");
             if (StringUtils.isBlank(khrq)) {
-                khrq = DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date());
+                khrq = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
                 zh.getJSONObject("model").remove("khrq");
                 zh.getJSONObject("model").put("khrq", khrq);
             }
@@ -248,7 +248,7 @@ public class ZhController {
             if (list != null && list.size() > 0) {
                 for (int i = 0; i < list.size(); i++) {
                     JSONObject jsonObject = list.getJSONObject(i);
-                    jsonObject.putIfAbsent("jzrq", DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()));
+                    jsonObject.putIfAbsent("jzrq", DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date()));
                 }
             }
             //调用接口添加编辑数据
@@ -280,7 +280,7 @@ public class ZhController {
             String money = zhDetail.getMoney();
             String add = BigDecimalUtil.add(money, jfje).toPlainString();
             zhDetail.setMoney(add);
-            zhDetail.setXfrq(DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()));
+            zhDetail.setXfrq(DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date()));
 
             List<Zh_his> list = zhDetail.getList();
             Zh_his zh_his = new Zh_his();
@@ -288,7 +288,7 @@ public class ZhController {
             zh_his.setSr(jfje);
             zh_his.setZhye(add);
             zh_his.setFk_zhid(zhDetail.getId());
-            zh_his.setJzrq(DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()));
+            zh_his.setJzrq(DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date()));
 
             if (list == null) {
                 list = new ArrayList<>();
@@ -335,6 +335,8 @@ public class ZhController {
             User cuser = api.getUserFromCookie(request);
             //1. 获取账户信息
             Zh zhDetail = api.getZhDetail(request, id);
+            // 改账户状态
+            zhDetail.setZt(Constants.ZhZt.XHDJ);
             // 2. 启动流程，获取启动结点信息
             WorkflowNode startNode = workflowService.getWorkflowStartNode(request, Constants.WorkflowId.XH);
             // 3. 获取启动结点的下一个结点
@@ -346,10 +348,10 @@ public class ZhController {
                     .setFk_xtglid(zhDetail.getFk_xtglid())
                     .setFk_wfid(Constants.WorkflowId.XH)
                     .setFk_yhid(cuser.getId())
-                    .setLx("销户")
+                    .setLx(Constants.WorkflowType.XH)
                     .setZt(Constants.WorkflowStatus.SHZ)
                     .setFqr(cuser.getUsername())
-                    .setFqsj(DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()));
+                    .setFqsj(DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date()));
             // 5. 构造流程历史
             WorkflowHistory wfh = new WorkflowHistory();
             wfh.setFk_qybm(zhDetail.getFk_qybm())
@@ -357,23 +359,35 @@ public class ZhController {
                     .setFk_jdid(startNode.getId())
                     .setFk_yhid(cuser.getFk_id())
                     .setSpr(cuser.getUsername())
-                    .setSpsj(DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", new Date()))
-                    .setCzmc(Constants.WorkflowOpt.START).setLx("销户");
+                    .setSpsj(DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date()))
+                    .setCzmc(Constants.WorkflowOpt.START).setLx(Constants.WorkflowType.XH);
 
             JSONObject json = new JSONObject();
-            json.put("WYWXJJ_XHSQModel", (JSONObject)JSONObject.toJSON(xhsq));
-            json.put("WYWXJJ_ZHModel", (JSONObject)JSONObject.toJSON(zhDetail));
-            json.put("WYWXJJ_WORKFLOW_SLModel", (JSONObject)JSONObject.toJSON(wfi));
-            json.put("WYWXJJ_WORKFLOW_HISModel", (JSONObject)JSONObject.toJSON(wfh));
 
-            XhSqWf xhSqWf = new XhSqWf();
-            xhSqWf.setWYWXJJ_XHSQModel(xhsq)
-                    .setWYWXJJ_ZHModel(zhDetail)
-                    .setWYWXJJ_WORKFLOW_SLModel(wfi)
-                    .setWYWXJJ_WORKFLOW_HISModel(wfh);
+            //销户申请内容
+            xhsq.setId(IdUtils.randomUUID());
+            xhsq.setSqrq(DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date()));
+            JSONObject jsonObject_xhsq = JSONObject.parseObject(JSONObject.toJSONString(xhsq));
+            json.put("wywxjJ_XHSQModel", jsonObject_xhsq);
 
-            JSONObject jsonObject = (JSONObject) JSONObject.toJSON(xhSqWf);
+            //账户内容
+            JSONObject jsonObject_zh = JSONObject.parseObject(JSONObject.toJSONString(zhDetail));
+            json.put("wywxjJ_ZHModel", JSONObject.toJSON(jsonObject_zh));
 
+            //流程实例
+            wfi.setFk_ywid(xhsq.getId());
+            wfi.setId(IdUtils.randomUUID());
+            JSONObject jsonObject_wfi = JSONObject.parseObject(JSONObject.toJSONString(wfi));
+            json.put("wywxjJ_WORKFLOW_SLModel", jsonObject_wfi);
+
+            //流程历史
+            wfh.setFk_ywid(IdUtils.randomUUID());
+            wfh.setFk_wkslid(wfi.getId());
+            wfh.setFk_wkslid(IdUtils.randomUUID());
+            JSONObject jsonObject_wfh = JSONObject.parseObject(JSONObject.toJSONString(wfh));
+            json.put("wywxjJ_WORKFLOW_HISModel", jsonObject_wfh);
+
+            //发送请求
             api.submitXhSq(request, json);
 
             //构造返回数据
@@ -384,4 +398,7 @@ public class ZhController {
             throw new BusinessException("销户申请提交成功失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
         }
     }
+
+    //销户审批
+
 }

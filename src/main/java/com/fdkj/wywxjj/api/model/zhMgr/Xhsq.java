@@ -71,4 +71,6 @@ public class Xhsq {
      * 登记日期
      */
     private String djrq;
+
+    private Zh zh;
 }

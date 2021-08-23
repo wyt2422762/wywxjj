@@ -77,4 +77,14 @@ public class WorkflowInstant {
      * 业务类型
      */
     private String lx;
+
+    /**
+     * 对应的业务数据
+     */
+    private Object data;
+
+    /**
+     * 当前结点id
+     */
+    private WorkflowNode currentNode;
 }
