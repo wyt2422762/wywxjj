@@ -125,9 +125,9 @@ public class Constants {
     }
 
     /**
-     * 流程操作
+     * 流程结点说明
      */
-    public static class WorkflowOpt {
+    public static class WorkflowNodeName {
         /**
          * 提交申请
          */
@@ -149,4 +149,19 @@ public class Constants {
          */
         public static final String END = "结束";
     }
+
+    /**
+     * 流程动作
+     */
+    public static class WorkflowAction {
+        /**
+         * 通过
+         */
+        public static final String PASS = "通过";
+        /**
+         * 不通过
+         */
+        public static final String REJECT = "不通过";
+    }
+
 }

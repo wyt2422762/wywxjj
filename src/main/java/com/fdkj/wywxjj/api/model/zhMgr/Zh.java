@@ -28,7 +28,7 @@ public class Zh {
     /**
      * 添加时间
      */
-    private String add_time;
+    private String addtime;
 
     /**
      * 房号信息id

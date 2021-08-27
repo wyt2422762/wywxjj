@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-销户管理</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show" style="padding: 10px;">
+  <div id="LAY_preview">
+    <fieldset class="layui-elem-field layui-field-title">
+      <legend>销户列表</legend>
+    </fieldset>
+
+    <!-- 待审核列表 -->
+    <div style="padding: 10px;">
+      <table id="xhglTable" class="layui-table" lay-filter="xhglTable"></table>
+      <script type="text/html" id="xhglTableToolBar">
+        <a class="layui-btn layui-btn-xs" lay-event="ls">审核历史</a>
+      </script>
+    </div>
+
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/zhMgr/zhMgr.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader', 'drawer'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+
+    getTableData();
+
+    //获取待审核列表
+    function getTableData() {
+      debugger;
+      let params = {};
+      let url = ctx + 'CZF/XHGL/getList';
+      //获取表格数据
+      table.render({
+        elem: '#xhglTable',
+        title: '销户列表',
+        url: url, //数据接口
+        where: params, //请求参数
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {templet: '<div>{{d.data.zh.no}}</div>', title: '账号'},
+          {templet: '<div>{{d.data.xhsq}}</div>', title: '销户申请'},
+          {templet: '<div>{{d.data.xhyy}}</div>', title: '销户原因'},
+          {templet: '<div>{{d.data.zjhm}}</div>', title: '证件号码'},
+          {templet: '<div>{{d.data.lxdh}}</div>', title: '联系电话'},
+          {templet: '<div>{{d.data.sqrq}}</div>', title: '申请日期'},
+          {templet: '<div>{{d.zt}}</div>', title: '状态'},
+          {toolbar: '#xhglTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
+    //工具条事件
+    table.on('tool(xhglTable)', function (obj) {
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'ls') { //审核历史
+        let index_i = top.layer.load();
+        $.ajax({
+          url: ctx + "/CZF/XHSH/getHistoryList/" + data.id,
+          type: "POST",
+          async: false,
+          dataType: "json",
+          contentType: "application/json;charset=utf-8",
+          success: function (data) {
+            top.layer.close(index_i);
+            let his = data.data;
+            top.layui.drawer.render({
+              title: '审核历史',  //标题
+              offset: 'l',    //r:抽屉在右边、l:抽屉在左边
+              top: 20,        //抽屉顶部距离，默认0
+              bottom: 20,     //抽屉底部距离，默认0
+              width: "600px", //r、l抽屉可以设置宽度
+              content: DRAWER.buildContent(his)
+            });
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            top.layer.close(index_i);
+            top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          }
+        });
+        return false;
+      }
+    });
+  });
+</script>
+</body>
+</html>

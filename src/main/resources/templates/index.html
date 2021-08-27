@@ -99,11 +99,19 @@
 <div th:replace="/common/footer::footer()"></div>
 
 <script th:inline="javascript">
-  layui.use(['element', 'layer', 'form', 'upload'], function () {
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer'
+  }).use(['element', 'layer', 'form', 'upload', 'cascader', 'drawer'], function () {
     let element = layui.element;
     let layer = layui.layer;
     let form = layui.form;
     let upload = layui.upload;
+    let cascader = layui.cascader;
+    let drawer = layui.drawer;
 
     let admin = {
       tabsPage: {},

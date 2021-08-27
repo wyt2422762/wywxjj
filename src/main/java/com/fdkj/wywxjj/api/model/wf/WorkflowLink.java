@@ -25,7 +25,7 @@ public class WorkflowLink {
     /**
      * 添加时间
      */
-    private String add_time;
+    private String addtime;
 
     /**
      * 流程定义id

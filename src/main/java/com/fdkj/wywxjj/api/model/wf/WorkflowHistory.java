@@ -1,5 +1,6 @@
 package com.fdkj.wywxjj.api.model.wf;
 
+import com.fdkj.wywxjj.api.model.sysMgr.User;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -25,7 +26,7 @@ public class WorkflowHistory {
     /**
      * 添加时间
      */
-    private String add_time;
+    private String addtime;
 
     /**
      * 流程实例id
@@ -76,4 +77,9 @@ public class WorkflowHistory {
      * 业务类型
      */
     private String lx;
+
+    /**
+     * 用户
+     */
+    private User user;
 }

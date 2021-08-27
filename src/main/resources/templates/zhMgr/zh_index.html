@@ -26,6 +26,10 @@
               <select name="zt" id="zt" placeholder="请选择账号状态">
                 <option value="">请选择账号状态</option>
                 <option value="正常">正常</option>
+                <option value="销户登记">销户登记</option>
+                <option value="销户初审">销户初审</option>
+                <option value="销户中审">销户中审</option>
+                <option value="销户终审">销户终审</option>
                 <option value="已销户">已销户</option>
               </select>
             </div>
@@ -52,6 +56,7 @@
           <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-danger"
              lay-event="xh">销户</a>
         {{#  } }}
+        <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="xhjl">历史</a>
       </script>
 
     </div>
@@ -70,8 +75,9 @@
   layui.config({
     base: ctx + 'static/js/layuiExts/'
   }).extend({
-    cascader: 'cascader/cascader'
-  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader', 'drawer'], function () {
     //let element = layui.element;
     //let laydate = layui.laydate;
     let form = layui.form;
@@ -122,7 +128,7 @@
           {field: 'money', title: '账户金额'},
           {field: 'khrq', title: '开户日期'},
           {field: 'zt', title: '账户状态'},
-          {toolbar: '#zhTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+          {toolbar: '#zhTableToolBar', align: 'center', fixed: 'right', title: '操作', width: 300}
         ]],
         parseData: function (res) { //res 即为原始返回的数据
           return {
@@ -212,6 +218,15 @@
             top.layer.close(index);
             window.location.reload();
           }
+        });
+      } else if(layEvent === 'xhjl') { //销户记录
+        let index = top.layer.open({
+          type: 2,
+          title: '销户记录',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/ZHGL/toXhjl/" + data.id,
         });
       }
     });

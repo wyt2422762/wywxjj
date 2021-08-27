@@ -13,6 +13,11 @@
     <!-- 待审核列表 -->
     <div style="padding: 10px;">
       <table id="dshTable" class="layui-table" lay-filter="dshTable"></table>
+
+      <script type="text/html" id="dshTableToolBar">
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs" lay-event="sh">去审核</a>
+      </script>
+
     </div>
 
   </div>
@@ -29,13 +34,15 @@
   layui.config({
     base: ctx + 'static/js/layuiExts/'
   }).extend({
-    cascader: 'cascader/cascader'
-  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader', 'drawer'], function () {
     //let element = layui.element;
     //let laydate = layui.laydate;
     let form = layui.form;
     let table = layui.table;
     let cascader = layui.cascader;
+    let drawer = layui.drawer;
 
     getTableData();
 
@@ -61,7 +68,9 @@
           {templet: '<div>{{d.data.xhyy}}</div>', title: '销户原因'},
           {templet: '<div>{{d.data.zjhm}}</div>', title: '证件号码'},
           {templet: '<div>{{d.data.lxdh}}</div>', title: '联系电话'},
-          {templet: '<div>{{d.data.sqrq}}</div>', title: '申请日期'}
+          {templet: '<div>{{d.data.sqrq}}</div>', title: '申请日期'},
+          {templet: '<div>{{d.currentNode.jdmc}}</div>', title: '审批结点'},
+          {toolbar: '#dshTableToolBar', align: 'center', fixed: 'right', title: '操作'}
         ]],
         parseData: function (res) { //res 即为原始返回的数据
           return {
@@ -73,6 +82,77 @@
         }
       });
     }
+
+    //工具条事件
+    table.on('tool(dshTable)', function (obj) {
+      debugger;
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'sh') { //审核
+        let index = top.layer.open({
+          type: 2,
+          title: '审核',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/XHSH/toSh/" + data.id,
+          btn: ['通过', '不通过', '审核历史', '取消'],
+          yes: function (index, layero) {
+            debugger;
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#sh_Form");
+            $(frm).find("input[name='action']").val("通过");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          btn2: function (index, layero) {
+            debugger;
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#sh_Form");
+            $(frm).find("input[name='action']").val("不通过");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          btn3: function (index, layero) {
+            let index_i = top.layer.load();
+            $.ajax({
+              url: ctx + "/CZF/XHSH/getHistoryList/" + data.id,
+              type: "POST",
+              async: false,
+              dataType: "json",
+              contentType: "application/json;charset=utf-8",
+              success: function (data) {
+                top.layer.close(index_i);
+                let his = data.data;
+                top.layui.drawer.render({
+                  title: '审核历史',  //标题
+                  offset: 'l',    //r:抽屉在右边、l:抽屉在左边
+                  top: 20,        //抽屉顶部距离，默认0
+                  bottom: 20,     //抽屉底部距离，默认0
+                  width: "600px", //r、l抽屉可以设置宽度
+                  content: DRAWER.buildContent(his)
+                });
+              },
+              error: function (XMLHttpRequest, textStatus, errorThrown) {
+                top.layer.close(index_i);
+                top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+              }
+            });
+            return false;
+          },
+          btn4: function (index, layero) {
+            top.layer.close(index);
+            return false;
+          },
+          end: function () {
+            top.layer.close(index);
+            window.location.reload();
+          }
+        });
+      }
+    });
 
   });
 </script>

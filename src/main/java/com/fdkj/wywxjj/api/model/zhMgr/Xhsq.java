@@ -1,5 +1,6 @@
 package com.fdkj.wywxjj.api.model.zhMgr;
 
+import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -72,5 +73,13 @@ public class Xhsq {
      */
     private String djrq;
 
+    /**
+     * 账号
+     */
     private Zh zh;
+
+    /**
+     * 流程实例
+     */
+    private WorkflowInstant wfi;
 }

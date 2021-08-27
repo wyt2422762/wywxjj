@@ -38,8 +38,7 @@ public class CusExceptionHandler {
     @ExceptionHandler(value = BusinessException.class)
     public Object cusException(HttpServletRequest req, BusinessException e) {
         if (isAjax(req)) {
-            CusResponseBody cusResponseBody = new CusResponseBody();
-            CusResponseBody.error(e.getCode(), e.getMessage());
+            CusResponseBody cusResponseBody = CusResponseBody.error(e.getCode(), e.getMessage());
             HttpStatus httpStatus = HttpStatus.resolve(e.getCode());
             return new ResponseEntity<>(cusResponseBody, httpStatus != null ? httpStatus : HttpStatus.INTERNAL_SERVER_ERROR);
         } else {

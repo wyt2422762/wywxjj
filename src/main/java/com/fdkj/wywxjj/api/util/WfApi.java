@@ -2,6 +2,7 @@ package com.fdkj.wywxjj.api.util;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
+import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowLink;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
@@ -182,8 +183,8 @@ public class WfApi {
     /**
      * 查询结点信息(全部)
      *
-     * @param request  req
-     * @param reqBody  请求体
+     * @param request req
+     * @param reqBody 请求体
      * @return res
      * @throws Exception err
      */
@@ -247,9 +248,9 @@ public class WfApi {
 
         boolean success = jsonObject.getBooleanValue("Success");
         if (!success) {
-            logger.error("获取缴纳设置详情失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_WORKFLOW_NODE_Model");
-            logger.error("获取缴纳设置详情失败，请求参数: " + params);
-            logger.error("获取缴纳设置详情失败，返回内容: " + responseEntityBody);
+            logger.error("获取流程结点详情失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_WORKFLOW_NODE_Model");
+            logger.error("获取流程结点详情失败，请求参数: " + params);
+            logger.error("获取流程结点详情失败，返回内容: " + responseEntityBody);
             throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
@@ -313,9 +314,10 @@ public class WfApi {
 
     /**
      * 查询待审核列表
+     *
      * @param request req
      * @param reqBody 请求体
-     * @param params 请求参数
+     * @param params  请求参数
      * @return res
      * @throws Exception err
      */
@@ -326,7 +328,7 @@ public class WfApi {
         //请求体
         JSONObject body = new JSONObject();
         body.put("fk_xtglid", user.getFk_xtglid());
-        if(reqBody != null && !reqBody.isEmpty()) {
+        if (reqBody != null && !reqBody.isEmpty()) {
             body.putAll(reqBody);
         }
 
@@ -340,7 +342,7 @@ public class WfApi {
 
         StringBuilder url = new StringBuilder(baseUrl + "/api/CZF/WYWXJJ_WORKFLOW_SL_List?page={page}&pageNum={pageNum}");
 
-        if(params != null && !params.isEmpty()) {
+        if (params != null && !params.isEmpty()) {
             Set<Map.Entry<String, String>> entrySet = params.entrySet();
             for (Map.Entry<String, String> stringStringEntry : entrySet) {
                 url.append("&").append(stringStringEntry.getKey()).append("={").append(stringStringEntry.getKey()).append("}");
@@ -372,4 +374,139 @@ public class WfApi {
         page.setDataList(dataList);
         return page;
     }
+
+    /**
+     * 获取流程实例详情
+     *
+     * @param request req
+     * @param id      流程实例id
+     * @return res
+     * @throws Exception err
+     */
+    public WorkflowInstant getWfslDetail(HttpServletRequest request, String id) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(null, headers);
+        //请求参数
+        Map<String, Object> params = new HashMap<>(1);
+        params.put("id", id);
+
+        String url = baseUrl + "/api/CZF/WYWXJJ_WORKFLOW_SL_Model?id={id}";
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url,
+                        HttpMethod.POST, requestEntity, String.class, params);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("获取流程实例详情失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_WORKFLOW_SL_Model");
+            logger.error("获取流程实例详情失败，请求参数: " + params);
+            logger.error("获取流程实例详情失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        return jsonObject.getJSONObject("Results").toJavaObject(WorkflowInstant.class);
+    }
+
+    /**
+     * 获取审核历史列表(分页)
+     *
+     * @param request req
+     * @param reqBody 请求体
+     * @param params  请求参数
+     * @return res
+     * @throws Exception err
+     */
+    public Page<WorkflowHistory> getWorkflowHistoryList(HttpServletRequest request, Map<String, String> reqBody, Integer pageNo, Integer pageSize) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //请求体
+        JSONObject body = new JSONObject();
+        body.put("fk_xtglid", user.getFk_xtglid());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
+        }
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(null, headers);
+
+        //请求参数
+        Map<String, Object> params = new HashMap<>(4);
+        params.put("page", pageNo == null ? 1 : pageNo);
+        params.put("pageNum", pageSize == null ? 10 : pageSize);
+
+        StringBuilder url = new StringBuilder(baseUrl + "/api/CZF/WYWXJJ_WORKFLOW_HIS_ListALL?page={page}&pageNum={pageNum}");
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url.toString(),
+                        HttpMethod.POST, requestEntity, String.class, params);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+
+        if (!success) {
+            logger.error("获取审核历史列表失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_WORKFLOW_HIS_ListALL");
+            logger.error("获取审核历史列表失败，请求参数: " + params);
+            logger.error("获取审核历史列表失败，请求体: " + body.toJSONString());
+            logger.error("获取审核历史列表失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        Page<WorkflowHistory> page = new Page<>(pageNo == null ? 1 : pageNo, pageSize == null ? 10 : pageSize);
+        Integer totalRecord = jsonObject.getInteger("TotalCount");
+        page.setTotalRecord(totalRecord);
+        List<WorkflowHistory> dataList = jsonObject.getJSONArray("Results").toJavaList(WorkflowHistory.class);
+        page.setDataList(dataList);
+        return page;
+    }
+
+    /**
+     * 获取审核历史列表
+     *
+     * @param request req
+     * @param reqBody 请求体
+     * @return res
+     * @throws Exception err
+     */
+    public List<WorkflowHistory> getWorkflowHistoryList(HttpServletRequest request, Map<String, String> reqBody) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //请求体
+        JSONObject body = new JSONObject();
+        body.put("fk_xtglid", user.getFk_xtglid());
+        if (reqBody != null && !reqBody.isEmpty()) {
+            body.putAll(reqBody);
+        }
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+
+        String url = baseUrl + "/api/CZF/WYWXJJ_WORKFLOW_HIS_ListALL";
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url, HttpMethod.POST, requestEntity, String.class);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+
+        if (!success) {
+            logger.error("获取审核历史列表失败，请求url: " + url);
+            logger.error("获取审核历史列表失败，请求体: " + body.toJSONString());
+            logger.error("获取审核历史列表失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        return jsonObject.getJSONArray("Results").toJavaList(WorkflowHistory.class);
+    }
+
 }

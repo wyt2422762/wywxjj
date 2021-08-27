@@ -87,3 +87,31 @@ function xh(id, data, index) {
     }
   });
 }
+
+//销户审批
+function xhsp(wkslid, yj, action, dqjdid, index) {
+  debugger;
+  let ii = top.layer.load();
+  $.ajax({
+    url: ctx + "/CZF/XHSH/sh/" + wkslid + "?action=" + action + "&yj=" + yj + "&dqjdid=" + dqjdid,
+    type: "POST",
+    dataType: "json",
+    contentType: "application/json;charset=utf-8",
+    success: function (data) {
+      top.layer.close(ii);
+      top.layer.msg(data.msg);
+      if (!index) {
+        window.location.reload();
+      } else {
+        top.layer.close(index); //关闭弹出框
+        let ifr = $("div.layui-tab div.layui-tab-content div.layui-show iframe", window.top.document)[0];
+        $(ifr).attr('src', $(ifr).attr('src'));
+      }
+    },
+    error: function (XMLHttpRequest, textStatus, errorThrown) {
+      top.layer.close(ii);
+      top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+      return false;
+    }
+  });
+}
