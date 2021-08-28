@@ -164,7 +164,7 @@
           //没找到 没点过
           $("#LAY_app_body").append([
             '<div class="layui-tabsbody-item layui-show ' + id +'">',
-            '<iframe scrolling="auto" data-an="' + data_an + '" class="menu-iframe" frameborder="no" border="0" tab-id="' + id + '" style="width: 100%;height: 630px;" src="' + url + '?opts=' + data_opts + '"></iframe>',
+            '<iframe scrolling="no" data-an="' + data_an + '" class="menu-iframe" frameborder="no" border="0" tab-id="' + id + '" style="width: 100%;height: 630px;" src="' + url + '?opts=' + data_opts + '"></iframe>',
             '</div>'].join(''));
           admin.tabsPage.index = tabs.length;
           element.tabAdd('layui-layout-tabs', {
