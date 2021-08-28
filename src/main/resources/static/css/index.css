@@ -200,4 +200,9 @@
   bottom: 0;
 }
 
+.menu-iframe {
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+}
+
 /*内容区域样式*/

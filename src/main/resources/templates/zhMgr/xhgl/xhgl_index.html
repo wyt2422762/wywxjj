@@ -45,6 +45,11 @@
     function getTableData() {
       debugger;
       let params = {};
+
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+
       let url = ctx + 'CZF/XHGL/getList';
       //获取表格数据
       table.render({

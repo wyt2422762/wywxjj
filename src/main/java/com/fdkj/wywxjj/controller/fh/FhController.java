@@ -116,8 +116,8 @@ public class FhController {
                                                    @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             Map<String, Object> reqBody = new HashMap<>();
-            reqBody.put("fk_xmxxid", fk_xmxxid);
-            reqBody.put("fk_ldxxid", fk_ldxxid);
+            reqBody.put("fk_xmxxid", fk_xmxxid.trim());
+            reqBody.put("fk_ldxxid", fk_ldxxid.trim());
 
             Page<Fh> ldPage = api.getFhList(request, reqBody, page, limit);
             //构造返回数据
@@ -132,18 +132,25 @@ public class FhController {
     /**
      * 获取房号列表(全部)
      *
-     * @param request req
+     * @param request   req
+     * @param fk_xmxxid 项目信息id
+     * @param fk_ldxxid 楼栋信息id
+     * @param szdy      所在单元
      * @return res
      */
     @RequestMapping("getListAll/{fk_xmxxid}/{fk_ldxxid}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
                                                    @PathVariable(value = "fk_xmxxid") String fk_xmxxid,
-                                                   @PathVariable(value = "fk_ldxxid") String fk_ldxxid) {
+                                                   @PathVariable(value = "fk_ldxxid") String fk_ldxxid,
+                                                   @RequestParam(value = "szdy", required = false) String szdy) {
         try {
             Map<String, Object> reqBody = new HashMap<>();
-            reqBody.put("fk_xmxxid", fk_xmxxid);
-            reqBody.put("fk_ldxxid", fk_ldxxid);
+            reqBody.put("fk_xmxxid", fk_xmxxid.trim());
+            reqBody.put("fk_ldxxid", fk_ldxxid.trim());
+            if (StringUtils.isNotBlank(szdy)) {
+                reqBody.put("szdy", szdy.trim());
+            }
 
             List<Fh> ldList = api.getFhAllList(request, reqBody);
             //构造返回数据

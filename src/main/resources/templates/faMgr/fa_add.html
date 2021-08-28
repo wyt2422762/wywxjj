@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-方案新增</title>
+</head>
+<body>
+
+<input type="hidden" id="opts" th:value="${optsStr}"/>
+
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <blockquote class="layui-elem-quote layui-text" th:text="新建方案"></blockquote>
+
+    <div style="padding: 10px;">
+      <div class="layui-row layui-col-space10">
+        <div class="layui-col-md2">
+          <ul id="ztree" class="ztree"></ul>
+        </div>
+        <div class="layui-col-md10">
+          <div id="right" style="display: none;">
+            <div>
+              <div class="layui-inline">
+                <button th:if="${#lists.contains(opts, 'add')}" id="addFa" class="layui-btn layui-btn-normal">新建方案
+                </button>
+              </div>
+            </div>
+            <table id="fhTable" class="layui-table" lay-filter="fhTable"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader', 'drawer'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+    let drawer = layui.drawer;
+
+    let zTreeSetting = {
+      view: {
+        dblClickExpand: false,
+        showLine: true,
+        selectedMulti: false
+      },
+      data: {
+        key: {
+          name: "xmmc", //
+          children: "children", //zTree 节点数据中保存子节点数据的属性名称。
+          isParent: "isParent", //zTree 节点数据保存节点是否为父节点的属性名称。
+          id: "id"
+        }
+      },
+      async: {
+        enable: true,//异步加载
+        //请求地址，可用function动态获取
+        url: ctx + "/CZF/LDGL/getListAll2",
+        autoParam: ["id", "pId"],//提交的节点参数，可用“id=xx”取请求提交时的别名
+        //otherParam:{"otherParam":"zTreeAsyncTest"},//提交的其他参数,json的形式
+        dataType: "json",//返回数据类型
+        type: "get",//请求方式
+        dataFilter: function (treeIdString, parentNodeJSON, responseData) { //数据过滤
+          let ldList = responseData.data;
+          if (ldList && ldList.length > 0) {
+            for (let i in ldList) {
+              let ld = ldList[i];
+              ld["pId"] = parentNodeJSON.id;
+              ld["xmmc"] = ld.cmc;
+              ld["type"] = "楼栋";
+              let dys = ld.dys - 0;
+              if (dys > 0) {
+                let children = [];
+                for (let j = 1; j <= dys; j++) {
+                  let dy = {
+                    id: j,
+                    xmmc: j + "单元",
+                    type: "单元"
+                  }
+                  children.push(dy);
+                }
+                ld["children"] = children;
+              }
+            }
+            return ldList;
+          } else {
+            return null;
+          }
+        }
+      },
+      callback: {
+        onAsyncError: onAsyncError,
+        beforeClick: beforeClickZtree,
+        onClick: zTreeOnClick
+      }
+    }
+
+    //异步加载失败回调
+    function onAsyncError(event, treeId, treeNode, XMLHttpRequest, textStatus, errorThrown) {
+      console.log("异步加载ztree子节点失败");
+    }
+
+    //ztree结点点击before回调
+    function beforeClickZtree(treeId, treeNode) {
+      //top.layer.msg(treeNode.id + "," + treeNode.isParent);
+    }
+
+    //ztree结点点击回调
+    function zTreeOnClick(event, treeId, treeNode) {
+      //top.layer.msg(treeNode.id + ", " + treeNode.xmmc);
+      debugger;
+      // 1. 判断结点类型
+      if (treeNode.type === "小区") {
+        $("#right").hide();
+        return false;
+      } else if (treeNode.type === "楼栋") {
+        let xmNode = treeNode.getParentNode();
+        let fk_xmxxid = xmNode.id;
+        let fk_ldxxid = treeNode.id;
+        getFhList(fk_xmxxid, fk_ldxxid);
+      } else if (treeNode.type === "单元") {
+        let ldNode = treeNode.getParentNode();
+        let xmNode = ldNode.getParentNode();
+        let fk_xmxxid = xmNode.id;
+        let fk_ldxxid = ldNode.id;
+        let szdy = treeNode.id;
+        getFhList(fk_xmxxid, fk_ldxxid, szdy);
+      }
+    }
+
+    //获取房间列表
+    function getFhList(fk_xmxxid, fk_ldxxid, szdy) {
+      let url = ctx + "CZF/FHGL/getListAll/" + fk_xmxxid + "/" + fk_ldxxid;
+      let data = {};
+      if (szdy) {
+        data["szdy"] = szdy;
+      }
+
+      debugger;
+
+      //获取表格数据
+      table.render({
+        elem: '#fhTable',
+        title: '房号列表',
+        url: url, //数据接口
+        where: data, //请求参数
+        page: false,
+        cols: [[ //表头
+          {field: 'fh', title: '房号'},
+          {field: 'scmj_jzmj', title: '建筑面积'},
+          {field: 'fjzt', title: '房间状态'},
+          {field: 'yzmc', title: '业主名称'},
+          {field: 'yzzjh', title: '业主证件号码'},
+          {field: 'yzzjh', title: '业主证件号码'},
+          {
+            title: '账户状态', templet: function (d) {
+              let zh = d.zh;
+              if (zh) {
+                return zh.zt;
+              } else {
+                return "未开户";
+              }
+            }
+          },
+          {
+            title: '账号', templet: function (d) {
+              let zh = d.zh;
+              if (zh) {
+                return zh.no;
+              } else {
+                return "";
+              }
+            }
+          },
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "data": res.data //解析数据列表
+          };
+        },
+        done: function (res, curr, count) {
+          $("#right").show();
+        }
+      });
+    }
+
+    initZTree();
+
+    //初始化左侧菜单树
+    function initZTree() {
+      let data = {};
+      if (cuser.yhType === '物业公司') {
+        data['fk_wyid'] = cuser['fk_id'];
+      }
+
+      let index = top.layer.load();
+
+      $.ajax({
+        url: ctx + "/CZF/XMGL/getListAll",
+        type: "GET",
+        dataType: "json",
+        async: false,
+        contentType: "application/json;charset=utf-8",
+        data: data,
+        success: function (data) {
+          top.layer.close(index); //关闭弹出框
+          let xmList = data.data;
+          if (xmList && xmList.length > 0) {
+            for (let i in xmList) {
+              let xm = xmList[i];
+              xm['type'] = "小区";
+              xm['isParent'] = true;
+            }
+          }
+          let zTreeObj = $.fn.zTree.init($("#ztree"), zTreeSetting, xmList);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(index); //关闭弹出框
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          return false;
+        }
+      });
+    }
+  });
+</script>
+</body>
+</html>

@@ -108,6 +108,27 @@ public class LdController {
         }
     }
 
+    /**
+     * 获取楼栋列表(全部)
+     *
+     * @param request req
+     * @return res
+     */
+    @RequestMapping("getListAll2")
+    @ResponseBody
+    public ResponseEntity<CusResponseBody> getList2(HttpServletRequest request,
+                                                   @RequestParam(value = "id") String fk_xmxxid) {
+        try {
+            List<Ld> ldList = api.getLdAllList(request, fk_xmxxid);
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取楼栋列表成功", ldList);
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("获取楼栋列表失败", e);
+            throw new BusinessException("获取楼栋列表失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
+
     @RequestMapping("getDetail/{id}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request, @PathVariable String id) {

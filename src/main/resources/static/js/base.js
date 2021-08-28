@@ -45,7 +45,10 @@ const IframeFunc = {
     let bHeight = that.contentWindow.document.body.scrollHeight;
     let dHeight = that.contentWindow.document.documentElement.scrollHeight;
     let height = Math.max(bHeight, dHeight);
-    $(that).height(height);
+    //console.log("bHeight = " + bHeight);
+    //console.log("dHeight = " + dHeight);
+    //console.log("height = " + height);
+    $(that).height(bHeight);
   }
 };
 

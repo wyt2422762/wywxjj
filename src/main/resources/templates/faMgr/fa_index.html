@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-方案管理</title>
+</head>
+<body>
+
+<input type="hidden" id="opts" th:value="${optsStr}" />
+
+<div class="layui-tab-item layui-show" style="padding: 10px;">
+  <div id="LAY_preview">
+    <fieldset class="layui-elem-field layui-field-title">
+      <legend>方案列表</legend>
+    </fieldset>
+
+    <!-- 方案列表 -->
+    <div style="padding: 10px;">
+      <div style="padding-bottom: 10px;">
+        <div class="layui-inline" style="float:right;">
+          <button th:if="${#lists.contains(opts, 'add')}" id="addFa" class="layui-btn layui-btn-normal" style="margin-left:15px;">新建方案</button>
+        </div>
+      </div>
+
+      <table id="faTable" class="layui-table" lay-filter="faTable"></table>
+    </div>
+
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader', 'drawer'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+    let drawer = layui.drawer;
+
+    getTableData();
+
+    //获取方案管理列表
+    function getTableData() {
+      let params = {};
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+      if(cuser.yhType === '物业公司') {
+        params['fk_wyid'] = cuser['fk_id'];
+      }
+      let url = ctx + 'CZF/FAGL/getList';
+      //获取表格数据
+      table.render({
+        elem: '#faTable',
+        title: '方案列表',
+        url: url, //数据接口
+        where: params, //请求参数
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {field: 'id', title: 'id'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
+    //添加按钮事件
+    $("#addFa").on('click', function () {
+      let admin = top.layui.admin;
+      let obj = {};
+      obj["data-id"] = "add-fa";
+      obj["data-url"] = ctx + "/CZF/FAGL/toAdd/";
+      obj["data-opts"] = $("#opts").val();
+      obj["title"] = "新建方案";
+      admin.openTabsPage(obj);
+      //定位当前tabs
+      top.layui.element.tabChange('menuTab', obj["data-id"]);
+      admin.tabsBodyChange(obj["data-id"], {});
+    });
+
+  });
+</script>
+</body>
+</html>
