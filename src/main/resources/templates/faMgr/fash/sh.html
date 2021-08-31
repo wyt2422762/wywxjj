@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-方案审核-审核</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show" style="padding: 10px;">
+  <div id="LAY_preview">
+    <div>
+      <div class="layui-tab layui-tab-card">
+        <ul class="layui-tab-title">
+          <li class="layui-this">资金使用方案</li>
+          <li>费项明细</li>
+          <li>业主信息</li>
+          <li>填写意见</li>
+        </ul>
+        <div class="layui-tab-content">
+          <div class="layui-tab-item layui-show">
+            <form class="layui-form" method="post" id="fa_Form" lay-filter="fa_Form">
+              <div class="layui-form" style="padding: 2px;">
+                <table class="layui-table" lay-size="sm">
+                  <tr>
+                    <th style="white-space: nowrap;">方案编号</th>
+                    <td>
+                      <input type="text" readonly name="fabh" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">工程预算(元)</th>
+                    <td>
+                      <input type="number" readonly name="fayjje" lay-verify="required" placeholder=""
+                             class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">计划开工日期</th>
+                    <td>
+                      <input type="text" name="kgrq" readonly lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">计划完工日期</th>
+                    <td>
+                      <input type="text" name="wgrq" readonly lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th style="white-space: nowrap;">施工单位</th>
+                    <td>
+                      <input type="text" readonly name="sgdw" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">法人代表</th>
+                    <td>
+                      <input type="text" readonly name="sgdwfr" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">营业执照</th>
+                    <td>
+                      <input type="text" readonly name="sgdwyyzz" lay-verify="required" placeholder=""
+                             class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">资质证号</th>
+                    <td>
+                      <input type="text" readonly name="sgdwzzzh" lay-verify="required" placeholder=""
+                             class="layui-input"/>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th style="white-space: nowrap;">开户账号</th>
+                    <td>
+                      <input type="text" readonly name="khzh" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">工程款支付方式</th>
+                    <td>
+                      <input type="text" readonly name="gckzzfs" lay-verify="required" placeholder=""
+                             class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">工程款使用原因</th>
+                    <td>
+                      <input type="text" readonly name="gcksyyy" lay-verify="required" placeholder=""
+                             class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">分摊方式</th>
+                    <td>
+                      <select disabled name="ftfs" lay-filter="ftfs">
+                        <option value="平均分摊" selected>平均分摊</option>
+                        <option value="按房屋面积分摊">按房屋面积分摊</option>
+                      </select>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th style="white-space: nowrap;">其他备注</th>
+                    <td colspan="7">
+                      <textarea readonly name="bz" placeholder="请输入内容" class="layui-textarea"></textarea>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th style="white-space: nowrap;">方案起草</th>
+                    <td colspan="5">
+                      <input type="text" readonly name="faqc" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">登记日期</th>
+                    <td>
+                      <input type="text" name="djrq" readonly lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th style="white-space: nowrap;">业主委员会意见</th>
+                    <td colspan="7">
+                      <textarea readonly name="yzwyhyj" placeholder="请输入内容" class="layui-textarea"></textarea>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <th style="white-space: nowrap;">业主委员会</th>
+                    <td colspan="5">
+                      <input type="text" readonly name="yzwyh" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">签署日期</th>
+                    <td>
+                      <input type="text" name="qzrq" readonly lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                </table>
+              </div>
+              <input type="hidden" name="fk_xmxxid" th:value="${fk_xmxxid}"/>
+              <input type="hidden" name="fk_ldxxid" th:value="${fk_ldxxid}"/>
+              <input type="hidden" name="dyh" th:value="${szdy}"/>
+              <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+            </form>
+          </div>
+          <div class="layui-tab-item">
+            <div style="padding: 2px;">
+              <table class="layui-table" lay-filter="fa_mxTables" id="fa_mxTables" style="margin-top: 0;"></table>
+            </div>
+          </div>
+          <div class="layui-tab-item">
+            <div style="padding: 2px;">
+              <table id="fhTable" class="layui-table" lay-filter="fhTable" lay-size="sm"></table>
+            </div>
+          </div>
+          <div class="layui-tab-item">
+            <div style="padding: 2px;">
+              <form class="layui-form" method="post" id="sh_Form" lay-filter="sh_Form">
+                <div class="layui-form">
+                  <div class="layui-form-item layui-form-text">
+                    <label class="layui-form-label">审核意见</label>
+                    <div class="layui-input-block">
+                      <textarea lay-verify="required" name="yj" placeholder="请输入审核意见" class="layui-textarea"></textarea>
+                    </div>
+                  </div>
+                </div>
+                <input type="hidden" name="action" />
+                <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/zhMgr/zhMgr.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+  const wfi = [[${wfi}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader'], function () {
+    //let element = layui.element;
+    //let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    //let cascader = layui.cascader;
+
+    getInitData();
+
+    //获取初始数据
+    function getInitData() {
+      let index = top.layer.load();
+
+      let fa = wfi.data;
+      //渲染表单数据
+      form.val("fa_Form", fa);
+
+      //渲染table数据
+      let mxTableData = fa.mxlist;
+      table.render({
+            elem: '#fa_mxTables',
+            title: '明细列表',
+            totalRow: true,
+            page: false,
+            data: mxTableData,
+            cols: [[//表头
+              {field: "fxmc", title: '费项名称', totalRowText: '合计'},
+              {field: "fxje", title: '费项金额(元)', totalRow: true},
+              {field: 'bz', title: '备注'}
+            ]]
+          });
+
+      //获取房间列表
+      getFhList(fa.fk_xmxxid, fa.fk_ldxxid, fa.szdy);
+
+      top.layer.close(index);
+    }
+
+    //获取房间列表
+    function getFhList(fk_xmxxid, fk_ldxxid, szdy) {
+      let url = ctx + "CZF/FHGL/getListAll/" + fk_xmxxid + "/" + fk_ldxxid;
+      let data = {};
+      if (szdy) {
+        data["szdy"] = szdy;
+      }
+
+      //获取表格数据
+      table.render({
+        elem: '#fhTable',
+        title: '房号列表',
+        url: url, //数据接口
+        where: data, //请求参数
+        page: false,
+        height: 400,
+        cols: [[ //表头
+          {field: 'fh', title: '房号'},
+          {field: 'scmj_jzmj', title: '建筑面积'},
+          {field: 'fjzt', title: '房间状态'},
+          {field: 'yzmc', title: '业主名称'},
+          {field: 'yzzjh', title: '业主证件号码'},
+          {field: 'yzzjh', title: '业主证件号码'},
+          {
+            title: '账户状态', templet: function (d) {
+              let zh = d.zh;
+              if (zh) {
+                return zh.zt;
+              } else {
+                return "未开户";
+              }
+            }
+          },
+          {
+            title: '账号', templet: function (d) {
+              let zh = d.zh;
+              if (zh) {
+                return zh.no;
+              } else {
+                return "";
+              }
+            }
+          },
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          let list = res.data;
+          fhList = list;
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "data": list //解析数据列表
+          };
+        }
+      });
+    }
+
+    form.on('submit(submitBut)', function (data) {
+      let wkslid = wfi.id;
+      let yj = data.field["yj"];
+      let action = data.field['action'];
+      let dqjdid = wfi.fk_dqjdid;
+
+      let index = top.layer.getFrameIndex(window.name); //获取窗口索引
+
+      fash(wkslid, yj, action, dqjdid, index);
+
+      return false;
+    });
+
+    //方案审核
+    function fash(wkslid, yj, action, dqjdid, index) {
+      debugger;
+      let ii = top.layer.load();
+      $.ajax({
+        url: ctx + "/CZF/FASH/sh/" + wkslid + "?action=" + action + "&yj=" + yj + "&dqjdid=" + dqjdid,
+        type: "POST",
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          top.layer.close(ii);
+          top.layer.msg(data.msg);
+          if (!index) {
+            window.location.reload();
+          } else {
+            top.layer.close(index); //关闭弹出框
+            let ifr = $("div.layui-tab div.layui-tab-content div.layui-show iframe", window.top.document)[0];
+            $(ifr).attr('src', $(ifr).attr('src'));
+          }
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(ii);
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          return false;
+        }
+      });
+    }
+
+  });
+</script>
+</body>
+</html>

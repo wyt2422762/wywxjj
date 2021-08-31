@@ -154,3 +154,26 @@ const DRAWER = {
     return content;
   }
 }
+
+//编号
+const SERIAL_NUMBER = {
+  get: function(callBackFunc) {
+    //提交数据
+    $.ajax({
+      url: ctx + "common/getRandomNo",
+      type: "GET",
+      dataType: "json",
+      async: false,
+      contentType: "application/json;charset=utf-8",
+      success: function (data) {
+        let no = data.data;
+        callBackFunc(no);
+        return false;
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        top.layer.msg("获取编号失败");
+        return false;
+      }
+    });
+  }
+}

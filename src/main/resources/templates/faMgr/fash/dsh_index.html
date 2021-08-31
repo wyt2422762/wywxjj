@@ -1,32 +1,21 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/common/header::header(~{::title},~{},~{})">
-  <title>物业维修基金管理系统-方案管理</title>
+  <title>物业维修基金管理系统-方案审核-待审核</title>
 </head>
 <body>
-
-<input type="hidden" id="opts" th:value="${optsStr}"/>
-
 <div class="layui-tab-item layui-show" style="padding: 10px;">
   <div id="LAY_preview">
     <fieldset class="layui-elem-field layui-field-title">
-      <legend>方案列表</legend>
+      <legend>待审核信息</legend>
     </fieldset>
 
-    <!-- 方案列表 -->
+    <!-- 待审核列表 -->
     <div style="padding: 10px;">
-      <div style="padding-bottom: 10px;">
-        <div class="layui-inline" style="float:right;">
-          <button th:if="${#lists.contains(opts, 'add')}" id="addFa" class="layui-btn layui-btn-normal"
-                  style="margin-left:15px;">新建方案
-          </button>
-        </div>
-      </div>
+      <table id="dshTable" class="layui-table" lay-filter="dshTable"></table>
 
-      <table id="faTable" class="layui-table" lay-filter="faTable"></table>
-
-      <script type="text/html" id="faTableToolBar">
-        <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
+      <script type="text/html" id="dshTableToolBar">
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs" lay-event="sh">去审核</a>
       </script>
 
     </div>
@@ -34,7 +23,10 @@
   </div>
 </div>
 
+
 <div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/zhMgr/zhMgr.js}"></script>
 
 <script th:inline="javascript">
   const cuser = [[${cuser}]];
@@ -54,20 +46,17 @@
 
     getTableData();
 
-    //获取方案管理列表
+    //获取待审核列表
     function getTableData() {
       let params = {};
       /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
         params['fk_qybm'] = cuser['fk_qybm'];
       }*/
-      if (cuser.yhType === '物业公司') {
-        params['fk_wyid'] = cuser['fk_id'];
-      }
-      let url = ctx + 'CZF/FAGL/getList';
+      let url = ctx + 'CZF/FASH/getPendingReviewList';
       //获取表格数据
       table.render({
-        elem: '#faTable',
-        title: '方案列表',
+        elem: '#dshTable',
+        title: '待审核列表',
         url: url, //数据接口
         where: params, //请求参数
         page: {
@@ -77,13 +66,11 @@
         limit: 10,
         //limits: [10, 20, 50],
         cols: [[ //表头
-          {field: 'fabh', title: '方案编号'},
-          {field: 'fayjje', title: '方案预算(元)'},
-          {field: 'sqrq', title: '申请日期'},
-          {field: 'zt', title: '状态'},
-          {field: 'yfzt', title: '预付状态'},
-          {field: 'jszt', title: '结算状态'},
-          {toolbar: '#faTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+          {templet: '<div>{{d.data.fabh}}</div>', title: '方案编号'},
+          {templet: '<div>{{d.data.fayjje}}</div>', title: '方案预算'},
+          {templet: '<div>{{d.data.sqrq}}</div>', title: '申请日期'},
+          {templet: '<div>{{d.currentNode.jdmc}}</div>', title: '审批结点'},
+          {toolbar: '#dshTableToolBar', align: 'center', fixed: 'right', title: '操作'}
         ]],
         parseData: function (res) { //res 即为原始返回的数据
           return {
@@ -97,24 +84,42 @@
     }
 
     //工具条事件
-    table.on('tool(faTable)', function (obj) {
+    table.on('tool(dshTable)', function (obj) {
+      debugger;
       let data = obj.data; //获得当前行数据
       let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
       let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
 
-      if (layEvent === 'mx') { //明细
-        top.layer.open({
+      if (layEvent === 'sh') { //审核
+        let index = top.layer.open({
           type: 2,
-          title: '方案明细',
+          title: '审核',
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/FAGL/toInfo/" + data.id,
-          btn: ["审核历史"],
+          content: ctx + "/CZF/FASH/toSh/" + data.id,
+          btn: ['通过', '不通过', '审核历史', '取消'],
           yes: function (index, layero) {
+            debugger;
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#sh_Form");
+            $(frm).find("input[name='action']").val("通过");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          btn2: function (index, layero) {
+            debugger;
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#sh_Form");
+            $(frm).find("input[name='action']").val("不通过");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          btn3: function (index, layero) {
+            debugger;
             let index_i = top.layer.load();
             $.ajax({
-              url: ctx + "/CZF/FASH/getHistoryList_yw/" + data.id,
+              url: ctx + "/CZF/FASH/getHistoryList_wfi/" + data.id,
               type: "POST",
               async: false,
               dataType: "json",
@@ -138,25 +143,16 @@
             });
             return false;
           },
-          end: function (index) {
+          btn4: function (index, layero) {
             top.layer.close(index);
+            return false;
+          },
+          end: function () {
+            top.layer.close(index);
+            window.location.reload();
           }
         });
       }
-    });
-
-    //添加按钮事件
-    $("#addFa").on('click', function () {
-      let admin = top.layui.admin;
-      let obj = {};
-      obj["data-id"] = "add-fa";
-      obj["data-url"] = ctx + "/CZF/FAGL/toAdd/";
-      obj["data-opts"] = $("#opts").val();
-      obj["title"] = "新建方案";
-      admin.openTabsPage(obj);
-      //定位当前tabs
-      top.layui.element.tabChange('menuTab', obj["data-id"]);
-      admin.tabsBodyChange(obj["data-id"], {});
     });
 
   });

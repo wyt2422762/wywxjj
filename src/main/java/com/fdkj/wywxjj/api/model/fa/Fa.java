@@ -183,5 +183,10 @@ public class Fa {
     /**
      * 明细信息
      */
-    private Fa_mx mXlist;
+    private List<Fa_mx> mXlist;
+
+    /**
+     * 方案状态
+     */
+    private String zt;
 }

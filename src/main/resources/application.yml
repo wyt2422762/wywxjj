@@ -28,4 +28,9 @@ spring:
 #mybatis:
 #  mapperLocations: classpath*:mapper/**/*Mapper.xml
 
+#编号设置
+orderNo:
+  datacenterId: 1
+  machineId: 1
+
 

@@ -4,6 +4,7 @@ import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.config.BusConfig;
 import com.fdkj.wywxjj.config.ServerConfig;
 import com.fdkj.wywxjj.error.BusinessException;
+import com.fdkj.wywxjj.utils.NoUtil;
 import com.fdkj.wywxjj.utils.file.FileUploadUtils;
 import com.fdkj.wywxjj.utils.file.FileUtils;
 import org.slf4j.Logger;
@@ -35,6 +36,9 @@ public class CommonController {
 
     @Autowired
     private ServerConfig serverConfig;
+
+    @Autowired
+    private NoUtil noUtil;
 
     /**
      * 通用下载请求
@@ -82,6 +86,22 @@ public class CommonController {
         } catch (Exception e) {
             log.error("上传失败", e);
             throw new BusinessException("上传失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
+
+    /**
+     * 获取编号
+     */
+    @RequestMapping("getRandomNo")
+    public ResponseEntity<CusResponseBody> getRandomNo(MultipartFile file) {
+        try {
+            long nextId = noUtil.getNextId();
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取编号成功", nextId);
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("获取编号失败", e);
+            throw new BusinessException("获取编号失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
         }
     }
 }

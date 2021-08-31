@@ -4,6 +4,8 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.area.Area;
 import com.fdkj.wywxjj.api.model.fa.Fa;
+import com.fdkj.wywxjj.api.model.fa.Fa_fh;
+import com.fdkj.wywxjj.api.model.fa.Fa_mx;
 import com.fdkj.wywxjj.api.model.sysMgr.*;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import com.fdkj.wywxjj.api.model.xmMgr.Ld;
@@ -2358,7 +2360,7 @@ public class Api {
      * 获取方案详情
      *
      * @param request req
-     * @param id 请求id
+     * @param id      请求id
      * @return res
      * @throws Exception err
      */
@@ -2389,7 +2391,13 @@ public class Api {
         }
 
         //构造返回信息
-        return jsonObject.getJSONObject("Results").toJavaObject(Fa.class);
+        JSONObject results = jsonObject.getJSONObject("Results");
+        Fa fa = results.getObject("model", Fa.class);
+        List<Fa_fh> fHlist = results.getJSONArray("FHlist").toJavaList(Fa_fh.class);
+        fa.setFHlist(fHlist);
+        List<Fa_mx> mXlist = results.getJSONArray("MXlist").toJavaList(Fa_mx.class);
+        fa.setMXlist(mXlist);
+        return fa;
     }
 
 
@@ -2417,4 +2425,29 @@ public class Api {
             throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
+
+    /**
+     * 方案审批
+     * @param request req
+     * @param body 请求体
+     */
+    public void spFa(HttpServletRequest request, JSONObject body) {
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(baseUrl + "/api/CZF/WYWXJJ_FASP",
+                        HttpMethod.POST, requestEntity, String.class);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("方案审核失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_FASP");
+            logger.error("方案审核失败，请求体: " + body.toJSONString());
+            logger.error("方案审核失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+    }
+
 }

@@ -182,4 +182,26 @@ public class WorkflowService {
         return workflowHistoryList;
     }
 
+    /**
+     * 获取审核历史记录(根据业务id，业务类型)
+     *
+     * @param request   req
+     * @param fk_ywid 业务id
+     * @return res
+     * @throws Exception err
+     */
+    public List<WorkflowHistory> getWorkflowHistoryListByYwId(HttpServletRequest request, String fk_ywid) throws Exception {
+        Map<String, String> reqBody = new HashMap<>();
+        reqBody.put("fk_ywid", fk_ywid);
+        List<WorkflowHistory> workflowHistoryList = wfApi.getWorkflowHistoryList(request, reqBody);
+        if(workflowHistoryList != null && !workflowHistoryList.isEmpty()) {
+            for (WorkflowHistory workflowHistory : workflowHistoryList) {
+                String fk_yhid = workflowHistory.getFk_yhid();
+                User userDetail = api.getUserDetail(request, fk_yhid);
+                workflowHistory.setUser(userDetail);
+            }
+        }
+        return workflowHistoryList;
+    }
+
 }

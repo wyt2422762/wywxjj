@@ -84,6 +84,10 @@ public class Constants {
          * 销户
          */
         public static final String XH = "销户";
+        /**
+         * FA
+         */
+        public static final String FA = "方案";
     }
 
     /**
@@ -108,6 +112,11 @@ public class Constants {
          * 销户
          */
         public static final String XH = "0A0204F1-E899-43E9-AC5E-B6E47C03393B";
+
+        /**
+         * 方案
+         */
+        public static final String FA = "5F0D031D-E586-40A4-937E-4ECD01B2B598";
     }
 
     /**
@@ -164,4 +173,53 @@ public class Constants {
         public static final String REJECT = "不通过";
     }
 
+    /**
+     * 分摊方式
+     */
+    public static class Ftfs {
+        /**
+         * 通过
+         */
+        public static final String PJFT = "平均分摊";
+        /**
+         * 不通过
+         */
+        public static final String MJFT = "按房屋面积分摊";
+    }
+
+    /**
+     * 可否提交
+     */
+    public static class CanSubmit {
+        /**
+         * 提交
+         */
+        public static final String TJ = "提交";
+        /**
+         * 拒绝
+         */
+        public static final String JJ = "拒绝";
+        /**
+         * 询问
+         */
+        public static final String XW = "询问";
+    }
+
+    /**
+     * 方案状态
+     */
+    public static class FaZt {
+        /**
+         * 审核中
+         */
+        public static final String SHZ = "审核中";
+        /**
+         * 审核通过
+         */
+        public static final String SHTG = "审核通过";
+        /**
+         * 审核不通过
+         */
+        public static final String SHBTG = "审核不通过";
+    }
 }
