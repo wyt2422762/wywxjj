@@ -10,7 +10,6 @@ import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
-import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.util.Api;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
@@ -169,7 +168,7 @@ public class FaController {
                     //获取房间个数
                     int fhgs = fhList.size();
                     //计算每户的金额
-                    String divide = BigDecimalUtil.divide(fayjje, (fhgs + "")).toPlainString();
+                    String divide = BigDecimalUtil.divideHalfUp(fayjje, (fhgs + "")).toPlainString();
                     List<Fa_fh> fa_fhList = new ArrayList<>();
                     //判断金额
                     for (Fh fh : fhList) {
@@ -215,7 +214,7 @@ public class FaController {
                         String no = fh.getFh();
                         String money = fh.getZh().getMoney();
                         String cmj = fh.getScmj_jzmj();
-                        String je = BigDecimalUtil.divide(BigDecimalUtil.multiply(fayjje, cmj).toPlainString(), zmj).toPlainString();
+                        String je = BigDecimalUtil.divideHalfUp(BigDecimalUtil.multiply(fayjje, cmj).toPlainString(), zmj).toPlainString();
                         int compareTo = BigDecimalUtil.compareTo(money, je);
                         if (compareTo < 0) {
                             bgs.add(no);

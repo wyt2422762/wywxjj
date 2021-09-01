@@ -177,3 +177,13 @@ const SERIAL_NUMBER = {
     });
   }
 }
+
+const TAB = {
+  open: function(obj) {
+    let admin = top.layui.admin;
+    admin.openTabsPage(obj);
+    //定位当前tabs
+    top.layui.element.tabChange('menuTab', obj["data-id"]);
+    admin.tabsBodyChange(obj["data-id"], {});
+  }
+}

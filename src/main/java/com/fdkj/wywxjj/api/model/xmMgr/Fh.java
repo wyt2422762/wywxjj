@@ -222,4 +222,9 @@ public class Fh {
      */
     private Zh zh;
 
+    /**
+     * 分摊金额
+     */
+    private String ftje;
+
 }

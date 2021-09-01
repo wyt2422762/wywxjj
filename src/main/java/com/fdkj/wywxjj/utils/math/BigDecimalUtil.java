@@ -153,69 +153,131 @@ public class BigDecimalUtil {
     }
 
     /**
-     * 精确除法 使用默认精度
+     * 除法(四舍五入)
      *
      * @param value1 v1
      * @param value2 v2
      * @return res
      */
-    public static BigDecimal divide(double value1, double value2) {
-        return divide(value1, value2, DEF_DIV_SCALE);
+    public static BigDecimal divideHalfUp(double value1, double value2) {
+        return divideHalfUp(value1, value2, DEF_DIV_SCALE);
     }
 
     /**
-     * 精确除法 使用默认精度
+     * 除法(四舍五入)
      *
      * @param value1 v1
      * @param value2 v2
      * @return res
      */
-    public static BigDecimal divide(String value1, String value2) {
-        return divide(value1, value2, DEF_DIV_SCALE);
+    public static BigDecimal divideHalfUp(String value1, String value2) {
+        return divideHalfUp(value1, value2, DEF_DIV_SCALE);
     }
 
     /**
-     * 精确除法
+     * 除法(四舍五入)
      *
      * @param value1 v1
      * @param value2 v2
      * @param scale  精度
      * @return res
      */
-    public static BigDecimal divide(BigDecimal value1, BigDecimal value2, int scale) {
+    public static BigDecimal divideHalfUp(BigDecimal value1, BigDecimal value2, int scale) {
         return value1.divide(value2, scale, RoundingMode.HALF_UP);
     }
 
     /**
-     * 精确除法
+     * 除法(四舍五入)
      *
      * @param value1 v1
      * @param value2 v2
      * @param scale  精度
      * @return res
      */
-    public static BigDecimal divide(double value1, double value2, int scale) {
+    public static BigDecimal divideHalfUp(double value1, double value2, int scale) {
         BigDecimal b1 = BigDecimal.valueOf(value1);
         BigDecimal b2 = BigDecimal.valueOf(value2);
         return b1.divide(b2, scale, RoundingMode.HALF_UP);
     }
 
     /**
-     * 精确除法
+     * 除法(四舍五入)
      *
      * @param value1 v1
      * @param value2 v2
      * @param scale  精度
      * @return res
      */
-    public static BigDecimal divide(String value1, String value2, int scale) {
+    public static BigDecimal divideHalfUp(String value1, String value2, int scale) {
         BigDecimal b1 = new BigDecimal(value1);
         BigDecimal b2 = new BigDecimal(value2);
         return b1.divide(b2, scale, RoundingMode.HALF_UP);
     }
 
     /**
-     * 四舍五入
+     * 除法(直接舍位，不考虑任何进位舍位操作)
+     *
+     * @param value1 v1
+     * @param value2 v2
+     * @return res
+     */
+    public static BigDecimal divideDown(double value1, double value2) {
+        return divideDown(value1, value2, DEF_DIV_SCALE);
+    }
+
+    /**
+     * 除法(直接舍位，不考虑任何进位舍位操作)
+     *
+     * @param value1 v1
+     * @param value2 v2
+     * @return res
+     */
+    public static BigDecimal divideDown(String value1, String value2) {
+        return divideDown(value1, value2, DEF_DIV_SCALE);
+    }
+
+    /**
+     * 除法(直接舍位，不考虑任何进位舍位操作)
+     *
+     * @param value1 v1
+     * @param value2 v2
+     * @param scale  精度
+     * @return res
+     */
+    public static BigDecimal divideDown(BigDecimal value1, BigDecimal value2, int scale) {
+        return value1.divide(value2, scale);
+    }
+
+    /**
+     * 除法(直接舍位，不考虑任何进位舍位操作)
+     *
+     * @param value1 v1
+     * @param value2 v2
+     * @param scale  精度
+     * @return res
+     */
+    public static BigDecimal divideDown(double value1, double value2, int scale) {
+        BigDecimal b1 = BigDecimal.valueOf(value1);
+        BigDecimal b2 = BigDecimal.valueOf(value2);
+        return b1.divide(b2, scale, RoundingMode.DOWN);
+    }
+
+    /**
+     * 除法(直接舍位，不考虑任何进位舍位操作)
+     *
+     * @param value1 v1
+     * @param value2 v2
+     * @param scale  精度
+     * @return res
+     */
+    public static BigDecimal divideDown(String value1, String value2, int scale) {
+        BigDecimal b1 = new BigDecimal(value1);
+        BigDecimal b2 = new BigDecimal(value2);
+        return b1.divide(b2, scale, RoundingMode.DOWN);
+    }
+
+    /**
+     * 保留n位小数(四舍五入)
      *
      * @param value v
      * @param scale 小数点后保留几位
@@ -226,24 +288,24 @@ public class BigDecimalUtil {
     }
 
     /**
-     * 四舍五入
+     * 保留n位小数(四舍五入)
      *
      * @param value v
      * @param scale 小数点后保留几位
      * @return res
      */
-    public static BigDecimal scale(double value, int scale) {
+    public static BigDecimal scaleUp(double value, int scale) {
         return BigDecimal.valueOf(value).setScale(scale, RoundingMode.HALF_UP);
     }
 
     /**
-     * 四舍五入
+     * 保留n位小数(四舍五入)
      *
      * @param value v
      * @param scale 小数点后保留几位
      * @return res
      */
-    public static BigDecimal scale(String value, int scale) {
+    public static BigDecimal scaleUp(String value, int scale) {
         return new BigDecimal(value).setScale(scale, RoundingMode.HALF_UP);
     }
 

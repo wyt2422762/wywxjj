@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-方案预付添加</title>
+</head>
+<body>
+<input type="hidden" id="opts" th:value="${optsStr}"/>
+
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+
+    <div style="padding: 10px;">
+      <div class="layui-tab layui-tab-card">
+        <ul class="layui-tab-title">
+          <li class="layui-this">预付信息</li>
+          <li>业主信息</li>
+        </ul>
+        <div class="layui-tab-content">
+          <div class="layui-tab-item layui-show">
+            <form class="layui-form" method="post" id="fa_Form" lay-filter="fa_Form">
+              <div class="layui-form" style="padding: 2px;">
+                <table class="layui-table" lay-size="sm">
+                  <tr>
+                    <th style="white-space: nowrap;">方案预付编号</th>
+                    <td>
+                      <input type="text" readonly name="yfkbh" lay-verify="required" placeholder=""
+                             class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">工程预算(元)</th>
+                    <td>
+                      <input type="text" readonly name="fays" th:value="${fa.fayjje}" lay-verify="required"
+                             placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">预付金额(元)</th>
+                    <td>
+                      <input type="number" name="yfkje" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">预付日期</th>
+                    <td>
+                      <input type="text" readonly name="yfkrq" lay-verify="required" placeholder=""
+                             class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap;">预付签署</th>
+                    <td>
+                      <input type="text" name="yfkqs" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">备注</th>
+                    <td colspan="5">
+                      <input type="text" name="bz" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                </table>
+                <button lay-submit lay-filter="ftsc" class="layui-btn layui-btn-sm">分摊生成</button>
+              </div>
+              <input type="hidden" name="fk_faid" th:value="${fa.id}"/>
+              <input type="hidden" name="fk_xtglid" th:value="${cuser.fk_xtglid}"/>
+              <input type="hidden" name="fk_qybm" th:value="${cuser.fk_qybm}"/>
+            </form>
+          </div>
+
+          <div class="layui-tab-item">
+            <div style="padding: 2px;">
+              <table id="ftTable" class="layui-table" lay-filter="ftTable" lay-size="sm"></table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/math.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+  const fa = [[${fa}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer',
+    tableEdit: 'tableEdit/tableEdit',
+  }).use(['element', 'laydate', 'table', 'tableEdit', 'form', 'cascader', 'drawer'], function () {
+    //let element = layui.element;
+    let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+    let drawer = layui.drawer;
+    let tableEdit = layui.tableEdit;
+
+    //日期
+    laydate.render({
+      elem: "input[name='yfkrq']"
+    });
+
+    //分摊数据
+    let ftData = [];
+
+    getNo();
+
+    //获取方案编号
+    function getNo() {
+      let index = top.layer.load();
+      $.ajax({
+        url: ctx + "/CZF/FAYF/getNo/" + fa.id,
+        type: "GET",
+        dataType: "json",
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          top.layer.close(index); //关闭弹出框
+          let no = data.data;
+          $("input[name='yfkbh']").val(no);
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(index); //关闭弹出框
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          return false;
+        }
+      });
+    }
+
+    //渲染分摊table
+    function buildFtTable() {
+      //获取表格数据
+      table.render({
+        elem: '#ftTable',
+        title: '分摊列表',
+        url: url, //数据接口
+        data: ftData, //请求参数
+        page: false,
+        height: 400,
+        cols: [[ //表头
+          {field: 'fh', title: '房号'},
+          {field: 'scmj_jzmj', title: '建筑面积'},
+          {field: 'fjzt', title: '房间状态'},
+          {field: 'yzmc', title: '业主名称'},
+          {field: 'yzzjh', title: '业主证件号码'},
+          {field: 'yzzjh', title: '业主证件号码'},
+          {
+            title: '账户状态', templet: function (d) {
+              let zh = d.zh;
+              if (zh) {
+                return zh.zt;
+              } else {
+                return "未开户";
+              }
+            }
+          },
+          {
+            title: '账号', templet: function (d) {
+              let zh = d.zh;
+              if (zh) {
+                return zh.no;
+              } else {
+                return "";
+              }
+            }
+          },
+        ]]
+      });
+    }
+
+    //分摊生成
+    form.on('submit(ftsc)', function (data) {
+      top.layer.msg("分摊生成");
+      let fayf = {};
+      for (let key in data.field) {
+        let val = data.field[key];
+        if (val) {
+          fayf[key] = val;
+        }
+      }
+
+      //判断预付金额是否大于剩余的金额
+
+
+      //请求后台，生成分摊信息
+
+      return false;
+    });
+
+  });
+</script>
+</body>
+</html>

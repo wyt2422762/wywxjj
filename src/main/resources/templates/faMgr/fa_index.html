@@ -27,6 +27,10 @@
 
       <script type="text/html" id="faTableToolBar">
         <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
+        {{#  if('审核通过' == d.zt){ }}
+          <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="yf">预付</a>
+          <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-warm layui-btn-xs" lay-event="js">结算</a>
+        {{#  } }}
       </script>
 
     </div>
@@ -142,21 +146,31 @@
             top.layer.close(index);
           }
         });
+      } else if(layEvent === 'yf') { //预付
+        TAB.open({
+          "data-id": "fa-yf",
+          "data-url": ctx + "/CZF/FAYF/Index/" + data.id,
+          "data-opts": $("#opts").val(),
+          "title": "方案预付"
+        });
+      } else if(layEvent === 'js') { //结算
+        TAB.open({
+          "data-id": "fa-js",
+          "data-url": ctx + "/CZF/FAGL/toJs/",
+          "data-opts": $("#opts").val(),
+          "title": "方案结算"
+        });
       }
     });
 
     //添加按钮事件
     $("#addFa").on('click', function () {
-      let admin = top.layui.admin;
-      let obj = {};
-      obj["data-id"] = "add-fa";
-      obj["data-url"] = ctx + "/CZF/FAGL/toAdd/";
-      obj["data-opts"] = $("#opts").val();
-      obj["title"] = "新建方案";
-      admin.openTabsPage(obj);
-      //定位当前tabs
-      top.layui.element.tabChange('menuTab', obj["data-id"]);
-      admin.tabsBodyChange(obj["data-id"], {});
+      TAB.open({
+        "data-id": "add-fa",
+        "data-url": ctx + "/CZF/FAGL/toAdd/",
+        "data-opts": $("#opts").val(),
+        "title": "新建方案"
+      });
     });
 
   });

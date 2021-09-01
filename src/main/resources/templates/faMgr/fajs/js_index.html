@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-方案结算信息</title>
+</head>
+<body>
+<input type="hidden" id="opts" th:value="${optsStr}"/>
+
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    方案结算
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/math.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer',
+    tableEdit: 'tableEdit/tableEdit',
+  }).use(['element', 'laydate', 'table', 'tableEdit', 'form', 'cascader', 'drawer'], function () {
+    //let element = layui.element;
+    let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+    let drawer = layui.drawer;
+    let tableEdit = layui.tableEdit;
+  });
+</script>
+</body>
+</html>
