@@ -1,5 +1,6 @@
 package com.fdkj.wywxjj.api.model.fa.yf;
 
+import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -84,4 +85,10 @@ public class Fa_yf {
      * 分摊信息列表
      */
     private List<Fa_yf_ft> ftList;
+
+
+    /**
+     * 分摊信息列表
+     */
+    private List<Fh> ftList2;
 }

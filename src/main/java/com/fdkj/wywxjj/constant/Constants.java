@@ -67,9 +67,17 @@ public class Constants {
          */
         public static final String YFFK = "预付返款";
         /**
-         * 维修支出
+         * 结算返款
          */
-        public static final String WXZC = "维修支出";
+        public static final String JSFK = "结算返款";
+        /**
+         * 维修预付
+         */
+        public static final String WXYF = "维修预付";
+        /**
+         * 维修结算
+         */
+        public static final String WXJS = "维修结算";
         /**
          * 销户退款
          */
@@ -222,4 +230,33 @@ public class Constants {
          */
         public static final String SHBTG = "审核不通过";
     }
+
+    /**
+     * 预付状态
+     */
+    public static class Yfzt {
+        /**
+         * 已预付
+         */
+        public static final String YYF = "已预付";
+        /**
+         * 未预付
+         */
+        public static final String WYF = "未预付";
+    }
+
+    /**
+     * 预付状态
+     */
+    public static class Jszt {
+        /**
+         * 已结算
+         */
+        public static final String YJS = "已结算";
+        /**
+         * 未预付
+         */
+        public static final String WJS = "未结算";
+    }
+
 }

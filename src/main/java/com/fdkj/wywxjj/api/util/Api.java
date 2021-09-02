@@ -7,6 +7,7 @@ import com.fdkj.wywxjj.api.model.fa.Fa;
 import com.fdkj.wywxjj.api.model.fa.Fa_fh;
 import com.fdkj.wywxjj.api.model.fa.Fa_mx;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf;
+import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf_ft;
 import com.fdkj.wywxjj.api.model.sysMgr.*;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import com.fdkj.wywxjj.api.model.xmMgr.Ld;
@@ -1685,6 +1686,7 @@ public class Api {
             for (int i = 0; i < results.size(); i++) {
                 JSONObject jsonObject1 = results.getJSONObject(i);
                 Zh zh = jsonObject1.toJavaObject(Zh.class);
+                zh.setId(jsonObject1.getString("zhid"));
                 Fh fh = jsonObject1.getObject("m", Fh.class);
                 if (StringUtils.isNotBlank(zh.getNo()) && StringUtils.isNotBlank(zh.getZt())) {
                     fh.setZh(zh);
@@ -1744,6 +1746,7 @@ public class Api {
             for (int i = 0; i < results.size(); i++) {
                 JSONObject jsonObject1 = results.getJSONObject(i);
                 Zh zh = jsonObject1.toJavaObject(Zh.class);
+                zh.setId(jsonObject1.getString("zhid"));
                 Fh fh = jsonObject1.getObject("m", Fh.class);
                 if (StringUtils.isNotBlank(zh.getNo()) && StringUtils.isNotBlank(zh.getZt())) {
                     fh.setZh(zh);
@@ -2429,8 +2432,9 @@ public class Api {
 
     /**
      * 方案审批
+     *
      * @param request req
-     * @param body 请求体
+     * @param body    请求体
      */
     public void spFa(HttpServletRequest request, JSONObject body) {
         //请求头
@@ -2455,9 +2459,10 @@ public class Api {
 
     /**
      * 获取方案预付款list(分页)
-     * @param request req
-     * @param reqBody 请求体
-     * @param pageNo 第几页
+     *
+     * @param request  req
+     * @param reqBody  请求体
+     * @param pageNo   第几页
      * @param pageSize 每页条数
      * @return res
      */
@@ -2505,6 +2510,7 @@ public class Api {
 
     /**
      * 获取方案预付款list(全部)
+     *
      * @param request req
      * @param reqBody 请求体
      * @return res
@@ -2578,6 +2584,59 @@ public class Api {
         JSONObject results = jsonObject.getJSONObject("Results");
         Fa_yf fa_yf = results.getObject("model", Fa_yf.class);
         //分摊信息
+        List<Fa_yf_ft> list = results.getJSONArray("list").toJavaList(Fa_yf_ft.class);
+
+        fa_yf.setFtList(list);
         return fa_yf;
+    }
+
+    /**
+     * 添加方案预付
+     *
+     * @param request req
+     * @param body    请求体
+     */
+    public void addFa_yf(HttpServletRequest request, JSONObject body) {
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(baseUrl + "/api/CZF/WYWXJJ_FA_YFK_TJ",
+                        HttpMethod.POST, requestEntity, String.class);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("添加方案预付失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_FA_YFK_TJ");
+            logger.error("添加方案预付失败失败，请求体: " + body.toJSONString());
+            logger.error("添加方案预付失败失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+    }
+
+    /**
+     * 添加方案预付
+     *
+     * @param request req
+     * @param body    请求体
+     */
+    public void delFa_yf(HttpServletRequest request, JSONObject body) {
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(baseUrl + "/api/CZF/WYWXJJ_FA_YFK_SC",
+                        HttpMethod.POST, requestEntity, String.class);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("删除方案预付失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_FA_YFK_SC");
+            logger.error("删除方案预付失败失败，请求体: " + body.toJSONString());
+            logger.error("删除方案预付失败失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
     }
 }

@@ -270,6 +270,8 @@ public class FaController {
     public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
                                                    @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
                                                    @RequestParam(value = "fk_wyid", required = false) String fk_wyid,
+                                                   @RequestParam(value = "fabh", required = false) String fabh,
+                                                   @RequestParam(value = "zt", required = false) String fazt,
                                                    @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             Map<String, String> reqBody = new HashMap<>();
@@ -278,6 +280,12 @@ public class FaController {
             }
             if (StringUtils.isNotBlank(fk_qybm)) {
                 reqBody.put("fk_qybm", fk_qybm);
+            }
+            if (StringUtils.isNotBlank(fabh)) {
+                reqBody.put("fabh", fabh);
+            }
+            if (StringUtils.isNotBlank(fazt)) {
+                reqBody.put("zt", fazt);
             }
             Page<Fa> faList = api.getFaList(request, reqBody, page, limit);
             //构造返回数据

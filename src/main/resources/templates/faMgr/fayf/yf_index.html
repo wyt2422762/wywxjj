@@ -26,7 +26,10 @@
       <table id="fayfTable" class="layui-table" lay-filter="fayfTable"></table>
 
       <script type="text/html" id="fayfTableToolBar">
-
+        <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
+        {{#  if('已支付' != d.zt){ }}
+          <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        {{#  } }}
       </script>
     </div>
 
@@ -80,10 +83,20 @@
         limit: 10,
         //limits: [10, 20, 50],
         cols: [[ //表头
-          {field: 'fabh', title: '预付编号'},
-          {field: 'fayjje', title: '预付金额(元)'},
-          {field: 'yfrq', title: '预付日期'},
-          {field: 'zt', title: '状态'},
+          {field: 'yfkbh', title: '预付编号'},
+          {field: 'yfkje', title: '预付金额(元)'},
+          {field: 'yfkrq', title: '预付日期'},
+          {field: 'yfkqs', title: '预付签署'},
+          {
+            field:'zt', title: '是否支付', templet: function (d) {
+              debugger;
+              if (d.zt === "已支付") {
+                return "是";
+              } else {
+                return "否"
+              }
+            }
+          },
           {toolbar: '#fayfTableToolBar', align: 'center', fixed: 'right', title: '操作'}
         ]],
         parseData: function (res) { //res 即为原始返回的数据
@@ -103,10 +116,44 @@
       let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
       let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
 
-      if (layEvent === 'update') { //修改
+      if (layEvent === 'mx') { //明细
+        top.layer.open({
+          type: 2,
+          title: '添加方案预付',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/FAYF/toInfo/" + data.id,
+          end: function (index) {
+            top.layer.close(index);
+          }
+        });
+      } else if (layEvent === 'update') { //修改
 
       } else if (layEvent === 'del') { //删除
-
+        top.layer.confirm("确定要删除该条预付信息？", {
+          btn: ['确定','取消'] //按钮
+        }, function(index){ //确定，提交预付
+          top.layer.close(index);
+          let loa = top.layer.load();
+          $.ajax({
+            url: ctx + "/CZF/FAYF/del/" + data.id,
+            type: "GET",
+            dataType: "json",
+            contentType: "application/json;charset=utf-8",
+            success: function (data) {
+              top.layer.close(loa); //关闭弹出框
+              top.layer.msg(data.msg);
+              getTableData();
+              return false;
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+              top.layer.close(loa); //关闭弹出框
+              top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+              return false;
+            }
+          });
+        });
       }
     });
 
@@ -121,6 +168,7 @@
         content: ctx + "/CZF/FAYF/toAdd/" + fk_faid,
         end: function (index) {
           top.layer.close(index);
+          window.location.href=window.location.href;
         }
       });
     });

@@ -21,6 +21,38 @@
                   style="margin-left:15px;">新建方案
           </button>
         </div>
+
+        <form class="layui-form" id="searchForm">
+
+          <div class="layui-inline" style="">
+            <div class="layui-input-inline">
+              <input type="text" id="fabh" name="fabh" placeholder="请输入方案编号搜索" value=""
+                     autocomplete="off" class="layui-input" style=""/>
+            </div>
+          </div>
+
+          <div class="layui-inline" style="">
+            <div class="layui-input-inline">
+              <select name="zt" id="zt">
+                <option value="请选择" selected>请选择</option>
+                <option value="审核中">审核中</option>
+                <option value="审核通过">审核通过</option>
+                <option value="审核不通过">审核不通过</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="layui-inline" style="">
+            <div class="layui-input-inline">
+              <button class="layui-btn layui-btn-danger btn_search" lay-submit lay-filter="formDemo1"
+                      style="margin-left:15px;">
+                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+              </button>
+            </div>
+          </div>
+
+        </form>
+        <div class="clearfix"></div>
       </div>
 
       <table id="faTable" class="layui-table" lay-filter="faTable"></table>
@@ -28,8 +60,10 @@
       <script type="text/html" id="faTableToolBar">
         <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
         {{#  if('审核通过' == d.zt){ }}
-          <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-normal layui-btn-xs" lay-event="yf">预付</a>
-          <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-warm layui-btn-xs" lay-event="js">结算</a>
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-normal layui-btn-xs"
+           lay-event="yf">预付</a>
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-warm layui-btn-xs"
+           lay-event="js">结算</a>
         {{#  } }}
       </script>
 
@@ -59,7 +93,7 @@
     getTableData();
 
     //获取方案管理列表
-    function getTableData() {
+    function getTableData(fabh, fazt) {
       let params = {};
       /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
         params['fk_qybm'] = cuser['fk_qybm'];
@@ -67,6 +101,13 @@
       if (cuser.yhType === '物业公司') {
         params['fk_wyid'] = cuser['fk_id'];
       }
+      if (fabh) {
+        params['fabh'] = fabh;
+      }
+      if (fazt) {
+        params['zt'] = fazt;
+      }
+
       let url = ctx + 'CZF/FAGL/getList';
       //获取表格数据
       table.render({
@@ -146,14 +187,14 @@
             top.layer.close(index);
           }
         });
-      } else if(layEvent === 'yf') { //预付
+      } else if (layEvent === 'yf') { //预付
         TAB.open({
           "data-id": "fa-yf",
           "data-url": ctx + "/CZF/FAYF/Index/" + data.id,
           "data-opts": $("#opts").val(),
-          "title": "方案预付"
+          "title": "方案预付(" + data.fabh + ")"
         });
-      } else if(layEvent === 'js') { //结算
+      } else if (layEvent === 'js') { //结算
         TAB.open({
           "data-id": "fa-js",
           "data-url": ctx + "/CZF/FAGL/toJs/",
@@ -171,6 +212,14 @@
         "data-opts": $("#opts").val(),
         "title": "新建方案"
       });
+    });
+
+    //搜索按钮事件
+    form.on('submit(formDemo1)', function (data) {
+      let fabh = data.field.fabh;
+      let fazt = data.field.zt;
+      getTableData(fabh, fazt);
+      return false;
     });
 
   });

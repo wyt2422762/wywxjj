@@ -258,12 +258,12 @@ public class FashController {
             //9. 修改账户状态
             if (workflowNextNode.getLx().equals(Constants.WorkflowNodeName.END)) {
                 if (action.equals(Constants.WorkflowAction.PASS)) {
-                    faDetail.setFazt("审核通过").setZt("审核通过");
+                    faDetail.setFazt(Constants.FaZt.SHTG).setZt(Constants.FaZt.SHTG);
                 } else if (action.equals(Constants.WorkflowAction.REJECT)) {
-                    faDetail.setFazt("审核不通过").setZt("审核不通过");
+                    faDetail.setFazt(Constants.FaZt.SHBTG).setZt(Constants.FaZt.SHBTG);
                 }
             } else {
-                faDetail.setZt("方案" + workflowNode.getJdmc()).setFazt("方案" + workflowNode.getJdmc());
+                faDetail.setZt(Constants.FaZt.SHZ).setFazt(Constants.FaZt.SHZ);
             }
 
             //10. 提交数据

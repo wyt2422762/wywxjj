@@ -189,4 +189,9 @@ public class Fa {
      * 方案状态
      */
     private String zt;
+
+    /**
+     * 预付款
+     */
+    private String yfk;
 }
