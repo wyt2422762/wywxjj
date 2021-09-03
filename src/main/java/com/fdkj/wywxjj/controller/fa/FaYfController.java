@@ -3,7 +3,6 @@ package com.fdkj.wywxjj.controller.fa;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.fa.Fa;
-import com.fdkj.wywxjj.api.model.fa.Fa_fh;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf_ft;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
@@ -188,8 +187,13 @@ public class FaYfController {
         }
     }
 
-    //判断金额是否允许
-
+    /**
+     * 判断金额是否允许
+     *
+     * @param request req
+     * @param fa_yf   预付信息
+     * @return res
+     */
     @RequestMapping("buildFtData")
     @ResponseBody
     public ResponseEntity<CusResponseBody> buildFtData(HttpServletRequest request,
@@ -306,7 +310,7 @@ public class FaYfController {
             }
             //4. 构造方案预付信息
             fa_yf.setId(IdUtils.randomUUID()).setAddtime(dateToStr).setFk_yhid(cuser.getId())
-                    .setCzr(cuser.getUsername());
+                    .setCzr(cuser.getUsername()).setZt(Constants.Zfzt.WZF);
             //5. 修改方案数据(预付状态，预付款)
             String yfk_fa = faDetail.getYfk();
             if (StringUtils.isBlank(yfk_fa)) {
@@ -445,10 +449,17 @@ public class FaYfController {
             Map<String, String> reqBody = new HashMap<>();
             reqBody.put("fk_faid", fk_faid);
             List<Fa_yf> fayfList = api.getFayfList(request, reqBody);
-            if(fayfList == null || fayfList.size() <= 1) {
+            if (fayfList == null || fayfList.size() <= 1) {
                 faDetail.setYfzt(Constants.Yfzt.WYF);
             }
-            //2. 算钱(账户余额，历史)
+            //2. 计算方案的预付款
+            BigDecimal subtract = BigDecimalUtil.subtract(faDetail.getYfk().trim(), fayfDetail.getYfkje().trim());
+            if (BigDecimalUtil.compareTo(subtract, new BigDecimal(0)) <= 0) {
+                faDetail.setYfk("");
+            } else {
+                faDetail.setYfk(subtract.toPlainString());
+            }
+            //3. 算钱(账户余额，历史)
             List<Zh> zhList = new ArrayList<>();
             List<Zh_his> zh_hisList = new ArrayList<>();
             for (Fa_yf_ft fa_yf_ft : ftList) {
@@ -471,7 +482,7 @@ public class FaYfController {
                 zh_hisList.add(zh_his);
             }
 
-            //3. 构造请求接口数据
+            //4. 构造请求接口数据
             JSONObject json = new JSONObject();
             //预付款id
             json.put("id", id);

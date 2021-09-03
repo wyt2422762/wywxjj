@@ -6,6 +6,28 @@
 <body>
 <div class="layui-tab-item layui-show" style="padding: 10px;">
   <div id="LAY_preview">
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+      <legend>缴费</legend>
+    </fieldset>
+
+    <!-- 缴费 -->
+    <form class="layui-form" method="post" id="zh_jfForm" lay-filter="zh_jfForm">
+      <div>
+        <table class="layui-table" style="table-layout:fixed;">
+          <tbody>
+          <tr>
+            <th style="white-space: nowrap;">缴费金额(元)</th>
+            <td colspan="2">
+              <input type="number" id="jfje" name="jfje" lay-verify="required" placeholder="" class="layui-input"/>
+            </td>
+            <td></td><td></td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+      <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+    </form>
+
     <fieldset class="layui-elem-field layui-field-title">
       <legend>账户信息</legend>
     </fieldset>
@@ -69,28 +91,6 @@
       <table id="zhMxTable" class="layui-table" lay-filter="zhMxTable"></table>
     </div>
 
-    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-      <legend>缴费</legend>
-    </fieldset>
-
-    <!-- 缴费 -->
-    <form class="layui-form" method="post" id="zh_jfForm" lay-filter="zh_jfForm">
-      <div>
-        <table class="layui-table" style="table-layout:fixed;">
-          <tbody>
-          <tr>
-            <th style="white-space: nowrap;">缴费金额(元)</th>
-            <td colspan="2">
-              <input type="number" id="jfje" name="jfje" lay-verify="required" placeholder="" class="layui-input"/>
-            </td>
-            <td></td><td></td>
-          </tr>
-          </tbody>
-        </table>
-      </div>
-      <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
-    </form>
-
   </div>
 </div>
 
@@ -141,6 +141,7 @@
             elem: '#zhMxTable',
             title: '明细列表',
             page: false,
+            height: 400,
             data: zh.list,
             cols: [[ //表头
               {field: 'jzrq', title: '记账日期'},

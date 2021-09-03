@@ -259,4 +259,31 @@ public class Constants {
         public static final String WJS = "未结算";
     }
 
+    /**
+     * 支付状态
+     */
+    public static class Zfzt {
+        /**
+         * 未支付
+         */
+        public static final String WZF = "未支付";
+        /**
+         * 已支付
+         */
+        public static final String YZF = "已支付";
+    }
+
+    /**
+     * 支付类型
+     */
+    public static class Zflx {
+        /**
+         * 预付
+         */
+        public static final String YF = "预付";
+        /**
+         * 结算
+         */
+        public static final String JS = "结算";
+    }
 }

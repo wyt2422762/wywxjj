@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/common/header::header(~{::title},~{},~{})">
-  <title>物业维修基金管理系统-方案预付信息</title>
+  <title>物业维修基金管理系统-方案预付支付</title>
 </head>
 <body>
 <input type="hidden" id="opts" th:value="${optsStr}"/>
@@ -14,21 +14,46 @@
 
     <!-- 预付 -->
     <div style="padding: 10px;">
-      <!-- 新建预付 -->
       <div style="padding-bottom: 10px;">
-        <div class="layui-inline" style="float:right;">
-          <button th:if="${#lists.contains(opts, 'add')}" id="addFayf" class="layui-btn layui-btn-normal"
-                  style="margin-left:15px;">新建预付
-          </button>
-        </div>
+        <form class="layui-form" id="searchForm">
+
+          <div class="layui-inline" style="">
+            <div class="layui-input-inline">
+              <input type="text" id="yfkbh" name="yfkbh" placeholder="请输入方案预付编号搜索" value=""
+                     autocomplete="off" class="layui-input" style=""/>
+            </div>
+          </div>
+
+          <div class="layui-inline" style="">
+            <div class="layui-input-inline">
+              <select name="zt" id="zt">
+                <option value="" selected>请选择</option>
+                <option value="已支付">已支付</option>
+                <option value="未支付">未支付</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="layui-inline" style="">
+            <div class="layui-input-inline">
+              <button class="layui-btn layui-btn-danger btn_search" lay-submit lay-filter="formDemo1"
+                      style="margin-left:15px;">
+                <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+              </button>
+            </div>
+          </div>
+
+        </form>
+        <div class="clearfix"></div>
       </div>
+
 
       <table id="fayfTable" class="layui-table" lay-filter="fayfTable"></table>
 
       <script type="text/html" id="fayfTableToolBar">
         <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
-        {{#  if('已支付' != d.zt){ }}
-          <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+        {{#  if('未支付' == d.zt){ }}
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="zf">支付</a>
         {{#  } }}
       </script>
     </div>
@@ -42,7 +67,6 @@
 
 <script th:inline="javascript">
   const cuser = [[${cuser}]];
-  const fk_faid = [[${fk_faid}]];
 
   layui.config({
     base: ctx + 'static/js/layuiExts/'
@@ -62,13 +86,21 @@
     getTableData();
 
     //获取预付列表
-    function getTableData() {
+    function getTableData(yfkbh, zt) {
+      debugger;
+
       let params = {};
       /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
         params['fk_qybm'] = cuser['fk_qybm'];
       }*/
+      if(yfkbh){
+        params['yfkbh'] = yfkbh;
+      }
+      if(zt){
+        params['zt'] = zt;
+      }
 
-      let url = ctx + 'CZF/FAYF/getList/' + fk_faid;
+      let url = ctx + 'CZF/FAYFZF/getList/';
 
       //获取表格数据
       table.render({
@@ -110,58 +142,46 @@
       if (layEvent === 'mx') { //明细
         top.layer.open({
           type: 2,
-          title: '添加方案预付',
+          title: '方案预付支付信息',
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/FAYF/toInfo/" + data.id,
+          content: ctx + "/CZF/FAYFZF/toInfo/" + data.id,
           end: function (index) {
             top.layer.close(index);
           }
         });
-      } else if (layEvent === 'update') { //修改
-
-      } else if (layEvent === 'del') { //删除
-        top.layer.confirm("确定要删除该条预付信息？", {
-          btn: ['确定','取消'] //按钮
-        }, function(index){ //确定，提交预付
-          top.layer.close(index);
-          let loa = top.layer.load();
-          $.ajax({
-            url: ctx + "/CZF/FAYF/del/" + data.id,
-            type: "GET",
-            dataType: "json",
-            contentType: "application/json;charset=utf-8",
-            success: function (data) {
-              top.layer.close(loa); //关闭弹出框
-              top.layer.msg(data.msg);
-              getTableData();
-              return false;
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-              top.layer.close(loa); //关闭弹出框
-              top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
-              return false;
-            }
-          });
+      } else if(layEvent === 'zf') { //支付
+        top.layer.open({
+          type: 2,
+          title: '方案预付支付信息',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/FAYFZF/toZf/" + data.id,
+          btn: ["确定", "取消"],
+          yes: function (index, layero) {
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#fa_yfzfForm");
+            $(frm).find("button.sb").click();
+            return false;
+          },
+          cancel: function (index, layero) {
+          },
+          end: function (index) {
+            top.layer.close(index);
+            window.location.reload();
+          }
         });
       }
     });
 
-    //添加按钮事件
-    $("#addFayf").on('click', function () {
-      top.layer.open({
-        type: 2,
-        title: '添加方案预付',
-        closeBtn: 1,
-        shadeClose: false,
-        area: ['1000px', '80%'],
-        content: ctx + "/CZF/FAYF/toAdd/" + fk_faid,
-        end: function (index) {
-          top.layer.close(index);
-          window.location.href=window.location.href;
-        }
-      });
+    //搜索按钮事件
+    form.on('submit(formDemo1)', function (data) {
+      let yfkbh = data.field.yfkbh;
+      let zt = data.field.zt;
+      getTableData(yfkbh, zt);
+      return false;
     });
 
   });

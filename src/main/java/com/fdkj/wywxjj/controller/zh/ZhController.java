@@ -273,7 +273,7 @@ public class ZhController {
             if (zhList != null && zhList.getTotalRecord() > 0) {
                 //说明账号存在
                 Zh zh1 = zhList.getDataList().get(0);
-                if (zh1.getNo().equals(no) && !zh1.getId().equals(zh.getString("id"))) {
+                if (zh1.getNo().equals(no) && !zh1.getId().equals(zh.getJSONObject("model").getString("id"))) {
                     throw new BusinessException("更新账户失败: 账号已存在", HttpStatus.INTERNAL_SERVER_ERROR.value());
                 }
             }
@@ -492,6 +492,68 @@ public class ZhController {
         } catch (Exception e) {
             log.error("获取销户记录失败", e);
             throw new BusinessException("获取销户记录失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
+
+
+    @RequestMapping("tk/{id}")
+    @ResponseBody
+    public ResponseEntity<CusResponseBody> xh(HttpServletRequest request,
+                                              @PathVariable String id) {
+        try {
+            //登录用户
+            User cuser = api.getUserFromCookie(request);
+            String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
+
+            //1. 获取账户信息
+            Zh zhDetail = api.getZhDetail(request, id);
+            //2. 判断账户状态
+            if(Constants.ZhZt.YXH != zhDetail.getZt()) {
+                log.error("账户(" + zhDetail.getId() + ")未销户，无法退款");
+                throw new BusinessException("该账户未销户，无法退款", HttpStatus.BAD_REQUEST.value());
+            }
+            //3. 账户金额改为0
+            //zhDetail.setMoney("0.00");
+
+            //3. 添加账户历史
+            List<Zh_his> list = zhDetail.getList();
+            Zh_his zh_his = new Zh_his();
+            zh_his.setCzlx(Constants.JzLb.JF)
+                    .setZc(zhDetail.getMoney())
+                    .setZhye("0.00")
+                    .setFk_zhid(zhDetail.getId())
+                    .setJzrq(dateToStr).setAddtime(dateToStr);
+
+            if (list == null) {
+                list = new ArrayList<>();
+            }
+            list.add(zh_his);
+
+            JSONObject jsonObject = new JSONObject();
+
+            JSONArray ja = (JSONArray) JSONArray.toJSON(list);
+            for (int i = 0; i < ja.size(); i++) {
+                JSONObject jsonObject1 = ja.getJSONObject(i);
+                jsonObject1.remove("id");
+            }
+            jsonObject.put("list", ja);
+
+            //4. 账户金额改为0
+            zhDetail.setMoney("0.00");
+            jsonObject.put("model", (JSONObject) JSONObject.toJSON(zhDetail));
+
+            api.aeZh(request, jsonObject);
+
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("退款成功");
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("退款失败", e);
+            if (e instanceof BusinessException) {
+                throw (BusinessException) e;
+            } else {
+                throw new BusinessException("退款失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+            }
         }
     }
 }

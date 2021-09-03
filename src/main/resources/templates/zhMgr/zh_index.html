@@ -56,7 +56,11 @@
           <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-danger"
              lay-event="xh">销户</a>
         {{#  } }}
-        <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="xhjl">历史</a>
+        {{#  if(d.zt == '已销户' && d.sftk != '已退款'){ }}
+          <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs"
+             lay-event="tk">退款</a>
+        {{#  } }}
+        <!--<a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="xhjl">历史</a>-->
       </script>
 
     </div>
@@ -154,7 +158,18 @@
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/ZHGL/toInfo/" + data.id,
+          content: ctx + "CZF/ZHGL/toInfo/" + data.id,
+          btn: ["销户历史"],
+          yes: function () {
+            top.layer.open({
+              type: 2,
+              title: '销户记录',
+              closeBtn: 1,
+              shadeClose: false,
+              area: ['1000px', '80%'],
+              content: ctx + "CZF/ZHGL/toXhjl/" + data.id,
+            });
+          },
           end: function () {
             top.layer.close(index);
           }
@@ -166,7 +181,7 @@
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/ZHGL/toEdit/" + data.id,
+          content: ctx + "CZF/ZHGL/toEdit/" + data.id,
           btn: ['保存', '取消'],
           yes: function (index, layero) {
             let body = top.layer.getChildFrame('body', index);
@@ -186,7 +201,7 @@
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/ZHGL/toJf/" + data.id,
+          content: ctx + "CZF/ZHGL/toJf/" + data.id,
           btn: ['保存', '取消'],
           yes: function (index, layero) {
             let body = top.layer.getChildFrame('body', index);
@@ -206,7 +221,7 @@
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/ZHGL/toXh/" + data.id,
+          content: ctx + "CZF/ZHGL/toXh/" + data.id,
           btn: ['保存', '取消'],
           yes: function (index, layero) {
             let body = top.layer.getChildFrame('body', index);
@@ -226,7 +241,24 @@
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/ZHGL/toXhjl/" + data.id,
+          content: ctx + "CZF/ZHGL/toXhjl/" + data.id,
+        });
+      } else if(layEvent === 'tk') { //退款
+        top.layer.confirm('确定要退款？', {
+          btn: ['确定', '取消']
+        }, function () {
+          $.ajax({
+            url: ctx + "CZF/ZHGL/tk/" + data.id,
+            type: "POST",
+            success: function (data) {
+              top.layer.msg(data.msg);
+              window.location.reload();
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+              top.layer.msg(XMLHttpRequest.responseJSON.msg);
+            }
+          });
+        }, function () {
         });
       }
     });

@@ -6,6 +6,51 @@
 <body>
 <div class="layui-tab-item layui-show" style="padding: 10px;">
   <div id="LAY_preview">
+    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
+      <legend>销户申请</legend>
+    </fieldset>
+
+    <!-- 销户申请 -->
+    <div>
+      <form class="layui-form" method="post" id="zh_xhForm" lay-filter="zh_xhForm">
+        <div class="layui-form">
+          <table class="layui-table" lay-size="sm">
+            <tbody>
+            <tr>
+              <th style="white-space: nowrap;">销户申请</th>
+              <td>
+                <input type="text" name="xhsq" lay-verify="required" placeholder="" class="layui-input"/>
+              </td>
+              <th style="white-space: nowrap;">与账户所有人关系</th>
+              <td>
+                <input type="text" name="gx" placeholder="" class="layui-input"/>
+              </td>
+              <th style="white-space: nowrap;">证件号码</th>
+              <td>
+                <input type="text" name="zjhm" lay-verify="required" placeholder="" class="layui-input"/>
+              </td>
+              <th style="white-space: nowrap;">联系电话</th>
+              <td>
+                <input type="text" name="lxdh" lay-verify="required" placeholder="" class="layui-input"/>
+              </td>
+            </tr>
+            <tr>
+              <th style="white-space: nowrap;">销户原因</th>
+              <td colspan="2">
+                <input type="text" name="xhyy" lay-verify="required" placeholder="" class="layui-input"/>
+              </td>
+              <td></td>
+              <th style="white-space: nowrap;"></th><td></td>
+              <th style="white-space: nowrap;"></th><td></td>
+            </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
+      </form>
+    </div>
+
     <fieldset class="layui-elem-field layui-field-title">
       <legend>账户信息</legend>
     </fieldset>
@@ -68,52 +113,6 @@
     <div style="max-height: 300px;">
       <table id="zhMxTable" class="layui-table" lay-filter="zhMxTable" lay-size="sm"></table>
     </div>
-
-    <fieldset class="layui-elem-field layui-field-title" style="margin-top: 20px;">
-      <legend>销户申请</legend>
-    </fieldset>
-
-    <!-- 销户申请 -->
-    <div>
-      <form class="layui-form" method="post" id="zh_xhForm" lay-filter="zh_xhForm">
-        <div class="layui-form">
-          <table class="layui-table" lay-size="sm">
-            <tbody>
-            <tr>
-              <th style="white-space: nowrap;">销户申请</th>
-              <td>
-                <input type="text" name="xhsq" lay-verify="required" placeholder="" class="layui-input"/>
-              </td>
-              <th style="white-space: nowrap;">与账户所有人关系</th>
-              <td>
-                <input type="text" name="gx" placeholder="" class="layui-input"/>
-              </td>
-              <th style="white-space: nowrap;">证件号码</th>
-              <td>
-                <input type="text" name="zjhm" lay-verify="required" placeholder="" class="layui-input"/>
-              </td>
-              <th style="white-space: nowrap;">联系电话</th>
-              <td>
-                <input type="text" name="lxdh" lay-verify="required" placeholder="" class="layui-input"/>
-              </td>
-            </tr>
-            <tr>
-              <th style="white-space: nowrap;">销户原因</th>
-              <td colspan="2">
-                <input type="text" name="xhyy" lay-verify="required" placeholder="" class="layui-input"/>
-              </td>
-              <td></td>
-              <th style="white-space: nowrap;"></th><td></td>
-              <th style="white-space: nowrap;"></th><td></td>
-            </tr>
-            </tbody>
-          </table>
-        </div>
-
-        <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
-      </form>
-    </div>
-
   </div>
 </div>
 
@@ -164,6 +163,7 @@
             elem: '#zhMxTable',
             title: '明细列表',
             page: false,
+            height: 400,
             data: zh.list,
             cols: [[ //表头
               {field: 'jzrq', title: '记账日期'},
