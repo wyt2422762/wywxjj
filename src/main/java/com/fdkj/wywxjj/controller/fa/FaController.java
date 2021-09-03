@@ -10,7 +10,8 @@ import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.FaApi;
+import com.fdkj.wywxjj.api.util.FhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
 import com.fdkj.wywxjj.error.BusinessException;
@@ -41,7 +42,9 @@ public class FaController {
     private static final Logger log = LoggerFactory.getLogger(FaController.class);
 
     @Autowired
-    private Api api;
+    private FaApi faApi;
+    @Autowired
+    private FhApi fhApi;
     @Autowired
     private WorkflowService workflowService;
 
@@ -56,7 +59,7 @@ public class FaController {
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request,
                               @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -76,7 +79,7 @@ public class FaController {
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request,
                               @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -97,7 +100,7 @@ public class FaController {
     public ModelAndView toInfo(HttpServletRequest request,
                                @PathVariable("id") String id,
                                @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -122,7 +125,7 @@ public class FaController {
                                  @PathVariable(value = "fk_xmxxid") String fk_xmxxid,
                                  @PathVariable(value = "fk_ldxxid") String fk_ldxxid,
                                  @RequestParam(value = "szdy", required = false) String szdy) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faApi.getUserFromCookie(request));
         request.setAttribute("fk_xmxxid", fk_xmxxid);
         request.setAttribute("fk_ldxxid", fk_ldxxid);
         request.setAttribute("szdy", szdy);
@@ -137,7 +140,6 @@ public class FaController {
      * @param fk_ldxxid 楼栋信息id
      * @param szdy      所在单元
      * @return res
-     * @throws Exception err
      */
     @RequestMapping("fajeYz/{fk_xmxxid}/{fk_ldxxid}")
     public ResponseEntity<CusResponseBody> fajeYz(HttpServletRequest request,
@@ -147,14 +149,14 @@ public class FaController {
                                                   @RequestParam(value = "fayjje", required = false) String fayjje,
                                                   @RequestParam(value = "ftfs", required = false) String ftfs) {
         try {
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faApi.getUserFromCookie(request);
             Map<String, Object> reqBody = new HashMap<>();
             reqBody.put("fk_xmxxid", fk_xmxxid.trim());
             reqBody.put("fk_ldxxid", fk_ldxxid.trim());
             if (StringUtils.isNotBlank(szdy)) {
                 reqBody.put("szdy", szdy.trim());
             }
-            List<Fh> fhList = api.getFhAllList(request, reqBody);
+            List<Fh> fhList = fhApi.getFhAllList(request, reqBody);
             if (fhList == null || fhList.isEmpty()) {
                 //构造返回数据
                 Map<String, Object> res = new HashMap<>();
@@ -287,7 +289,7 @@ public class FaController {
             if (StringUtils.isNotBlank(fazt)) {
                 reqBody.put("zt", fazt);
             }
-            Page<Fa> faList = api.getFaList(request, reqBody, page, limit);
+            Page<Fa> faList = faApi.getFaList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取方案列表成功", faList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -308,7 +310,7 @@ public class FaController {
     @ResponseBody
     public ResponseEntity<CusResponseBody> getBasicDetail(HttpServletRequest request, @PathVariable String id) {
         try {
-            Fa faDetail = api.getFaDetail(request, id);
+            Fa faDetail = faApi.getFaDetail(request, id);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取方案基本数据成功", faDetail);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -332,7 +334,7 @@ public class FaController {
 
         try {
             //登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faApi.getUserFromCookie(request);
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
 
             Fa fa = jsonObject.toJavaObject(Fa.class);
@@ -407,7 +409,7 @@ public class FaController {
             JSONObject jsonObject_wfh = JSONObject.parseObject(JSONObject.toJSONString(wfh));
             json.put("hiSmodel", jsonObject_wfh);
 
-            api.aeFa(request, json);
+            faApi.aeFa(request, json);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("方案提交成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

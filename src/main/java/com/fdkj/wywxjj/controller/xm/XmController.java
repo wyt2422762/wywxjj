@@ -5,7 +5,7 @@ import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.xmMgr.Xm;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.XmApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
@@ -39,7 +39,7 @@ public class XmController {
     private static final Logger log = LoggerFactory.getLogger(XmController.class);
 
     @Autowired
-    private Api api;
+    private XmApi xmApi;
 
     /**
      * 跳转到
@@ -51,7 +51,7 @@ public class XmController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", xmApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -70,7 +70,7 @@ public class XmController {
      */
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", xmApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -91,7 +91,7 @@ public class XmController {
     public ModelAndView toEdit(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", xmApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -113,7 +113,7 @@ public class XmController {
     public ModelAndView toInfo(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", xmApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
@@ -135,13 +135,13 @@ public class XmController {
     public ModelAndView toInfo1(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", xmApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if(opts != null && !opts.isEmpty()){
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
         }
-        Xm xm = api.getXmDetail(request, id);
+        Xm xm = xmApi.getXmDetail(request, id);
         request.setAttribute("xm", xm);
         return new ModelAndView("xmMgr/xm_info1");
     }
@@ -173,7 +173,7 @@ public class XmController {
             if(StringUtils.isNotBlank(fk_qybm)){
                 reqBody.put("fk_qybm", fk_qybm);
             }
-            Page<Xm> xmPage = api.getXmList(request, reqBody, page, limit);
+            Page<Xm> xmPage = xmApi.getXmList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取小区列表成功", xmPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -202,7 +202,7 @@ public class XmController {
             if(StringUtils.isNotBlank(fk_qybm)){
                 reqBody.put("fk_qybm", fk_qybm);
             }
-            List<Xm> xmList = api.getXmAllList(request, reqBody);
+            List<Xm> xmList = xmApi.getXmAllList(request, reqBody);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取小区列表成功", xmList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -216,7 +216,7 @@ public class XmController {
     @ResponseBody
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request, @PathVariable String id) {
         try {
-            Xm xmDetail = api.getXmDetail(request, id);
+            Xm xmDetail = xmApi.getXmDetail(request, id);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取小区列表成功", xmDetail);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -250,7 +250,7 @@ public class XmController {
     public ResponseEntity<CusResponseBody> importData(HttpServletRequest request, MultipartFile file) {
         try {
             //登录用户
-            User user = api.getUserFromCookie(request);
+            User user = xmApi.getUserFromCookie(request);
             //物业公司id
             String fk_id = user.getFk_id();
             String fk_qybm = user.getFk_qybm();
@@ -271,7 +271,7 @@ public class XmController {
                     xm.setFk_qybm(fk_qybm);
                 });
                 JSONArray jsonArray = JSONArray.parseArray(JSON.toJSONString(xmList));
-                api.importXm(request, jsonArray);
+                xmApi.importXm(request, jsonArray);
             }
             CusResponseBody cusResponseBody = CusResponseBody.success("导入小区成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -300,17 +300,17 @@ public class XmController {
                 String jhkgrq = xm.getString("jhkgrq");
                 //处理日期格式
                 if (StringUtils.isNotBlank(jhjgrq)) {
-                    xm.put("jhkgrq", DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", DateUtils.dateTime("yyyy-MM-dd\'T\'HH:mm:ss.sss", jhjgrq)));
+                    xm.put("jhkgrq", DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", DateUtils.dateTime("yyyy-MM-dd\'T\'HH:mm:ss.sss", jhjgrq)));
                 } else {
                     xm.remove("jhkgrq");
                 }
                 if (StringUtils.isNotBlank(jhkgrq)) {
-                    xm.put("jhkgrq", DateUtils.parseDateToStr("yyyy-MM-dd\'T\'HH:mm:ss.sss", DateUtils.dateTime("yyyy-MM-dd\'T\'HH:mm:ss.sss", jhkgrq)));
+                    xm.put("jhkgrq", DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", DateUtils.dateTime("yyyy-MM-dd\'T\'HH:mm:ss.sss", jhkgrq)));
                 } else {
                     xm.remove("jhkgrq");
                 }
                 //调用接口添加编辑数据
-                api.aeXM(request, xm);
+                xmApi.aeXM(request, xm);
             }
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新小区成功");

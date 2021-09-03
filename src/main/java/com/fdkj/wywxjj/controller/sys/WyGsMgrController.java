@@ -2,7 +2,7 @@ package com.fdkj.wywxjj.controller.sys;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.WyGs;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.WygsApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
@@ -29,11 +29,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("/PTXT/WYGSGL")
 public class WyGsMgrController {
-
     private static final Logger log = LoggerFactory.getLogger(WyGsMgrController.class);
 
     @Autowired
-    private Api api;
+    private WygsApi wygsApi;
 
     /**
      * 跳转到
@@ -45,7 +44,7 @@ public class WyGsMgrController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", wygsApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/wyGsMgr/wyGsMgr_index");
     }
@@ -74,7 +73,7 @@ public class WyGsMgrController {
                 reqBody.put("fk_qybm", fk_qybm);
             }
 
-            Page<WyGs> wyGsPage = api.getWyGsList(request, reqBody, page, limit);
+            Page<WyGs> wyGsPage = wygsApi.getWyGsList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取物业公司列表成功", wyGsPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -96,7 +95,7 @@ public class WyGsMgrController {
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request,
                                                      @PathVariable("id") String id) {
         try {
-            WyGs wyGs = api.getWyGsDetail(request, id);
+            WyGs wyGs = wygsApi.getWyGsDetail(request, id);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取物业公司详情成功", wyGs);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -109,7 +108,7 @@ public class WyGsMgrController {
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", wygsApi.getUserFromCookie(request));
         return new ModelAndView("sysMgr/wyGsMgr/wyGsMgr_add");
     }
 
@@ -117,9 +116,9 @@ public class WyGsMgrController {
     public ModelAndView toEdit(HttpServletRequest request,
                                @PathVariable("id") String id) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", wygsApi.getUserFromCookie(request));
         //2. 对应的物业公司信息
-        WyGs wyGs = api.getWyGsDetail(request, id);
+        WyGs wyGs = wygsApi.getWyGsDetail(request, id);
         request.setAttribute("wyGs", wyGs);
         return new ModelAndView("sysMgr/wyGsMgr/wyGsMgr_edit");
     }
@@ -136,7 +135,7 @@ public class WyGsMgrController {
     public ResponseEntity<CusResponseBody> aeWyGs(HttpServletRequest request,
                                                   @RequestBody JSONObject json) {
         try {
-            api.aeWyGs(request, json);
+            wygsApi.aeWyGs(request, json);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新物业公司成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -161,7 +160,7 @@ public class WyGsMgrController {
             if (StringUtils.isBlank(id)) {
                 throw new BusinessException("物业公司id不能为空", HttpStatus.BAD_REQUEST.value());
             }
-            api.delWyGs(request, id.trim());
+            wygsApi.delWyGs(request, id.trim());
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("删除物业公司成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

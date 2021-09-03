@@ -5,7 +5,7 @@ import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowLink;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.UserApi;
 import com.fdkj.wywxjj.api.util.WfApi;
 import com.fdkj.wywxjj.constant.Constants;
 import com.fdkj.wywxjj.model.base.Page;
@@ -32,7 +32,7 @@ public class WorkflowService {
     private WfApi wfApi;
 
     @Autowired
-    private Api api;
+    private UserApi userApi;
 
     /**
      * 获取流程实例
@@ -175,7 +175,7 @@ public class WorkflowService {
         if(workflowHistoryList != null && !workflowHistoryList.isEmpty()) {
             for (WorkflowHistory workflowHistory : workflowHistoryList) {
                 String fk_yhid = workflowHistory.getFk_yhid();
-                User userDetail = api.getUserDetail(request, fk_yhid);
+                User userDetail = userApi.getUserDetail(request, fk_yhid);
                 workflowHistory.setUser(userDetail);
             }
         }
@@ -197,7 +197,7 @@ public class WorkflowService {
         if(workflowHistoryList != null && !workflowHistoryList.isEmpty()) {
             for (WorkflowHistory workflowHistory : workflowHistoryList) {
                 String fk_yhid = workflowHistory.getFk_yhid();
-                User userDetail = api.getUserDetail(request, fk_yhid);
+                User userDetail = userApi.getUserDetail(request, fk_yhid);
                 workflowHistory.setUser(userDetail);
             }
         }

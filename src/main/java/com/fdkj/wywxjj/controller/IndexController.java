@@ -1,7 +1,7 @@
 package com.fdkj.wywxjj.controller;
 
 import com.fdkj.wywxjj.api.model.sysMgr.View_PT_XT_MK_Model;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.SystemApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import org.slf4j.Logger;
@@ -29,12 +29,12 @@ public class IndexController {
     private static final Logger log = LoggerFactory.getLogger(IndexController.class);
 
     @Autowired
-    private Api api;
+    private SystemApi systemApi;
 
     @RequestMapping("")
     public ModelAndView index(HttpServletRequest request) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
-        List<View_PT_XT_MK_Model> menu = api.getUserMenu(request);
+        request.setAttribute("user", systemApi.getUserFromCookie(request));
+        List<View_PT_XT_MK_Model> menu = systemApi.getUserMenu(request);
         request.setAttribute("menu", menu);
         return new ModelAndView("index");
     }
@@ -43,7 +43,7 @@ public class IndexController {
     @ResponseBody
     public ResponseEntity<CusResponseBody> getMenu(HttpServletRequest request) {
         try {
-            List<View_PT_XT_MK_Model> menu = api.getUserMenu(request);
+            List<View_PT_XT_MK_Model> menu = systemApi.getUserMenu(request);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("退出成功", menu);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

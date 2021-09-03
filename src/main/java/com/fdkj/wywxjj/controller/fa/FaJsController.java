@@ -1,8 +1,7 @@
 package com.fdkj.wywxjj.controller.fa;
 
 import com.fdkj.wywxjj.api.model.fa.js.Fa_js;
-import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.FaJsApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
@@ -35,7 +34,7 @@ public class FaJsController {
     private static final Logger log = LoggerFactory.getLogger(FaJsController.class);
 
     @Autowired
-    private Api api;
+    private FaJsApi faJsApi;
 
     /**
      * 跳转
@@ -48,7 +47,7 @@ public class FaJsController {
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request,
                               @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faJsApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -78,7 +77,7 @@ public class FaJsController {
             }
             reqBody.put("fk_faid", fk_faid);
             //请求接口
-            Page<Fa_js> fajsList = api.getFajsList(request, reqBody, 1, 1);
+            Page<Fa_js> fajsList = faJsApi.getFajsList(request, reqBody, 1, 1);
 
             boolean res = false;
             //如果有，则结果改为true

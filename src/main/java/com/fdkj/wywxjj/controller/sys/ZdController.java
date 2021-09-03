@@ -1,14 +1,12 @@
 package com.fdkj.wywxjj.controller.sys;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fdkj.wywxjj.api.model.sysMgr.Yh;
 import com.fdkj.wywxjj.api.model.sysMgr.Zd;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.DictApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.controller.xm.XmController;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,7 +30,7 @@ public class ZdController {
     private static final Logger log = LoggerFactory.getLogger(XmController.class);
 
     @Autowired
-    private Api api;
+    private DictApi dictApi;
 
     /**
      * 跳转到
@@ -44,7 +42,7 @@ public class ZdController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", dictApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/zdMgr/zdMgr_index");
     }
@@ -64,7 +62,7 @@ public class ZdController {
                                                    @RequestParam(value = "zdm", required = false) String zdm,
                                                    @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
-            Page<Zd> yhPage = api.getZdList(request, zdm, page, limit);
+            Page<Zd> yhPage = dictApi.getZdList(request, zdm, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取字典列表成功", yhPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -86,7 +84,7 @@ public class ZdController {
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request,
                                                      @PathVariable("id") String id) {
         try {
-            Zd zd = api.getZdDetail(request, id);
+            Zd zd = dictApi.getZdDetail(request, id);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取字典详情成功", zd);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -100,7 +98,7 @@ public class ZdController {
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", dictApi.getUserFromCookie(request));
         return new ModelAndView("sysMgr/zdMgr/zdMgr_add");
     }
 
@@ -108,9 +106,9 @@ public class ZdController {
     public ModelAndView toEdit(HttpServletRequest request,
                                @PathVariable("id") String id) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", dictApi.getUserFromCookie(request));
         //2. 对应的字典信息
-        Zd zd = api.getZdDetail(request, id);
+        Zd zd = dictApi.getZdDetail(request, id);
         request.setAttribute("zd", zd);
         return new ModelAndView("sysMgr/zdMgr/zdMgr_edit");
     }
@@ -127,7 +125,7 @@ public class ZdController {
     public ResponseEntity<CusResponseBody> aeZd(HttpServletRequest request,
                                                 @RequestBody JSONObject json) {
         try {
-            api.aeZd(request, json);
+            dictApi.aeZd(request, json);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新字典成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

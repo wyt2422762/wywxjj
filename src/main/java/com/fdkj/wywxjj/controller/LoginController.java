@@ -2,7 +2,7 @@ package com.fdkj.wywxjj.controller;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.SystemApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import org.apache.commons.lang3.StringUtils;
@@ -34,7 +34,7 @@ public class LoginController {
     private static final Logger log = LoggerFactory.getLogger(LoginController.class);
 
     @Autowired
-    private Api api;
+    private SystemApi systemApi;
 
     @RequestMapping("toLogin")
     public ModelAndView toLogin() {
@@ -52,7 +52,7 @@ public class LoginController {
                 throw new BusinessException("参数不正确", HttpStatus.BAD_REQUEST.value());
             }
 
-            JSONObject res = api.getUserToken(userName, password);
+            JSONObject res = systemApi.getUserToken(userName, password);
             String token = res.getString("token");
             User user = res.getObject("user", User.class);
 

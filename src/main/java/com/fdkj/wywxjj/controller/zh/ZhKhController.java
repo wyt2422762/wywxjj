@@ -5,7 +5,7 @@ import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.sysMgr.Yh;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import com.fdkj.wywxjj.api.model.xmMgr.Xm;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.*;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.utils.math.BigDecimalUtil;
 import org.apache.commons.lang3.StringUtils;
@@ -26,7 +26,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 账户
+ * 账户开户
  *
  * @author wyt
  */
@@ -37,7 +37,17 @@ public class ZhKhController {
     private static final Logger log = LoggerFactory.getLogger(ZhKhController.class);
 
     @Autowired
-    private Api api;
+    private ZhApi zhApi;
+    @Autowired
+    private XmApi xmApi;
+    @Autowired
+    private LdApi ldApi;
+    @Autowired
+    private FhApi fhApi;
+    @Autowired
+    private JnszApi jnszApi;
+    @Autowired
+    private YhApi yhApi;
 
     /**
      * 跳转到
@@ -49,7 +59,7 @@ public class ZhKhController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -71,13 +81,13 @@ public class ZhKhController {
     public ModelAndView toKh(HttpServletRequest request,
                              @RequestParam(value = "opts", required = false) List<String> opts,
                              @PathVariable("fk_xmxxid") String fk_xmxxid) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
         }
-        Xm xm = api.getXmDetail(request, fk_xmxxid);
+        Xm xm = xmApi.getXmDetail(request, fk_xmxxid);
         request.setAttribute("xm", xm);
         return new ModelAndView("zhMgr/kh/zhkh_kh");
     }
@@ -85,8 +95,8 @@ public class ZhKhController {
     /**
      * 跳转开户
      *
-     * @param request req
-     * @param opts  opts
+     * @param request   req
+     * @param opts      opts
      * @param fk_fhxxid 房号信息id
      * @return res
      * @throws Exception err
@@ -95,7 +105,7 @@ public class ZhKhController {
     public ModelAndView toActKh(HttpServletRequest request,
                                 @RequestParam(value = "opts", required = false) List<String> opts,
                                 @PathVariable("fk_fhxxid") String fk_fhxxid) throws Exception {
-        User cuser = api.getUserFromCookie(request);
+        User cuser = zhApi.getUserFromCookie(request);
         request.setAttribute("cuser", cuser);
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
@@ -104,7 +114,7 @@ public class ZhKhController {
         }
 
         //获取房号信息
-        Fh fh = api.getFhDetail(request, fk_fhxxid);
+        Fh fh = fhApi.getFhDetail(request, fk_fhxxid);
         if (fh == null) {
             throw new BusinessException("房间信息为空", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
@@ -112,14 +122,14 @@ public class ZhKhController {
         //获取缴纳设置
         Map<String, String> reqBody = new HashMap<>();
         //reqBody.put("fk_qybm", cuser.getFk_qybm());
-        Jnsz jnsz = api.getJnszList(request, reqBody, 1, 1);
+        Jnsz jnsz = jnszApi.getJnszList(request, reqBody, 1, 1);
         if (jnsz == null) {
             throw new BusinessException("缴纳设置信息为空", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
-        jnsz = api.getJnszDetail(request, jnsz.getId());
+        jnsz = jnszApi.getJnszDetail(request, jnsz.getId());
         request.setAttribute("jnsz", jnsz);
         //获取银行信息
-        Yh yh = api.getYhDetail(request, cuser.getFk_id());
+        Yh yh = yhApi.getYhDetail(request, cuser.getFk_id());
         if (yh == null) {
             throw new BusinessException("银行信息为空", HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
@@ -162,39 +172,23 @@ public class ZhKhController {
         //4. 获取缴纳设置信息
         String jnfs = jnsz.getJnfs();
         String jnbz = jnsz.getJnbz();
-        if("不固定".equals(jnbz)) {
+        if ("不固定".equals(jnbz)) {
             res.put("bgd", true);
         }
         //5. 获取缴纳比例/金额
-        if("按合同总价缴纳".equals(jnfs)){
+        if ("按合同总价缴纳".equals(jnfs)) {
             res.put("jnbz", jnsz.getJnbl());
-        } else if("按建筑面积缴纳".equals(jnfs)){
+        } else if ("按建筑面积缴纳".equals(jnfs)) {
             res.put("jnbz", jnsz.getJnBz_jzmj(jzmj, lc));
         }
 
         //6. 计算钱
-        if("按合同总价缴纳".equals(jnfs)){
+        if ("按合同总价缴纳".equals(jnfs)) {
             res.put("money", jnsz.calacMoneyByHtje(htje));
-        } else if("按建筑面积缴纳".equals(jnfs)){
+        } else if ("按建筑面积缴纳".equals(jnfs)) {
             res.put("money", jnsz.calacMoneyByJzmj(jzmj, lc));
         }
 
         return res;
     }
-
-    public static void main(String[] args) {
-        String ht = "1430000.47";
-        String bl = "10.74";
-        BigDecimal ht_bd = new BigDecimal(ht.trim());
-        BigDecimal bl_bd = new BigDecimal(bl.trim());
-        BigDecimal multiply = ht_bd.multiply(bl_bd);
-        System.out.println(multiply);
-        BigDecimal scale = multiply.setScale(2, BigDecimal.ROUND_HALF_UP);
-        System.out.println(scale);
-
-        BigDecimal bigDecimal = BigDecimalUtil.multiplyAndScale(ht, bl);
-        System.out.println(bigDecimal);
-
-    }
-
 }

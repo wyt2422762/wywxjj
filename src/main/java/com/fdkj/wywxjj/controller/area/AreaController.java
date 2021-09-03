@@ -1,9 +1,8 @@
 package com.fdkj.wywxjj.controller.area;
 
 import com.fdkj.wywxjj.api.model.area.Area;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.AreaApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
-import com.fdkj.wywxjj.controller.CommonController;
 import com.fdkj.wywxjj.error.BusinessException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,7 +28,7 @@ public class AreaController {
     private static final Logger log = LoggerFactory.getLogger(AreaController.class);
 
     @Autowired
-    private Api api;
+    private AreaApi areaApi;
 
     @RequestMapping("/getData")
     @ResponseBody
@@ -47,7 +46,7 @@ public class AreaController {
     }
 
     private void getData(HttpServletRequest request, Area area) throws Exception {
-        List<Area> areaDataList = api.getAreaDataList(request, area.getID());
+        List<Area> areaDataList = areaApi.getAreaDataList(request, area.getID());
         if (areaDataList != null && !areaDataList.isEmpty()) {
             area.setChildren(areaDataList);
             for (Area areaChild : areaDataList) {

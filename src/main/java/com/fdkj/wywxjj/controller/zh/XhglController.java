@@ -5,7 +5,7 @@ import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
 import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.ZhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
 import com.fdkj.wywxjj.error.BusinessException;
@@ -24,7 +24,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,7 +39,7 @@ public class XhglController {
     private static final Logger log = LoggerFactory.getLogger(XhglController.class);
 
     @Autowired
-    private Api api;
+    private ZhApi zhApi;
     @Autowired
     private WorkflowService workflowService;
 
@@ -54,7 +53,7 @@ public class XhglController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -78,7 +77,7 @@ public class XhglController {
                                                                 @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             //当前登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = zhApi.getUserFromCookie(request);
 
             //流程定义id
             String fk_wfid = Constants.WorkflowId.XH;
@@ -92,9 +91,9 @@ public class XhglController {
                 String fk_ywid = workflowInstant.getFk_ywid();
                 String fk_dqjdid = workflowInstant.getFk_dqjdid();
                 //销户申请
-                Xhsq xhsqDetail = api.getXhsqDetail(request, fk_ywid);
+                Xhsq xhsqDetail = zhApi.getXhsqDetail(request, fk_ywid);
                 //账号
-                Zh zhDetail = api.getZhDetail(request, xhsqDetail.getFk_zhid());
+                Zh zhDetail = zhApi.getZhDetail(request, xhsqDetail.getFk_zhid());
                 xhsqDetail.setZh(zhDetail);
                 workflowInstant.setData(xhsqDetail);
                 WorkflowNode workflowNodeById = workflowService.getWorkflowNodeById(request, fk_dqjdid);

@@ -8,7 +8,7 @@ import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
 import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.ZhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
 import com.fdkj.wywxjj.error.BusinessException;
@@ -43,7 +43,7 @@ public class XhshController {
     private static final Logger log = LoggerFactory.getLogger(XhshController.class);
 
     @Autowired
-    private Api api;
+    private ZhApi zhApi;
     @Autowired
     private WorkflowService workflowService;
 
@@ -57,7 +57,7 @@ public class XhshController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -77,7 +77,7 @@ public class XhshController {
      */
     @RequestMapping("toSh/{fk_wfslid}")
     public ModelAndView toSh(HttpServletRequest request, @PathVariable("fk_wfslid") String fk_wfslid, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -88,9 +88,9 @@ public class XhshController {
         //获取流程实例信息
         WorkflowInstant wfi = workflowService.getWorkflowInstantById(request, fk_wfslid);
         String fk_ywid = wfi.getFk_ywid();
-        Xhsq xhsq = api.getXhsqDetail(request, fk_ywid);
+        Xhsq xhsq = zhApi.getXhsqDetail(request, fk_ywid);
         String fk_zhid = xhsq.getFk_zhid();
-        Zh zh = api.getZhDetail(request, fk_zhid);
+        Zh zh = zhApi.getZhDetail(request, fk_zhid);
         xhsq.setZh(zh);
         wfi.setData(xhsq);
         request.setAttribute("wfi", wfi);
@@ -113,7 +113,7 @@ public class XhshController {
                                                                 @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             //当前登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = zhApi.getUserFromCookie(request);
             //获取用户对应的审批结点
             List<WorkflowNode> roleNodeList = workflowService.getRoleNodeList(request, cuser.getFk_jsid(), Constants.WorkflowId.XH);
 
@@ -136,9 +136,9 @@ public class XhshController {
                 String fk_ywid = workflowInstant.getFk_ywid();
                 String fk_dqjdid = workflowInstant.getFk_dqjdid();
                 //销户申请
-                Xhsq xhsqDetail = api.getXhsqDetail(request, fk_ywid);
+                Xhsq xhsqDetail = zhApi.getXhsqDetail(request, fk_ywid);
                 //账号
-                Zh zhDetail = api.getZhDetail(request, xhsqDetail.getFk_zhid());
+                Zh zhDetail = zhApi.getZhDetail(request, xhsqDetail.getFk_zhid());
                 xhsqDetail.setZh(zhDetail);
                 workflowInstant.setData(xhsqDetail);
                 WorkflowNode workflowNodeById = workflowService.getWorkflowNodeById(request, fk_dqjdid);
@@ -169,7 +169,7 @@ public class XhshController {
                                                           @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
         try {
             //当前登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = zhApi.getUserFromCookie(request);
             List<WorkflowHistory> workflowHistoryListByWfslId = workflowService.getWorkflowHistoryListByWfslId(request, fk_wkslid);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取审核历史列表成功", workflowHistoryListByWfslId);
@@ -198,7 +198,7 @@ public class XhshController {
                                               @RequestParam(value = "dqjdid") String dqjdid) {
         try {
             //当前登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = zhApi.getUserFromCookie(request);
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
             //1. 获取流程实例信息
             WorkflowInstant wfi = workflowService.getWorkflowInstantById(request, fk_wkslid);
@@ -232,9 +232,9 @@ public class XhshController {
                     .setYj(yj);
             //7. 获取xhsq
             String fk_ywid = wfi.getFk_ywid();
-            Xhsq xhsq = api.getXhsqDetail(request, fk_ywid);
+            Xhsq xhsq = zhApi.getXhsqDetail(request, fk_ywid);
             //8. 获取账户
-            Zh zh = api.getZhDetail(request, xhsq.getFk_zhid());
+            Zh zh = zhApi.getZhDetail(request, xhsq.getFk_zhid());
             //9. 修改账户状态
             if (workflowNextNode.getLx().equals(Constants.WorkflowNodeName.END)) {
                 if (action.equals(Constants.WorkflowAction.PASS)) {
@@ -261,7 +261,7 @@ public class XhshController {
             json.put("wywxjJ_WORKFLOW_HISModel", jsonObject_wfh);
 
             //发送请求
-            api.spXhSq(request, json);
+            zhApi.spXhSq(request, json);
 
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("销户申请审批成功");

@@ -2,7 +2,7 @@ package com.fdkj.wywxjj.controller.sys;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.Yh;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.YhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
@@ -29,11 +29,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("/CZF/YHGL")
 public class YhMgrController {
-
     private static final Logger log = LoggerFactory.getLogger(YhMgrController.class);
 
     @Autowired
-    private Api api;
+    private YhApi yhApi;
 
     /**
      * 跳转到
@@ -45,7 +44,7 @@ public class YhMgrController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", yhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/yhMgr/yhMgr_index");
     }
@@ -73,7 +72,7 @@ public class YhMgrController {
             if(StringUtils.isNotBlank(fk_qybm)){
                 reqBody.put("fk_qybm", fk_qybm);
             }
-            Page<Yh> yhPage = api.getYhList(request, reqBody, page, limit);
+            Page<Yh> yhPage = yhApi.getYhList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取银行列表成功", yhPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -95,7 +94,7 @@ public class YhMgrController {
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request,
                                                      @PathVariable("id") String id) {
         try {
-            Yh yh = api.getYhDetail(request, id);
+            Yh yh = yhApi.getYhDetail(request, id);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取银行详情成功", yh);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -108,7 +107,7 @@ public class YhMgrController {
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", yhApi.getUserFromCookie(request));
         return new ModelAndView("sysMgr/yhMgr/yhMgr_add");
     }
 
@@ -116,9 +115,9 @@ public class YhMgrController {
     public ModelAndView toEdit(HttpServletRequest request,
                                @PathVariable("id") String id) throws Exception {
         //1. 当前登陆用户
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", yhApi.getUserFromCookie(request));
         //2. 对应的银行信息
-        Yh yh = api.getYhDetail(request, id);
+        Yh yh = yhApi.getYhDetail(request, id);
         request.setAttribute("yh", yh);
         return new ModelAndView("sysMgr/yhMgr/yhMgr_edit");
     }
@@ -135,7 +134,7 @@ public class YhMgrController {
     public ResponseEntity<CusResponseBody> aeYh(HttpServletRequest request,
                                                 @RequestBody JSONObject json) {
         try {
-            api.aeYh(request, json);
+            yhApi.aeYh(request, json);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新银行成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -160,7 +159,7 @@ public class YhMgrController {
             if (StringUtils.isBlank(id)) {
                 throw new BusinessException("银行id不能为空", HttpStatus.BAD_REQUEST.value());
             }
-            api.delYh(request, id.trim());
+            yhApi.delYh(request, id.trim());
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("删除银行成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

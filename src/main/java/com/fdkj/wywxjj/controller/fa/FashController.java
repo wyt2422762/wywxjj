@@ -6,12 +6,9 @@ import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
-import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
-import com.fdkj.wywxjj.api.model.zhMgr.Zh;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.FaApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
-import com.fdkj.wywxjj.controller.zh.XhshController;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
 import com.fdkj.wywxjj.service.WorkflowService;
@@ -44,7 +41,7 @@ public class FashController {
     private static final Logger log = LoggerFactory.getLogger(FashController.class);
 
     @Autowired
-    private Api api;
+    private FaApi faApi;
     @Autowired
     private WorkflowService workflowService;
 
@@ -58,7 +55,7 @@ public class FashController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -78,7 +75,7 @@ public class FashController {
      */
     @RequestMapping("toSh/{fk_wfslid}")
     public ModelAndView toSh(HttpServletRequest request, @PathVariable("fk_wfslid") String fk_wfslid, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -89,7 +86,7 @@ public class FashController {
         //获取流程实例信息
         WorkflowInstant wfi = workflowService.getWorkflowInstantById(request, fk_wfslid);
         String fk_ywid = wfi.getFk_ywid();
-        Fa faDetail = api.getFaDetail(request, fk_ywid);
+        Fa faDetail = faApi.getFaDetail(request, fk_ywid);
         wfi.setData(faDetail);
         request.setAttribute("wfi", wfi);
 
@@ -111,7 +108,7 @@ public class FashController {
                                                                 @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             //当前登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faApi.getUserFromCookie(request);
             //获取用户对应的审批结点
             List<WorkflowNode> roleNodeList = workflowService.getRoleNodeList(request, cuser.getFk_jsid(), Constants.WorkflowId.XH);
 
@@ -134,7 +131,7 @@ public class FashController {
                 String fk_ywid = workflowInstant.getFk_ywid();
                 String fk_dqjdid = workflowInstant.getFk_dqjdid();
                 //销户申请
-                Fa faDetail = api.getFaDetail(request, fk_ywid);
+                Fa faDetail = faApi.getFaDetail(request, fk_ywid);
                 workflowInstant.setData(faDetail);
                 WorkflowNode workflowNodeById = workflowService.getWorkflowNodeById(request, fk_dqjdid);
                 workflowInstant.setCurrentNode(workflowNodeById);
@@ -160,11 +157,11 @@ public class FashController {
     @RequestMapping("getHistoryList_yw/{fk_ywid}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getHistoryList_yw(HttpServletRequest request,
-                                                          @PathVariable("fk_ywid") String fk_ywid,
-                                                          @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
+                                                             @PathVariable("fk_ywid") String fk_ywid,
+                                                             @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
         try {
             //当前登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faApi.getUserFromCookie(request);
             List<WorkflowHistory> workflowHistoryListByWfslId = workflowService.getWorkflowHistoryListByYwId(request, fk_ywid);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取审核历史列表成功", workflowHistoryListByWfslId);
@@ -178,19 +175,19 @@ public class FashController {
     /**
      * 查询审核历史
      *
-     * @param request req
+     * @param request   req
      * @param fk_wkslid 流程实例id
-     * @param fk_qybm 区域编码
+     * @param fk_qybm   区域编码
      * @return res
      */
     @RequestMapping("getHistoryList_wfi/{fk_wkslid}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getHistoryList_wfi(HttpServletRequest request,
-                                                          @PathVariable("fk_wkslid") String fk_wkslid,
-                                                          @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
+                                                              @PathVariable("fk_wkslid") String fk_wkslid,
+                                                              @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
         try {
             //当前登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faApi.getUserFromCookie(request);
             List<WorkflowHistory> workflowHistoryListByWfslId = workflowService.getWorkflowHistoryListByWfslId(request, fk_wkslid);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取审核历史列表成功", workflowHistoryListByWfslId);
@@ -219,7 +216,7 @@ public class FashController {
                                               @RequestParam(value = "dqjdid") String dqjdid) {
         try {
             //当前登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faApi.getUserFromCookie(request);
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
             //1. 获取流程实例信息
             WorkflowInstant wfi = workflowService.getWorkflowInstantById(request, fk_wkslid);
@@ -253,7 +250,7 @@ public class FashController {
                     .setYj(yj);
             //7. 获取fa
             String fk_ywid = wfi.getFk_ywid();
-            Fa faDetail = api.getFaDetail(request, fk_ywid);
+            Fa faDetail = faApi.getFaDetail(request, fk_ywid);
             //8. 修改方案状态
             //9. 修改账户状态
             if (workflowNextNode.getLx().equals(Constants.WorkflowNodeName.END)) {
@@ -280,7 +277,7 @@ public class FashController {
             json.put("wywxjJ_FAmodel", jsonObject_fa);
 
             //发送请求
-            api.spFa(request, json);
+            faApi.spFa(request, json);
 
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("方案审批成功");

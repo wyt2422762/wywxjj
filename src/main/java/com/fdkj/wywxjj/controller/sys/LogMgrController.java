@@ -1,9 +1,8 @@
 package com.fdkj.wywxjj.controller.sys;
 
 import com.fdkj.wywxjj.api.model.sysMgr.Xtrz;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.LogApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
-import com.fdkj.wywxjj.controller.area.AreaController;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
 import org.slf4j.Logger;
@@ -27,15 +26,14 @@ import java.util.List;
 @Controller
 @RequestMapping("GYFW/PT_XTRZ")
 public class LogMgrController {
-
     private static final Logger log = LoggerFactory.getLogger(LogMgrController.class);
 
     @Autowired
-    private Api api;
+    private LogApi logApi;
 
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", logApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/logMgr/logMgr_index");
     }
@@ -46,7 +44,7 @@ public class LogMgrController {
                                                       @RequestParam(value = "startTime", required = false) String startTime,
                                                       @RequestParam(value = "endTime", required = false) String endTime) {
         try {
-            Page<Xtrz> logPage = api.getLogList(request, page, limit, startTime, endTime);
+            Page<Xtrz> logPage = logApi.getLogList(request, page, limit, startTime, endTime);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取系统日志列表成功", logPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

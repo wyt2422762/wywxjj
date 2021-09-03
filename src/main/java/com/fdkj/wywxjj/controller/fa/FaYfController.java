@@ -9,7 +9,10 @@ import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh_his;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.FaApi;
+import com.fdkj.wywxjj.api.util.FaYfApi;
+import com.fdkj.wywxjj.api.util.FhApi;
+import com.fdkj.wywxjj.api.util.ZhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
 import com.fdkj.wywxjj.error.BusinessException;
@@ -42,7 +45,13 @@ public class FaYfController {
     private static final Logger log = LoggerFactory.getLogger(FaYfController.class);
 
     @Autowired
-    private Api api;
+    private FaYfApi faYfApi;
+    @Autowired
+    private FaApi faApi;
+    @Autowired
+    private FhApi fhApi;
+    @Autowired
+    private ZhApi zhApi;
 
     /**
      * 跳转
@@ -57,7 +66,7 @@ public class FaYfController {
     public ModelAndView index(HttpServletRequest request,
                               @RequestParam(value = "opts", required = false) List<String> opts,
                               @PathVariable("fk_faid") String fk_faid) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faYfApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -80,13 +89,13 @@ public class FaYfController {
     public ModelAndView toAdd(HttpServletRequest request,
                               @RequestParam(value = "opts", required = false) List<String> opts,
                               @PathVariable("fk_faid") String fk_faid) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faYfApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
         }
-        Fa faDetail = api.getFaDetail(request, fk_faid);
+        Fa faDetail = faApi.getFaDetail(request, fk_faid);
         request.setAttribute("fa", faDetail);
         return new ModelAndView("faMgr/fayf/yf_add");
     }
@@ -104,7 +113,7 @@ public class FaYfController {
     public ModelAndView toInfo(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", faYfApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -136,7 +145,7 @@ public class FaYfController {
                 reqBody.put("fk_qybm", fk_qybm);
             }
             reqBody.put("fk_faid", fk_faid);
-            Page<Fa_yf> fayfList = api.getFayfList(request, reqBody, page, limit);
+            Page<Fa_yf> fayfList = faYfApi.getFayfList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取方案列表成功", fayfList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -159,9 +168,9 @@ public class FaYfController {
                 reqBody.put("fk_qybm", fk_qybm);
             }
             reqBody.put("fk_faid", fk_faid);
-            List<Fa_yf> fayfList = api.getFayfList(request, reqBody);
+            List<Fa_yf> fayfList = faYfApi.getFayfList(request, reqBody);
             //2. 获取方案数据
-            Fa faDetail = api.getFaDetail(request, fk_faid);
+            Fa faDetail = faApi.getFaDetail(request, fk_faid);
             String no = faDetail.getFabh();
             if (fayfList != null && !fayfList.isEmpty()) {
                 //按编号降序排列
@@ -207,7 +216,7 @@ public class FaYfController {
                 throw new BusinessException("请求数据有误", HttpStatus.BAD_REQUEST.value());
             }
             //1. 获取方案信息
-            Fa faDetail = api.getFaDetail(request, fk_faid);
+            Fa faDetail = faApi.getFaDetail(request, fk_faid);
             //2. 获取方案对应的账户房间信息
             String fk_xmxxid = faDetail.getFk_xmxxid();
             String fk_ldxxid = faDetail.getFk_ldxxid();
@@ -222,7 +231,7 @@ public class FaYfController {
             if (StringUtils.isNotBlank(szdy)) {
                 reqBody.put("szdy", szdy.trim());
             }
-            List<Fh> fhList = api.getFhAllList(request, reqBody);
+            List<Fh> fhList = fhApi.getFhAllList(request, reqBody);
             if (fhList == null || fhList.isEmpty()) {
                 if (StringUtils.isBlank(fk_ldxxid)) {
                     throw new BusinessException("请求数据有误", HttpStatus.BAD_REQUEST.value());
@@ -288,7 +297,7 @@ public class FaYfController {
                                                        @RequestBody JSONObject reqBody) {
         try {
             //登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faYfApi.getUserFromCookie(request);
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
 
             //方案预付信息
@@ -298,7 +307,7 @@ public class FaYfController {
 
             //1. 获取方案信息
             String fk_faid = fa_yf.getFk_faid();
-            Fa faDetail = api.getFaDetail(request, fk_faid);
+            Fa faDetail = faApi.getFaDetail(request, fk_faid);
             //2. 判断方案状态，如果方案已结算，不能添加预付
             if (Constants.Jszt.YJS.equals(faDetail.getJszt())) {
                 log.error("方案(" + faDetail.getId() + ")已结算，无法提交预付");
@@ -337,7 +346,7 @@ public class FaYfController {
 
                 //处理账户信息(计算钱，历史信息)
                 String fk_zhid = fh.getZh().getId();
-                Zh zhDetail = api.getZhDetail(request, fk_zhid);
+                Zh zhDetail = zhApi.getZhDetail(request, fk_zhid);
                 String money = zhDetail.getMoney();
                 //计算余额
                 BigDecimal subtract = BigDecimalUtil.subtract(money, fa_yf_ft.getFtje());
@@ -367,7 +376,7 @@ public class FaYfController {
             //账户分摊信息
             json.put("wywxjJ_ZH_HISmodel", JSONArray.parseArray(JSONArray.toJSONString(zh_hisList)));
             //请求接口
-            api.addFa_yf(request, json);
+            faYfApi.addFa_yf(request, json);
 
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("添加方案预付成功", fhList);
@@ -389,9 +398,9 @@ public class FaYfController {
                                                      @PathVariable("id") String id) {
         try {
             //登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faYfApi.getUserFromCookie(request);
             //预付详情
-            Fa_yf fayfDetail = api.getFayfDetail(request, id);
+            Fa_yf fayfDetail = faYfApi.getFayfDetail(request, id);
             //分摊列表
             List<Fa_yf_ft> ftList = fayfDetail.getFtList();
             List<Fh> fhList = new ArrayList<>();
@@ -399,10 +408,10 @@ public class FaYfController {
                 String fk_fhid = fa_yf_ft.getFk_fhid();
                 String fk_zhid = fa_yf_ft.getFk_zhid();
 
-                Fh fhDetail = api.getFhDetail(request, fk_fhid);
+                Fh fhDetail = fhApi.getFhDetail(request, fk_fhid);
                 fhDetail.setFtje(fa_yf_ft.getFtje());
 
-                Zh zhDetail = api.getZhDetail(request, fk_zhid);
+                Zh zhDetail = zhApi.getZhDetail(request, fk_zhid);
                 fhDetail.setZh(zhDetail);
 
                 fhList.add(fhDetail);
@@ -434,21 +443,21 @@ public class FaYfController {
                                                @PathVariable("id") String id) {
         try {
             //登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = faYfApi.getUserFromCookie(request);
             //时间
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
             //预付详情
-            Fa_yf fayfDetail = api.getFayfDetail(request, id);
+            Fa_yf fayfDetail = faYfApi.getFayfDetail(request, id);
             //分摊列表
             List<Fa_yf_ft> ftList = fayfDetail.getFtList();
             // 获取方案信息
             String fk_faid = fayfDetail.getFk_faid();
-            Fa faDetail = api.getFaDetail(request, fk_faid);
+            Fa faDetail = faApi.getFaDetail(request, fk_faid);
             //1. 判断是否要修改方案预付状态
             //获取方案的预付列表
             Map<String, String> reqBody = new HashMap<>();
             reqBody.put("fk_faid", fk_faid);
-            List<Fa_yf> fayfList = api.getFayfList(request, reqBody);
+            List<Fa_yf> fayfList = faYfApi.getFayfList(request, reqBody);
             if (fayfList == null || fayfList.size() <= 1) {
                 faDetail.setYfzt(Constants.Yfzt.WYF);
             }
@@ -465,7 +474,7 @@ public class FaYfController {
             for (Fa_yf_ft fa_yf_ft : ftList) {
                 //处理账户信息(计算钱，历史信息)
                 String fk_zhid = fa_yf_ft.getFk_zhid();
-                Zh zhDetail = api.getZhDetail(request, fk_zhid);
+                Zh zhDetail = zhApi.getZhDetail(request, fk_zhid);
                 String money = zhDetail.getMoney();
                 //计算余额
                 BigDecimal add = BigDecimalUtil.add(money, fa_yf_ft.getFtje());
@@ -493,7 +502,7 @@ public class FaYfController {
             //账户分摊信息
             json.put("wywxjJ_ZH_HISmodel", JSONArray.parseArray(JSONArray.toJSONString(zh_hisList)));
             //请求接口
-            api.delFa_yf(request, json);
+            faYfApi.delFa_yf(request, json);
 
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("删除方案预付成功");

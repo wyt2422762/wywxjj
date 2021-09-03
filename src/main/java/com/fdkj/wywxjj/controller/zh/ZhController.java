@@ -9,7 +9,7 @@ import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
 import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh_his;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.ZhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
 import com.fdkj.wywxjj.error.BusinessException;
@@ -43,7 +43,7 @@ public class ZhController {
     private static final Logger log = LoggerFactory.getLogger(ZhController.class);
 
     @Autowired
-    private Api api;
+    private ZhApi zhApi;
     @Autowired
     private WorkflowService workflowService;
 
@@ -57,7 +57,7 @@ public class ZhController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -80,7 +80,7 @@ public class ZhController {
     public ModelAndView toInfo(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -103,7 +103,7 @@ public class ZhController {
     public ModelAndView toJf(HttpServletRequest request,
                              @RequestParam(value = "opts", required = false) List<String> opts,
                              @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -126,7 +126,7 @@ public class ZhController {
     public ModelAndView toEdit(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -149,7 +149,7 @@ public class ZhController {
     public ModelAndView toXh(HttpServletRequest request,
                              @RequestParam(value = "opts", required = false) List<String> opts,
                              @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -172,7 +172,7 @@ public class ZhController {
     public ModelAndView toXhjl(HttpServletRequest request,
                                @RequestParam(value = "opts", required = false) List<String> opts,
                                @PathVariable("id") String id) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
@@ -215,7 +215,7 @@ public class ZhController {
             if (StringUtils.isNotBlank(fk_qybm)) {
                 reqBody.put("fk_qybm", fk_qybm);
             }
-            Page<Zh> zhPage = api.getZhList(request, reqBody, page, limit);
+            Page<Zh> zhPage = zhApi.getZhList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取账户列表成功", zhPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -237,7 +237,7 @@ public class ZhController {
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request,
                                                      @PathVariable String id) {
         try {
-            Zh zhDetail = api.getZhDetail(request, id);
+            Zh zhDetail = zhApi.getZhDetail(request, id);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取账户详情成功", zhDetail);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -269,7 +269,7 @@ public class ZhController {
             reqBody.put("fk_yhid", fk_yhid);
             reqBody.put("no", no);
 
-            Page<Zh> zhList = api.getZhList(request, reqBody, 1, 1);
+            Page<Zh> zhList = zhApi.getZhList(request, reqBody, 1, 1);
             if (zhList != null && zhList.getTotalRecord() > 0) {
                 //说明账号存在
                 Zh zh1 = zhList.getDataList().get(0);
@@ -298,7 +298,7 @@ public class ZhController {
                 }
             }
             //调用接口添加编辑数据
-            api.aeZh(request, zh);
+            zhApi.aeZh(request, zh);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新账户成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -322,7 +322,7 @@ public class ZhController {
                                                 @PathVariable String id,
                                                 @RequestParam("jfje") String jfje) {
         try {
-            Zh zhDetail = api.getZhDetail(request, id);
+            Zh zhDetail = zhApi.getZhDetail(request, id);
             String money = zhDetail.getMoney();
             String add = BigDecimalUtil.add(money, jfje).toPlainString();
             zhDetail.setMoney(add);
@@ -355,7 +355,7 @@ public class ZhController {
 
             jsonObject.put("list", ja);
 
-            api.aeZh(request, jsonObject);
+            zhApi.aeZh(request, jsonObject);
 
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("账户缴费成功");
@@ -381,10 +381,10 @@ public class ZhController {
                                               @RequestBody Xhsq xhsq) {
         try {
             //登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = zhApi.getUserFromCookie(request);
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
             //1. 获取账户信息
-            Zh zhDetail = api.getZhDetail(request, id);
+            Zh zhDetail = zhApi.getZhDetail(request, id);
             // 2. 改账户状态
             zhDetail.setZt(Constants.ZhZt.XHDJ);
             // 3. 设置销户申请
@@ -437,7 +437,7 @@ public class ZhController {
             json.put("wywxjJ_WORKFLOW_HISModel", jsonObject_wfh);
 
             //发送请求
-            api.submitXhSq(request, json);
+            zhApi.submitXhSq(request, json);
 
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("销户申请提交成功");
@@ -464,15 +464,15 @@ public class ZhController {
                                                        @RequestParam("limit") Integer limit) {
         try {
             //登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = zhApi.getUserFromCookie(request);
             // 1. 获取账户信息
-            Zh zh = api.getZhDetail(request, id);
+            Zh zh = zhApi.getZhDetail(request, id);
             // 2. 获取销户记录
             Map<String, String> reqBody = new HashMap<>();
             if (StringUtils.isNotBlank(id)) {
                 reqBody.put("fk_zhid", id);
             }
-            Page<Xhsq> xhsqPage = api.getXhsqList(request, reqBody, page, limit);
+            Page<Xhsq> xhsqPage = zhApi.getXhsqList(request, reqBody, page, limit);
             List<Xhsq> dataList = xhsqPage.getDataList();
             if (dataList != null && !dataList.isEmpty()) {
                 for (Xhsq xhsq : dataList) {
@@ -502,13 +502,13 @@ public class ZhController {
                                               @PathVariable String id) {
         try {
             //登录用户
-            User cuser = api.getUserFromCookie(request);
+            User cuser = zhApi.getUserFromCookie(request);
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
 
             //1. 获取账户信息
-            Zh zhDetail = api.getZhDetail(request, id);
+            Zh zhDetail = zhApi.getZhDetail(request, id);
             //2. 判断账户状态
-            if(Constants.ZhZt.YXH != zhDetail.getZt()) {
+            if (Constants.ZhZt.YXH != zhDetail.getZt()) {
                 log.error("账户(" + zhDetail.getId() + ")未销户，无法退款");
                 throw new BusinessException("该账户未销户，无法退款", HttpStatus.BAD_REQUEST.value());
             }
@@ -542,7 +542,7 @@ public class ZhController {
             zhDetail.setMoney("0.00");
             jsonObject.put("model", (JSONObject) JSONObject.toJSON(zhDetail));
 
-            api.aeZh(request, jsonObject);
+            zhApi.aeZh(request, jsonObject);
 
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("退款成功");

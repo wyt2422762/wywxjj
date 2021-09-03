@@ -2,7 +2,7 @@ package com.fdkj.wywxjj.controller.sys;
 
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.Jnsz;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.JnszApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import org.apache.commons.lang3.StringUtils;
@@ -31,11 +31,10 @@ import java.util.Map;
 @Controller
 @RequestMapping("/CZF/JNSZ")
 public class JnszController {
-
     private static final Logger log = LoggerFactory.getLogger(JnszController.class);
 
     @Autowired
-    private Api api;
+    private JnszApi jnszApi;
 
     /**
      * 跳转到
@@ -47,7 +46,7 @@ public class JnszController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", api.getUserFromCookie(request));
+        request.setAttribute("cuser", jnszApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/jnsz/jnsz_index");
     }
@@ -64,11 +63,11 @@ public class JnszController {
                                                        @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
         try {
             Map<String, String> reqBody = new HashMap<>();
-            if(StringUtils.isNotBlank(fk_qybm)){
+            if (StringUtils.isNotBlank(fk_qybm)) {
                 reqBody.put("fk_qybm", fk_qybm);
             }
-            Jnsz jnsz = api.getJnszList(request, reqBody, 1, 1);
-            jnsz = api.getJnszDetail(request, jnsz.getId());
+            Jnsz jnsz = jnszApi.getJnszList(request, reqBody, 1, 1);
+            jnsz = jnszApi.getJnszDetail(request, jnsz.getId());
 
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取缴纳设置成功", jnsz);
@@ -89,9 +88,9 @@ public class JnszController {
     @RequestMapping("aeJnsz")
     @ResponseBody
     public ResponseEntity<CusResponseBody> aeJnsz(HttpServletRequest request,
-                                                @RequestBody JSONObject jnsz) {
+                                                  @RequestBody JSONObject jnsz) {
         try {
-            api.aeJnsz(request, jnsz);
+            jnszApi.aeJnsz(request, jnsz);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新缴纳设置成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

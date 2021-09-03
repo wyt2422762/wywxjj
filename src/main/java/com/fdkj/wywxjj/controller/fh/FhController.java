@@ -7,7 +7,9 @@ import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import com.fdkj.wywxjj.api.model.xmMgr.Ld;
 import com.fdkj.wywxjj.api.model.xmMgr.Xm;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.FhApi;
+import com.fdkj.wywxjj.api.util.LdApi;
+import com.fdkj.wywxjj.api.util.XmApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
@@ -39,7 +41,11 @@ public class FhController {
     private static final Logger log = LoggerFactory.getLogger(FhController.class);
 
     @Autowired
-    private Api api;
+    private XmApi xmApi;
+    @Autowired
+    private LdApi ldApi;
+    @Autowired
+    private FhApi fhApi;
 
     /**
      * 跳转到
@@ -54,16 +60,16 @@ public class FhController {
                               @PathVariable("fk_xmxxid") String fk_xmxxid,
                               @PathVariable("fk_ldxxid") String fk_ldxxid,
                               @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", fhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
         }
 
-        Xm xm = api.getXmDetail(request, fk_xmxxid);
+        Xm xm = xmApi.getXmDetail(request, fk_xmxxid);
         request.setAttribute("xm", xm);
-        Ld ld = api.getLdDetail(request, fk_ldxxid);
+        Ld ld = ldApi.getLdDetail(request, fk_ldxxid);
         request.setAttribute("ld", ld);
 
         return new ModelAndView("fhMgr/fh_add");
@@ -83,21 +89,52 @@ public class FhController {
                               @PathVariable("fk_ldxxid") String fk_ldxxid,
                               @PathVariable("id") String id,
                               @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", fhApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
         }
 
-        Xm xm = api.getXmDetail(request, fk_xmxxid);
+        Xm xm = xmApi.getXmDetail(request, fk_xmxxid);
         request.setAttribute("xm", xm);
-        Ld ld = api.getLdDetail(request, fk_ldxxid);
+        Ld ld = ldApi.getLdDetail(request, fk_ldxxid);
         request.setAttribute("ld", ld);
 
         request.setAttribute("id", id);
 
         return new ModelAndView("fhMgr/fh_edit");
+    }
+
+    /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toInfo/{fk_xmxxid}/{fk_ldxxid}/{id}")
+    public ModelAndView toInfo(HttpServletRequest request,
+                              @PathVariable("fk_xmxxid") String fk_xmxxid,
+                              @PathVariable("fk_ldxxid") String fk_ldxxid,
+                              @PathVariable("id") String id,
+                              @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
+        request.setAttribute("user", fhApi.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        if (opts != null && !opts.isEmpty()) {
+            String s = StringUtils.join(opts, ",");
+            request.setAttribute("optsStr", s);
+        }
+
+        Xm xm = xmApi.getXmDetail(request, fk_xmxxid);
+        request.setAttribute("xm", xm);
+        Ld ld = ldApi.getLdDetail(request, fk_ldxxid);
+        request.setAttribute("ld", ld);
+
+        request.setAttribute("id", id);
+
+        return new ModelAndView("fhMgr/fh_info");
     }
 
     /**
@@ -119,7 +156,7 @@ public class FhController {
             reqBody.put("fk_xmxxid", fk_xmxxid.trim());
             reqBody.put("fk_ldxxid", fk_ldxxid.trim());
 
-            Page<Fh> ldPage = api.getFhList(request, reqBody, page, limit);
+            Page<Fh> ldPage = fhApi.getFhList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取房号列表成功", ldPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -152,7 +189,7 @@ public class FhController {
                 reqBody.put("szdy", szdy.trim());
             }
 
-            List<Fh> ldList = api.getFhAllList(request, reqBody);
+            List<Fh> ldList = fhApi.getFhAllList(request, reqBody);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取房号列表成功", ldList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -166,7 +203,7 @@ public class FhController {
     @ResponseBody
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request, @PathVariable String id) {
         try {
-            Fh fhDetail = api.getFhDetail(request, id);
+            Fh fhDetail = fhApi.getFhDetail(request, id);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取房号列表成功", fhDetail);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -201,7 +238,7 @@ public class FhController {
                                                 @RequestBody JSONObject fh) {
         try {
             //调用接口添加编辑数据
-            api.aeFh(request, fh);
+            fhApi.aeFh(request, fh);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新房间成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -225,7 +262,7 @@ public class FhController {
                                                       @RequestParam("fk_ldxxid") String fk_ldxxid) {
         try {
             //登录用户
-            User user = api.getUserFromCookie(request);
+            User user = fhApi.getUserFromCookie(request);
             String fk_xtglid = user.getFk_xtglid();
 
             ExcelUtil<Fh> util = new ExcelUtil<>(Fh.class);
@@ -237,7 +274,7 @@ public class FhController {
                     fh.setFk_ldxxid(fk_ldxxid);
                 });
                 JSONArray jsonArray = JSONArray.parseArray(JSON.toJSONString(fhList));
-                api.importFh(request, jsonArray);
+                fhApi.importFh(request, jsonArray);
             }
             CusResponseBody cusResponseBody = CusResponseBody.success("导入房间成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

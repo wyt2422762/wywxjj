@@ -6,7 +6,8 @@ import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.xmMgr.Ld;
 import com.fdkj.wywxjj.api.model.xmMgr.Xm;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.LdApi;
+import com.fdkj.wywxjj.api.util.XmApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
@@ -36,7 +37,9 @@ public class LdController {
     private static final Logger log = LoggerFactory.getLogger(LdController.class);
 
     @Autowired
-    private Api api;
+    private XmApi xmApi;
+    @Autowired
+    private LdApi ldApi;
 
     /**
      * 跳转到
@@ -50,14 +53,14 @@ public class LdController {
     public ModelAndView toAdd(HttpServletRequest request,
                               @PathVariable("fk_xmxxid") String fk_xmxxid,
                               @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", ldApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
-        if(opts != null && !opts.isEmpty()){
+        if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
         }
 
-        Xm xm = api.getXmDetail(request, fk_xmxxid);
+        Xm xm = xmApi.getXmDetail(request, fk_xmxxid);
         request.setAttribute("xm", xm);
 
         return new ModelAndView("ldMgr/ld_add");
@@ -74,10 +77,10 @@ public class LdController {
     @RequestMapping("getList/{fk_xmxxid}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
-                                                     @PathVariable("fk_xmxxid") String fk_xmxxid,
-                                                     @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
+                                                   @PathVariable("fk_xmxxid") String fk_xmxxid,
+                                                   @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
-            Page<Ld> ldPage = api.getLdList(request, fk_xmxxid, page, limit);
+            Page<Ld> ldPage = ldApi.getLdList(request, fk_xmxxid, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取楼栋列表成功", ldPage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -96,9 +99,9 @@ public class LdController {
     @RequestMapping("getListAll/{fk_xmxxid}")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
-                                                     @PathVariable(value = "fk_xmxxid") String fk_xmxxid) {
+                                                   @PathVariable(value = "fk_xmxxid") String fk_xmxxid) {
         try {
-            List<Ld> ldList = api.getLdAllList(request, fk_xmxxid);
+            List<Ld> ldList = ldApi.getLdAllList(request, fk_xmxxid);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取楼栋列表成功", ldList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -117,9 +120,9 @@ public class LdController {
     @RequestMapping("getListAll2")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getList2(HttpServletRequest request,
-                                                   @RequestParam(value = "id") String fk_xmxxid) {
+                                                    @RequestParam(value = "id") String fk_xmxxid) {
         try {
-            List<Ld> ldList = api.getLdAllList(request, fk_xmxxid);
+            List<Ld> ldList = ldApi.getLdAllList(request, fk_xmxxid);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取楼栋列表成功", ldList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -133,7 +136,7 @@ public class LdController {
     @ResponseBody
     public ResponseEntity<CusResponseBody> getDetail(HttpServletRequest request, @PathVariable String id) {
         try {
-            Ld ldDetail = api.getLdDetail(request, id);
+            Ld ldDetail = ldApi.getLdDetail(request, id);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取楼栋列表成功", ldDetail);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -168,7 +171,7 @@ public class LdController {
                                                 @RequestBody JSONObject ld) {
         try {
             //调用接口添加编辑数据
-            api.aeLd(request, ld);
+            ldApi.aeLd(request, ld);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新楼栋成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -188,10 +191,10 @@ public class LdController {
     @RequestMapping("/importData")
     @ResponseBody
     public ResponseEntity<CusResponseBody> importData(HttpServletRequest request, MultipartFile file,
-                                                      @RequestParam("fk_xmxxid")String fk_xmxxid) {
+                                                      @RequestParam("fk_xmxxid") String fk_xmxxid) {
         try {
             //登录用户
-            User user = api.getUserFromCookie(request);
+            User user = ldApi.getUserFromCookie(request);
             String fk_xtglid = user.getFk_xtglid();
 
             ExcelUtil<Ld> util = new ExcelUtil<>(Ld.class);
@@ -202,7 +205,7 @@ public class LdController {
                     ld.setFk_xmxxid(fk_xmxxid);
                 });
                 JSONArray jsonArray = JSONArray.parseArray(JSON.toJSONString(ldList));
-                api.importLd(request, jsonArray);
+                ldApi.importLd(request, jsonArray);
             }
             CusResponseBody cusResponseBody = CusResponseBody.success("导入楼栋成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

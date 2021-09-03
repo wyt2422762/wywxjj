@@ -3,7 +3,8 @@ package com.fdkj.wywxjj.controller.sys;
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.Role;
 import com.fdkj.wywxjj.api.model.sysMgr.View_PT_XT_MK_Model;
-import com.fdkj.wywxjj.api.util.Api;
+import com.fdkj.wywxjj.api.util.RoleApi;
+import com.fdkj.wywxjj.api.util.SystemApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
@@ -32,11 +33,12 @@ import java.util.List;
 @Controller
 @RequestMapping("PTXT/JSGL")
 public class RoleMgrController {
-
     private static final Logger log = LoggerFactory.getLogger(RoleMgrController.class);
 
     @Autowired
-    private Api api;
+    private RoleApi roleApi;
+    @Autowired
+    private SystemApi systemApi;
 
     /**
      * 跳转到
@@ -48,7 +50,7 @@ public class RoleMgrController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", roleApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/roleMgr/roleMgr_index");
     }
@@ -68,7 +70,7 @@ public class RoleMgrController {
                                                       @RequestParam(value = "roleName", required = false) String roleName,
                                                       @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
-            Page<Role> rolePage = api.getRoleList(request, roleName, page, limit);
+            Page<Role> rolePage = roleApi.getRoleList(request, roleName, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取角色列表成功", rolePage);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -89,11 +91,11 @@ public class RoleMgrController {
      */
     @RequestMapping("toEdit")
     public ModelAndView toEdit(HttpServletRequest request, @RequestParam("roleId") String roleId, @RequestParam("roleName") String roleName) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", roleApi.getUserFromCookie(request));
         request.setAttribute("roleId", roleId);
         request.setAttribute("roleName", roleName);
         //获取角色的模块权限
-        List<View_PT_XT_MK_Model> roleModel = api.getRoleModel(request, roleId);
+        List<View_PT_XT_MK_Model> roleModel = systemApi.getRoleModel(request, roleId);
         buildPT_XT_MK_Models(request, roleModel);
         return new ModelAndView("sysMgr/roleMgr/roleMgr_edit");
     }
@@ -119,9 +121,9 @@ public class RoleMgrController {
      */
     @RequestMapping("toAdd")
     public ModelAndView toAdd(HttpServletRequest request) throws Exception {
-        request.setAttribute("user", api.getUserFromCookie(request));
+        request.setAttribute("user", roleApi.getUserFromCookie(request));
         //获取角色的模块权限
-        List<View_PT_XT_MK_Model> roleModel = api.getAllModels(request);
+        List<View_PT_XT_MK_Model> roleModel = systemApi.getAllModels(request);
         buildPT_XT_MK_Models(request, roleModel);
         return new ModelAndView("sysMgr/roleMgr/roleMgr_add");
     }
@@ -138,7 +140,7 @@ public class RoleMgrController {
     public ResponseEntity<CusResponseBody> getLogList(HttpServletRequest request,
                                                       @RequestBody JSONObject json) {
         try {
-            api.aeRole(request, json);
+            roleApi.aeRole(request, json);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("更新角色成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
@@ -163,7 +165,7 @@ public class RoleMgrController {
             if (StringUtils.isBlank(roleId)) {
                 throw new BusinessException("角色id不能为空", HttpStatus.BAD_REQUEST.value());
             }
-            api.delRole(request, roleId.trim());
+            roleApi.delRole(request, roleId.trim());
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("删除角色成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
