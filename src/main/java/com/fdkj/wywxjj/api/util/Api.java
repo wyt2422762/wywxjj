@@ -42,7 +42,6 @@ import java.util.*;
  */
 @Component
 public class Api {
-
     private static final Logger logger = LoggerFactory.getLogger(Api.class);
 
     @Value("${bus.api.baseUrl}")
@@ -419,7 +418,7 @@ public class Api {
     }
 
     /**
-     * 更新添加房号
+     * 更新添加字典
      *
      * @param request req
      * @param body    请求体
@@ -2065,7 +2064,7 @@ public class Api {
     }
 
     /**
-     * 获取缴纳设置详情
+     * 获取账户详情
      *
      * @param request req
      * @param id      账户id
