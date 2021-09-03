@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.fa.Fa;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf_ft;
-import com.fdkj.wywxjj.api.model.fa.yf.zf.Fa_zf;
+import com.fdkj.wywxjj.api.model.fa.zf.Fa_zf;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.xmMgr.Fh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;

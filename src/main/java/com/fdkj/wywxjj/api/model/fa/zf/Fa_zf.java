@@ -1,4 +1,4 @@
-package com.fdkj.wywxjj.api.model.fa.yf.zf;
+package com.fdkj.wywxjj.api.model.fa.zf;
 
 import lombok.Data;
 import lombok.experimental.Accessors;
