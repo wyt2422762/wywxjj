@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/common/header::header(~{::title},~{},~{})">
-  <title>物业维修基金管理系统-方案预付支付</title>
+  <title>物业维修基金管理系统-方案结算支付</title>
 </head>
 <body>
 <input type="hidden" id="opts" th:value="${optsStr}"/>
@@ -9,17 +9,17 @@
 <div class="layui-tab-item layui-show">
   <div id="LAY_preview">
     <fieldset class="layui-elem-field layui-field-title">
-      <legend>方案预付列表</legend>
+      <legend>方案结算列表</legend>
     </fieldset>
 
-    <!-- 预付 -->
+    <!-- 结算 -->
     <div style="padding: 10px;">
       <div style="padding-bottom: 10px;">
         <form class="layui-form" id="searchForm">
 
           <div class="layui-inline" style="">
             <div class="layui-input-inline">
-              <input type="text" id="yfkbh" name="yfkbh" placeholder="请输入方案预付编号搜索" value=""
+              <input type="text" id="jsbh" name="jsbh" placeholder="请输入方案结算编号搜索" value=""
                      autocomplete="off" class="layui-input" style=""/>
             </div>
           </div>
@@ -48,9 +48,9 @@
       </div>
 
 
-      <table id="fayfTable" class="layui-table" lay-filter="fayfTable"></table>
+      <table id="fajsTable" class="layui-table" lay-filter="fajsTable"></table>
 
-      <script type="text/html" id="fayfTableToolBar">
+      <script type="text/html" id="fajsTableToolBar">
         <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
         {{#  if('未支付' == d.zt){ }}
         <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="zf">支付</a>
@@ -86,24 +86,24 @@
     getTableData();
 
     //获取预付列表
-    function getTableData(yfkbh, zt) {
+    function getTableData(jsbh, zt) {
       let params = {};
       /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
         params['fk_qybm'] = cuser['fk_qybm'];
       }*/
-      if(yfkbh){
-        params['yfkbh'] = yfkbh;
+      if(jsbh){
+        params['jsbh'] = jsbh;
       }
       if(zt){
         params['zt'] = zt;
       }
 
-      let url = ctx + 'CZF/FAYFZF/getList/';
+      let url = ctx + 'CZF/FAJSZF/getList/';
 
       //获取表格数据
       table.render({
-        elem: '#fayfTable',
-        title: '方案预付列表',
+        elem: '#fajsTable',
+        title: '方案结算列表',
         url: url, //数据接口
         where: params, //请求参数
         page: {
@@ -113,12 +113,14 @@
         limit: 10,
         //limits: [10, 20, 50],
         cols: [[ //表头
-          {field: 'yfkbh', title: '预付编号'},
-          {field: 'yfkje', title: '预付金额(元)'},
-          {field: 'yfkrq', title: '预付日期'},
-          {field: 'yfkqs', title: '预付签署'},
+          {field: 'jsbh', title: '结算编号'},
+          {field: 'jsje', title: '结算金额(元)'},
+          {field: 'yfje', title: '预付金额(元)'},
+          {field: 'yzfje', title: '应支付金额(元)'},
+          {field: 'jsrq', title: '结算日期'},
+          {field: 'jsdj', title: '结算登记'},
           {field:'zt', title: '状态'},
-          {toolbar: '#fayfTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+          {toolbar: '#fajsTableToolBar', align: 'center', fixed: 'right', title: '操作'}
         ]],
         parseData: function (res) { //res 即为原始返回的数据
           return {
@@ -132,7 +134,7 @@
     }
 
     //工具条事件
-    table.on('tool(fayfTable)', function (obj) {
+    table.on('tool(fajsTable)', function (obj) {
       let data = obj.data; //获得当前行数据
       let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
       let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
@@ -140,11 +142,11 @@
       if (layEvent === 'mx') { //明细
         top.layer.open({
           type: 2,
-          title: '方案预付支付信息',
+          title: '方案结算支付信息',
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/FAYFZF/toInfo/" + data.id,
+          content: ctx + "/CZF/FAJSZF/toInfo/" + data.id,
           end: function (index) {
             top.layer.close(index);
           }
@@ -152,15 +154,15 @@
       } else if(layEvent === 'zf') { //支付
         top.layer.open({
           type: 2,
-          title: '方案预付支付信息',
+          title: '方案结算支付信息',
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
-          content: ctx + "/CZF/FAYFZF/toZf/" + data.id,
+          content: ctx + "/CZF/FAJSZF/toZf/" + data.id,
           btn: ["确定", "取消"],
           yes: function (index, layero) {
             let body = top.layer.getChildFrame('body', index);
-            let frm = $(body).find("form#fa_yfzfForm");
+            let frm = $(body).find("form#fa_jszfForm");
             $(frm).find("button.sb").click();
             return false;
           },
@@ -176,9 +178,9 @@
 
     //搜索按钮事件
     form.on('submit(formDemo1)', function (data) {
-      let yfkbh = data.field.yfkbh;
+      let jsbh = data.field.jsbh;
       let zt = data.field.zt;
-      getTableData(yfkbh, zt);
+      getTableData(jsbh, zt);
       return false;
     });
 

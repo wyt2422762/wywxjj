@@ -17,7 +17,7 @@
       <!-- 新建预付 -->
       <div style="padding-bottom: 10px;">
         <div class="layui-inline" style="float:right;">
-          <button th:if="${#lists.contains(opts, 'add')}" id="addFayf" class="layui-btn layui-btn-normal"
+          <button th:if="${#lists.contains(opts, 'add') && fa.jszt != '已结算'}" id="addFayf" class="layui-btn layui-btn-normal"
                   style="margin-left:15px;">新建预付
           </button>
         </div>
@@ -28,7 +28,7 @@
       <script type="text/html" id="fayfTableToolBar">
         <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
         {{#  if('已支付' != d.zt){ }}
-          <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+          <a th:if="${#lists.contains(opts, 'del') && fa.jszt != '已结算'}" class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
         {{#  } }}
       </script>
     </div>
@@ -42,7 +42,7 @@
 
 <script th:inline="javascript">
   const cuser = [[${cuser}]];
-  const fk_faid = [[${fk_faid}]];
+  const fk_faid = [[${fa.id}]];
 
   layui.config({
     base: ctx + 'static/js/layuiExts/'
@@ -110,7 +110,7 @@
       if (layEvent === 'mx') { //明细
         top.layer.open({
           type: 2,
-          title: '添加方案预付',
+          title: '方案预付详情',
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],
@@ -159,7 +159,7 @@
         content: ctx + "/CZF/FAYF/toAdd/" + fk_faid,
         end: function (index) {
           top.layer.close(index);
-          window.location.href=window.location.href;
+          window.location.reload();
         }
       });
     });

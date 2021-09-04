@@ -187,7 +187,6 @@
       },
       //左右滚动tab标签
       rollPage: function (type, index) {
-        debugger;
         let tabsHeader = $('#LAY_app_tabsheader')
           , liItem = tabsHeader.children('li')
           , scrollWidth = tabsHeader.prop('scrollWidth')
@@ -255,7 +254,6 @@
       },
       //关闭当前标签页
       closeThisTabs: function () {
-        debugger;
         if (!admin.tabsPage.index) return;
         $('#LAY_app_tabsheader>li').eq(admin.tabsPage.index).find('.layui-tab-close').trigger('click');
       },

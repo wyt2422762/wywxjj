@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/common/header::header(~{::title},~{},~{})">
-  <title>物业维修基金管理系统-方案预付详情</title>
+  <title>物业维修基金管理系统-方案结算详情</title>
 </head>
 <body>
 <input type="hidden" id="opts" th:value="${optsStr}"/>
@@ -10,54 +10,73 @@
   <div id="LAY_preview">
 
     <div style="padding: 10px;">
-      <form class="layui-form" method="post" id="fa_yfForm" lay-filter="fa_yfForm">
+      <form class="layui-form" method="post" id="fa_jsForm" lay-filter="fa_jsForm">
         <div class="layui-tab layui-tab-card">
           <ul class="layui-tab-title">
-            <li class="layui-this">预付信息</li>
+            <li class="layui-this">结算信息</li>
             <li>业主信息</li>
           </ul>
           <div class="layui-tab-content">
-            <!-- 预付信息 -->
+            <!-- 结算信息 -->
             <div class="layui-tab-item layui-show">
               <div class="layui-form" style="padding: 2px;">
                 <table class="layui-table" lay-size="sm">
                   <tr>
-                    <th style="white-space: nowrap;">方案预付编号</th>
-                    <td>
-                      <input type="text" readonly name="yfkbh" lay-verify="required" placeholder=""
+                    <th style="white-space: nowrap;">方案结算编号</th>
+                    <td colspan="3">
+                      <input type="text" readonly name="jsbh" lay-verify="required" placeholder=""
                              class="layui-input"/>
                     </td>
                     <th style="white-space: nowrap;">工程预算(元)</th>
                     <td>
-                      <input type="text" readonly name="fays" lay-verify="required"
+                      <input type="number" readonly name="fays" lay-verify="required"
                              placeholder="" class="layui-input"/>
                     </td>
-                    <th style="white-space: nowrap;">预付金额(元)</th>
+                    <th style="white-space: nowrap;">已预付金额(元)</th>
                     <td>
-                      <input type="number" name="yfkje" lay-verify="required" placeholder="" class="layui-input"/>
-                    </td>
-                    <th style="white-space: nowrap;">预付日期</th>
-                    <td>
-                      <input type="text" readonly name="yfkrq" lay-verify="required" placeholder=""
-                             class="layui-input"/>
+                      <input type="number" readonly name="yfje" lay-verify="required" placeholder="" class="layui-input"/>
                     </td>
                   </tr>
                   <tr>
-                    <th style="white-space: nowrap;">预付签署</th>
+                    <th style="white-space: nowrap;">结算金额(元)</th>
                     <td>
-                      <input type="text" readonly name="yfkqs" lay-verify="required" placeholder="" class="layui-input"/>
+                      <input type="number" readonly name="jsje" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
                     </td>
+                    <th style="white-space: nowrap;">应支付金额(元)</th>
+                    <td>
+                      <input type="number" readonly name="yzfje" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">结算日期</th>
+                    <td>
+                      <input type="text" readonly name="jsrq" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">结算登记</th>
+                    <td>
+                      <input type="text" readonly name="jsdj" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
+                    <th style="white-space: nowrap;">结算批示</th>
+                    <td colspan="3">
+                      <input type="text" readonly name="jsps" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">批示日期</th>
+                    <td>
+                      <input type="text" readonly name="jspsrq" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                    <th style="white-space: nowrap;">批示人</th>
+                    <td>
+                      <input type="text" readonly name="jspsr" lay-verify="required" placeholder="" class="layui-input"/>
+                    </td>
+                  </tr>
+                  <tr>
                     <th style="white-space: nowrap;">备注</th>
-                    <td colspan="5">
-                      <!--<input type="text" readonly name="bz" placeholder="" class="layui-input"/>-->
+                    <td colspan="7">
                       <textarea name="bz" readonly placeholder="请输入内容" class="layui-textarea"></textarea>
                     </td>
                   </tr>
                 </table>
               </div>
-              <input type="hidden" name="fk_faid" />
-              <input type="hidden" name="fk_xtglid" />
-              <input type="hidden" name="fk_qybm" />
             </div>
             <!-- 分摊信息 -->
             <div class="layui-tab-item">
@@ -101,19 +120,19 @@
     function getDetail() {
       let index = top.layer.load();
       $.ajax({
-        url: ctx + "/CZF/FAYF/getDetail/" + id,
+        url: ctx + "/CZF/FAJS/getDetail/" + id,
         type: "GET",
         dataType: "json",
         contentType: "application/json;charset=utf-8",
         success: function (data) {
           top.layer.close(index); //关闭弹出框
-          let fayf = data.data;
+          let fajs = data.data;
 
           //渲染表单数据
-          form.val("fa_yfForm", fayf);
+          form.val("fa_jsForm", fajs);
 
           //渲染表格数据
-          buildFtTable(fayf)
+          buildFtTable(fajs)
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
           top.layer.close(index); //关闭弹出框
@@ -124,11 +143,11 @@
     }
 
     //渲染分摊table
-    function buildFtTable(fa_yf) {
+    function buildFtTable(fa_js) {
       table.render({
         elem: '#ftTable',
         title: '分摊列表',
-        data: fa_yf.ftList2,
+        data: fa_js.ftList2,
         page: false,
         method: "POST",
         totalRow: true,

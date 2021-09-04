@@ -211,8 +211,9 @@
           field: "fxje", title: '费项金额(元)', event: 'fxje', config: {
             type: 'input', verify: {
               "regx": function (data) {
-                return !(!data || isNaN(data) || data <= 0);
-              }, msg: "请输入大于0的数字"
+                let reg = new RegExp("^\\d+(?:\\.\\d{1,2})?$")
+                return !(!data || isNaN(data) || data <= 0 || !reg.test(data));
+              }, msg: "请输入大于0的数字(最多两位小数)"
             }
           }, totalRow: true
         },
@@ -292,7 +293,6 @@
 
     //获取房间列表
     function getFhList(fk_xmxxid, fk_ldxxid, szdy) {
-      debugger;
       let url = ctx + "CZF/FHGL/getListAll/" + fk_xmxxid + "/" + fk_ldxxid;
       let data = {};
       if (szdy) {
@@ -311,7 +311,6 @@
         data: data,
         success: function (data) {
           top.layer.close(index); //关闭弹出框
-          debugger;
           fhList = data.data;
           return false;
         },
@@ -390,7 +389,6 @@
       dt["fHlist"] = fHlist;
 
       let index = top.layer.load();
-      debugger;
       //提交数据
       $.ajax({
         url: ctx + "CZF/FAGL/addFa",

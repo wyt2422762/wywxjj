@@ -342,7 +342,8 @@ public class FaController {
             fa.setAddtime(dateToStr).setSqrq(dateToStr).setFk_xtglid(cuser.getFk_xtglid())
                     .setFk_qybm(cuser.getFk_qybm()).setId(IdUtils.randomUUID())
                     .setZt(Constants.FaZt.SHZ).setFazt(Constants.FaZt.SHZ)
-                    .setFk_wyid(cuser.getFk_id());
+                    .setFk_wyid(cuser.getFk_id()).setYfzt(Constants.Yfzt.WYF)
+                    .setJszt(Constants.Jszt.WJS);
             //费项明细
             List<Fa_mx> mXlist = fa.getMXlist();
             if (mXlist != null && !mXlist.isEmpty()) {

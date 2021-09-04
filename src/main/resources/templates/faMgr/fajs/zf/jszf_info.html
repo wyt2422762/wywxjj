@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="/common/header::header(~{::title},~{},~{})">
-  <title>物业维修基金管理系统-方案预付支付</title>
+  <title>物业维修基金管理系统-方案预付支付详情</title>
 </head>
 <body>
 <input type="hidden" id="opts" th:value="${optsStr}"/>
@@ -12,115 +12,15 @@
     <div style="padding: 10px;">
         <div class="layui-tab layui-tab-card">
           <ul class="layui-tab-title">
-            <li class="layui-this">支付信息</li>
-            <li>预付信息</li>
-            <li>预付分摊信息</li>
-            <li>方案信息</li>
+            <li class="layui-this">方案信息</li>
             <li>费项明细</li>
+            <li>结算信息</li>
+            <li>结算分摊信息</li>
+            <li style="display: none;" class="tab_yfzfxx">预付支付信息</li>
           </ul>
           <div class="layui-tab-content">
-            <!-- 预付支付信息 -->
-            <div class="layui-tab-item layui-show">
-              <form class="layui-form" method="post" id="fa_yfzfForm" lay-filter="fa_yfzfForm">
-                <div class="layui-form" style="padding: 2px;">
-                  <table class="layui-table" lay-size="sm">
-                    <tr>
-                      <th style="white-space: nowrap;">支付编号</th>
-                      <td>
-                        <input type="text" readonly name="zfbh" lay-verify="required" placeholder=""
-                               class="layui-input" th:value="${zfbh}"/>
-                      </td>
-                      <th style="white-space: nowrap;">支付金额(元)</th>
-                      <td>
-                        <input type="number" readonly name="zfje" lay-verify="required" placeholder=""
-                               class="layui-input"/>
-                      </td>
-                      <th style="white-space: nowrap;">款项支取</th>
-                      <td>
-                        <input type="text" name="kxzq" lay-verify="required" placeholder=""
-                               class="layui-input"/>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th style="white-space: nowrap;">支付登记</th>
-                      <td>
-                        <input type="text" name="zfdj" lay-verify="required" placeholder=""
-                               class="layui-input"/>
-                      </td>
-                      <th style="white-space: nowrap;">身份证号</th>
-                      <td>
-                        <input type="text" name="sfzh" lay-verify="required" placeholder=""
-                               class="layui-input"/>
-                      </td>
-                      <th style="white-space: nowrap;">工作单位</th>
-                      <td>
-                        <input type="text" name="gzdw" lay-verify="required" placeholder=""
-                               class="layui-input"/>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th style="white-space: nowrap;">备注</th>
-                      <td colspan="5">
-                        <textarea name="bz" placeholder="请输入内容" class="layui-textarea"></textarea>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-                <input type="hidden" name="fk_yfkid" th:value="${id}"/>
-                <input type="hidden" name="fk_xtglid" th:value="${cuser.fk_xtglid}"/>
-                <input type="hidden" name="fk_qybm" th:value="${cuser.fk_qybm}"/>
-                <input type="hidden" name="fk_faid" />
-                <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>
-              </form>
-            </div>
-            <!-- 预付信息 -->
-            <div class="layui-tab-item">
-              <form class="layui-form" method="post" id="fa_yfForm" lay-filter="fa_yfForm">
-                <div class="layui-form" style="padding: 2px;">
-                  <table class="layui-table" lay-size="sm">
-                    <tr>
-                      <th style="white-space: nowrap;">方案预付编号</th>
-                      <td>
-                        <input type="text" readonly name="yfkbh" lay-verify="required" placeholder=""
-                               class="layui-input"/>
-                      </td>
-                      <th style="white-space: nowrap;">工程预算(元)</th>
-                      <td>
-                        <input type="text" readonly name="fays" lay-verify="required"
-                               placeholder="" class="layui-input"/>
-                      </td>
-                      <th style="white-space: nowrap;">预付金额(元)</th>
-                      <td>
-                        <input type="number" name="yfkje" lay-verify="required" placeholder="" class="layui-input"/>
-                      </td>
-                      <th style="white-space: nowrap;">预付日期</th>
-                      <td>
-                        <input type="text" readonly name="yfkrq" lay-verify="required" placeholder=""
-                               class="layui-input"/>
-                      </td>
-                    </tr>
-                    <tr>
-                      <th style="white-space: nowrap;">预付签署</th>
-                      <td>
-                        <input type="text" readonly name="yfkqs" lay-verify="required" placeholder="" class="layui-input"/>
-                      </td>
-                      <th style="white-space: nowrap;">备注</th>
-                      <td colspan="5">
-                        <input type="text" readonly name="bz" placeholder="" class="layui-input"/>
-                      </td>
-                    </tr>
-                  </table>
-                </div>
-              </form>
-            </div>
-            <!-- 分摊信息 -->
-            <div class="layui-tab-item">
-              <div style="padding: 2px;">
-                <table id="ftTable" class="layui-table" lay-filter="ftTable" lay-size="sm"></table>
-              </div>
-            </div>
             <!-- 方案信息 -->
-            <div class="layui-tab-item">
+            <div class="layui-tab-item layui-show">
               <form class="layui-form" method="post" id="fa_Form" lay-filter="fa_Form">
                 <div class="layui-form" style="padding: 2px;">
                   <table class="layui-table" lay-size="sm">
@@ -234,6 +134,124 @@
                 <table class="layui-table" lay-filter="fa_mxTables" id="fa_mxTables" style="margin-top: 0;"></table>
               </div>
             </div>
+            <!-- 结算信息 -->
+            <div class="layui-tab-item">
+              <form class="layui-form" method="post" id="fa_jsForm" lay-filter="fa_jsForm">
+                <div class="layui-form" style="padding: 2px;">
+                  <table class="layui-table" lay-size="sm">
+                    <tr>
+                      <th style="white-space: nowrap;">方案结算编号</th>
+                      <td colspan="3">
+                        <input type="text" readonly name="jsbh" lay-verify="required" placeholder=""
+                               class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">工程预算(元)</th>
+                      <td>
+                        <input type="number" readonly name="fays" lay-verify="required"
+                               placeholder="" class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">已预付金额(元)</th>
+                      <td>
+                        <input type="number" readonly name="yfje" lay-verify="required" placeholder="" class="layui-input"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th style="white-space: nowrap;">结算金额(元)</th>
+                      <td>
+                        <input type="number" readonly name="jsje" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">应支付金额(元)</th>
+                      <td>
+                        <input type="number" readonly name="yzfje" lay-verify="required|cnumber" placeholder="" class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">结算日期</th>
+                      <td>
+                        <input type="text" readonly name="jsrq" placeholder="" class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">结算登记</th>
+                      <td>
+                        <input type="text" readonly name="jsdj" placeholder="" class="layui-input"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th style="white-space: nowrap;">结算批示</th>
+                      <td colspan="3">
+                        <input type="text" readonly name="jsps" lay-verify="required" placeholder="" class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">批示日期</th>
+                      <td>
+                        <input type="text" readonly name="jspsrq" lay-verify="required" placeholder="" class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">批示人</th>
+                      <td>
+                        <input type="text" readonly name="jspsr" lay-verify="required" placeholder="" class="layui-input"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th style="white-space: nowrap;">备注</th>
+                      <td colspan="7">
+                        <textarea name="bz" readonly placeholder="请输入内容" class="layui-textarea"></textarea>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </form>
+            </div>
+            <!-- 分摊信息 -->
+            <div class="layui-tab-item">
+              <div style="padding: 2px;">
+                <table id="ftTable" class="layui-table" lay-filter="ftTable" lay-size="sm"></table>
+              </div>
+            </div>
+            <!-- 结算支付信息 -->
+            <div class="layui-tab-item tab_jszfxx" style="display: none;">
+              <form class="layui-form" method="post" id="fa_jszfForm" lay-filter="fa_jszfForm">
+                <div class="layui-form" style="padding: 2px;">
+                  <table class="layui-table" lay-size="sm">
+                    <tr>
+                      <th style="white-space: nowrap;">支付编号</th>
+                      <td>
+                        <input type="text" readonly name="zfbh" lay-verify="required"
+                               class="layui-input" th:value="${zfbh}"/>
+                      </td>
+                      <th style="white-space: nowrap;">支付金额(元)</th>
+                      <td>
+                        <input type="number" readonly name="zfje" lay-verify="required"
+                               class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">款项支取</th>
+                      <td>
+                        <input type="text" readonly name="kxzq" lay-verify="required"
+                               class="layui-input"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th style="white-space: nowrap;">支付登记</th>
+                      <td>
+                        <input type="text" readonly name="zfdj" lay-verify="required"
+                               class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">身份证号</th>
+                      <td>
+                        <input type="text" readonly name="sfzh" lay-verify="required"
+                               class="layui-input"/>
+                      </td>
+                      <th style="white-space: nowrap;">工作单位</th>
+                      <td>
+                        <input type="text" readonly name="gzdw" lay-verify="required"
+                               class="layui-input"/>
+                      </td>
+                    </tr>
+                    <tr>
+                      <th style="white-space: nowrap;">备注</th>
+                      <td colspan="5">
+                        <textarea name="bz" readonly class="layui-textarea"></textarea>
+                      </td>
+                    </tr>
+                  </table>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
     </div>
@@ -272,28 +290,32 @@
     function getDetail() {
       let index = top.layer.load();
       $.ajax({
-        url: ctx + "CZF/FAYFZF/getDetail/" + id,
+        url: ctx + "/CZF/FAJSZF/getDetail/" + id,
         type: "GET",
         dataType: "json",
         contentType: "application/json;charset=utf-8",
         success: function (data) {
           top.layer.close(index); //关闭弹出框
-          let fayf = data.data.yfInfo;
+          let fajs = data.data.jsInfo;
           let fa = data.data.faInfo;
 
-          $("input[name='fk_faid']").val(fa.id);
-          $("input[name='zfje']").val(fayf.yfkje);
-
           //渲染表单数据
-          form.val("fa_yfForm", fayf);
-          //渲染预付分摊表格数据
-          buildFtTable(fayf)
+          form.val("fa_jsForm", fajs);
+          //渲染结算分摊表格数据
+          buildFtTable(fajs)
 
           //方案form
           form.val("fa_Form", fa);
 
           //渲染方案明细table
           buildFamxTable(fa);
+
+          //结算支付信息
+          let jszf = data.data.jszfInfo;
+          if(jszf){
+            form.val("fa_jszfForm", jszf);
+            $(".tab_jszfxx").show();
+          }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
           top.layer.close(index); //关闭弹出框
@@ -370,43 +392,6 @@
         ]]
       });
     }
-
-    //提交数据
-    form.on('submit(submitBut)', function (data) {
-      let indexOut = top.layer.getFrameIndex(window.name); //获取窗口索引
-
-      //方案基本信息
-      let zfData = {};
-      for (let key in data.field) {
-        let val = data.field[key];
-        if (val) {
-          zfData[key] = val;
-        }
-      }
-
-      let index = top.layer.load();
-      //提交数据
-      $.ajax({
-        url: ctx + "CZF/FAYFZF/zf/" + id,
-        type: "POST",
-        dataType: "json",
-        async: false,
-        contentType: "application/json;charset=utf-8",
-        data: JSON.stringify(zfData),
-        success: function (data) {
-          top.layer.msg(data.msg);
-          top.layer.close(index); //关闭弹出框
-          top.layer.close(indexOut); //关闭弹出框
-          return false;
-        },
-        error: function (XMLHttpRequest, textStatus, errorThrown) {
-          top.layer.close(index); //关闭弹出框
-          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
-          return false;
-        }
-      });
-
-    });
 
   });
 </script>

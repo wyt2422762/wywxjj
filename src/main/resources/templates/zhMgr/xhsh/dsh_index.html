@@ -88,7 +88,6 @@
 
     //工具条事件
     table.on('tool(dshTable)', function (obj) {
-      debugger;
       let data = obj.data; //获得当前行数据
       let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
       let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
@@ -103,7 +102,6 @@
           content: ctx + "/CZF/XHSH/toSh/" + data.id,
           btn: ['通过', '不通过', '审核历史', '取消'],
           yes: function (index, layero) {
-            debugger;
             let body = top.layer.getChildFrame('body', index);
             let frm = $(body).find("form#sh_Form");
             $(frm).find("input[name='action']").val("通过");
@@ -111,7 +109,6 @@
             return false;
           },
           btn2: function (index, layero) {
-            debugger;
             let body = top.layer.getChildFrame('body', index);
             let frm = $(body).find("form#sh_Form");
             $(frm).find("input[name='action']").val("不通过");

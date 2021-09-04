@@ -195,11 +195,82 @@
           "title": "方案预付(" + data.fabh + ")"
         });
       } else if (layEvent === 'js') { //结算
-        TAB.open({
-          "data-id": "fa-js",
-          "data-url": ctx + "/CZF/FAGL/toJs/",
-          "data-opts": $("#opts").val(),
-          "title": "方案结算"
+        //判断是否有结算信息
+        let jsLoad = top.layer.load();
+        let fk_faid = data.id;
+        $.ajax({
+          url: ctx + "CZF/FAJS/hasJsData/" + fk_faid,
+          type: "POST",
+          async: false,
+          dataType: "json",
+          contentType: "application/json;charset=utf-8",
+          success: function (data) {
+            top.layer.close(jsLoad);
+            let fa_js_id = data.data;
+            if (!fa_js_id) {
+              top.layer.msg("无结算信息");
+              top.layer.confirm("该方案无结算信息，是否新建结算", {
+                btn: ['确定', '取消'] //按钮
+              }, function (index) { //确定，提交预付
+                top.layer.close(index);
+                top.layer.open({
+                  type: 2,
+                  title: '添加方案结算',
+                  closeBtn: 1,
+                  shadeClose: false,
+                  area: ['1000px', '80%'],
+                  content: ctx + "/CZF/FAJS/toAdd/" + fk_faid,
+                  end: function (index) {
+                    top.layer.close(index);
+                    window.location.reload();
+                  }
+                });
+              });
+            } else {
+              top.layer.open({
+                type: 2,
+                title: '方案结算详情',
+                closeBtn: 1,
+                shadeClose: false,
+                area: ['1000px', '80%'],
+                content: ctx + "/CZF/FAJS/toInfo/" + fa_js_id,
+                btn: ["删除"],
+                yes: function (indexOut) {
+                  top.layer.confirm("确定要删除该结算信息？", {
+                    btn: ['确定', '取消'] //按钮
+                  }, function (index) { //确定，提交预付
+                    top.layer.close(index);
+                    let loa = top.layer.load();
+                    $.ajax({
+                      url: ctx + "/CZF/FAJS/del/" + fa_js_id,
+                      type: "GET",
+                      dataType: "json",
+                      contentType: "application/json;charset=utf-8",
+                      success: function (data) {
+                        top.layer.close(loa); //关闭弹出框
+                        top.layer.msg(data.msg);
+                        top.layer.close(indexOut); //关闭弹出框
+                        window.location.reload();
+                        return false;
+                      },
+                      error: function (XMLHttpRequest, textStatus, errorThrown) {
+                        top.layer.close(loa); //关闭弹出框
+                        top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+                        return false;
+                      }
+                    });
+                  });
+                },
+                end: function (index) {
+                  top.layer.close(index);
+                }
+              });
+            }
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            top.layer.close(jsLoad);
+            top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          }
         });
       }
     });

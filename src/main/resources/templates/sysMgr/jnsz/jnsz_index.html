@@ -161,7 +161,6 @@
         }
       },
       cRequired: function (value, item) {
-        debugger;
         if (!value) {
           if (item.name === 'jnbl' && $("input[name='jnfs']").val() === "按合同总价缴纳") {
             return "缴纳比例不能为空";
@@ -278,8 +277,6 @@
         }
       }
 
-      debugger;
-
       let index = top.layer.load();
       $.ajax({
         url: ctx + "/CZF/JNSZ/aeJnsz",
@@ -382,7 +379,6 @@
        * 如果不相同，则可以同时使用。
        **/
       aopTable.on('tool(lsTables)', function (obj) {
-        debugger;
         let rowIndex = $(obj.tr).attr("data-index");
         if (obj.event === 'start' || obj.event === 'end' || obj.event === 'val') {
           let field = obj.field; //单元格字段
@@ -403,7 +399,6 @@
 
     //添加表格行
     $("#newBtn").on('click', function () {
-      debugger;
       //判断缴纳标准
       let jsbz = $("select[name = 'jnbz-jz']").val();
       if (jsbz === "按面积大小缴纳") {
@@ -441,13 +436,11 @@
         contentType: "application/json;charset=utf-8",
         success: function (data) {
           top.layer.close(index);
-          debugger;
           let val = data.data
           //判断数据类型
           if (val) {
             jnfs = val['jnfs'];
             jnbz = val['jnbz'];
-            debugger;
             //表单赋值
             form.val("jnsz_form", { //formTest 即 class="layui-form" 所在元素属性 lay-filter="" 对应的值
               "jnfs": val['jnfs'],

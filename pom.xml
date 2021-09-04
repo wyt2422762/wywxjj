@@ -29,6 +29,8 @@
         <fastjson.version>1.2.76</fastjson.version>
         <druid.version>1.2.6</druid.version>
         <poi-ooxml.version>5.0.0</poi-ooxml.version>
+        <easypoi.version>4.4.0</easypoi.version>
+        <aspose-cells.version>21.8</aspose-cells.version>
     </properties>
 
     <repositories>
@@ -36,6 +38,12 @@
             <id>mvn</id>
             <name>https://mvnrepository.com/</name>
             <url>https://mvnrepository.com/</url>
+        </repository>
+
+        <repository>
+            <id>AsposeJavaAPI</id>
+            <name>Aspose Java API</name>
+            <url>https://repository.aspose.com/repo/</url>
         </repository>
     </repositories>
 
@@ -135,6 +143,21 @@
             <artifactId>poi-ooxml</artifactId>
             <version>${poi-ooxml.version}</version>
         </dependency>
+
+        <!-- easypoi -->
+        <dependency>
+            <groupId>cn.afterturn</groupId>
+            <artifactId>easypoi-spring-boot-starter</artifactId>
+            <version>${easypoi.version}</version>
+        </dependency>
+
+        <!-- aspose-cells -->
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-cells</artifactId>
+            <version>${aspose-cells.version}</version>
+        </dependency>
+
 
     </dependencies>
 

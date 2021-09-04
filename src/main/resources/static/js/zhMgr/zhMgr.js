@@ -90,7 +90,6 @@ function xh(id, data, index) {
 
 //销户审批
 function xhsp(wkslid, yj, action, dqjdid, index) {
-  debugger;
   let ii = top.layer.load();
   $.ajax({
     url: ctx + "/CZF/XHSH/sh/" + wkslid + "?action=" + action + "&yj=" + yj + "&dqjdid=" + dqjdid,

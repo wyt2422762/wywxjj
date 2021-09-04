@@ -72,7 +72,9 @@ public class FaYfController {
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
         }
-        request.setAttribute("fk_faid", fk_faid);
+        Fa faDetail = faApi.getFaDetail(request, fk_faid);
+        request.setAttribute("fa", faDetail);
+
         return new ModelAndView("faMgr/fayf/yf_index");
     }
 
@@ -197,7 +199,7 @@ public class FaYfController {
     }
 
     /**
-     * 判断金额是否允许
+     * 预付分摊
      *
      * @param request req
      * @param fa_yf   预付信息
@@ -276,11 +278,15 @@ public class FaYfController {
                 CusResponseBody cusResponseBody = CusResponseBody.success("获取分摊信息成功", fhList);
                 return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
             } else {
-                throw new BusinessException("获取方案预付编号失败: 分摊方式错误", HttpStatus.BAD_REQUEST.value());
+                throw new BusinessException("分摊生成失败: 分摊方式错误", HttpStatus.BAD_REQUEST.value());
             }
         } catch (Exception e) {
-            log.error("获取方案预付编号失败", e);
-            throw new BusinessException("获取方案预付编号失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+            log.error("分摊生成失败", e);
+            if (e instanceof BusinessException) {
+                throw (BusinessException) e;
+            } else {
+                throw new BusinessException("分摊生成失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+            }
         }
     }
 
@@ -418,14 +424,14 @@ public class FaYfController {
             }
             fayfDetail.setFtList2(fhList);
             //构造返回数据
-            CusResponseBody cusResponseBody = CusResponseBody.success("添加方案预付成功", fayfDetail);
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取方案预付详情成功", fayfDetail);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("添加方案预付失败", e);
+            log.error("获取方案预付详情失败", e);
             if (e instanceof BusinessException) {
                 throw (BusinessException) e;
             } else {
-                throw new BusinessException("添加方案预付失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+                throw new BusinessException("获取方案预付详情失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
             }
         }
     }
