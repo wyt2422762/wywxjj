@@ -60,9 +60,9 @@
       <script type="text/html" id="faTableToolBar">
         <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
         {{#  if('审核通过' == d.zt){ }}
-        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-normal layui-btn-xs"
+        <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-normal layui-btn-xs"
            lay-event="yf">预付</a>
-        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-warm layui-btn-xs"
+        <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-warm layui-btn-xs"
            lay-event="js">结算</a>
         {{#  } }}
       </script>
@@ -76,6 +76,7 @@
 
 <script th:inline="javascript">
   const cuser = [[${cuser}]];
+  const opts = [[${opts}]];
 
   layui.config({
     base: ctx + 'static/js/layuiExts/'
@@ -208,25 +209,29 @@
             top.layer.close(jsLoad);
             let fa_js_id = data.data;
             if (!fa_js_id) {
-              top.layer.msg("无结算信息");
-              top.layer.confirm("该方案无结算信息，是否新建结算", {
-                btn: ['确定', '取消'] //按钮
-              }, function (index) { //确定，提交预付
-                top.layer.close(index);
-                top.layer.open({
-                  type: 2,
-                  title: '添加方案结算',
-                  closeBtn: 1,
-                  shadeClose: false,
-                  area: ['1000px', '80%'],
-                  content: ctx + "/CZF/FAJS/toAdd/" + fk_faid,
-                  end: function (index) {
-                    top.layer.close(index);
-                    window.location.reload();
-                  }
+              if(opts.indexOf("add") < 0) {
+                top.layer.msg("无结算信息");
+              } else {
+                top.layer.confirm("该方案无结算信息，是否新建结算", {
+                  btn: ['确定', '取消'] //按钮
+                }, function (index) { //确定，提交预付
+                  top.layer.close(index);
+                  top.layer.open({
+                    type: 2,
+                    title: '添加方案结算',
+                    closeBtn: 1,
+                    shadeClose: false,
+                    area: ['1000px', '80%'],
+                    content: ctx + "/CZF/FAJS/toAdd/" + fk_faid,
+                    end: function (index) {
+                      top.layer.close(index);
+                      window.location.reload();
+                    }
+                  });
                 });
-              });
+              }
             } else {
+              let opts = [[${opts}]];
               top.layer.open({
                 type: 2,
                 title: '方案结算详情',
@@ -234,7 +239,7 @@
                 shadeClose: false,
                 area: ['1000px', '80%'],
                 content: ctx + "/CZF/FAJS/toInfo/" + fa_js_id,
-                btn: ["删除"],
+                btn: opts.indexOf("del") > -1 ? ["删除"] : [],
                 yes: function (indexOut) {
                   top.layer.confirm("确定要删除该结算信息？", {
                     btn: ['确定', '取消'] //按钮
