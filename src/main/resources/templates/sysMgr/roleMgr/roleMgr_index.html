@@ -126,7 +126,7 @@
         }, function () {
           let roleId = data.id;
           $.ajax({
-            url: ctx + "PTXT/JSGL/delRole?roleId=" + roleId,
+            url: ctx + "PTXT/JSGL/delRole/" + roleId,
             type: "POST",
             success: function (data) {
               top.layer.msg(data.msg);

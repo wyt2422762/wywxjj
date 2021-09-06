@@ -15,10 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,9 +63,9 @@ public class RoleMgrController {
      */
     @RequestMapping("getList")
     @ResponseBody
-    public ResponseEntity<CusResponseBody> getLogList(HttpServletRequest request,
-                                                      @RequestParam(value = "roleName", required = false) String roleName,
-                                                      @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
+    public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
+                                                   @RequestParam(value = "roleName", required = false) String roleName,
+                                                   @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             Page<Role> rolePage = roleApi.getRoleList(request, roleName, page, limit);
             //构造返回数据
@@ -137,8 +134,8 @@ public class RoleMgrController {
      */
     @RequestMapping("aeRole")
     @ResponseBody
-    public ResponseEntity<CusResponseBody> getLogList(HttpServletRequest request,
-                                                      @RequestBody JSONObject json) {
+    public ResponseEntity<CusResponseBody> aeRole(HttpServletRequest request,
+                                                  @RequestBody JSONObject json) {
         try {
             roleApi.aeRole(request, json);
             //构造返回数据
@@ -154,18 +151,15 @@ public class RoleMgrController {
      * 删除角色
      *
      * @param request req
-     * @param roleId  角色Id
+     * @param id      角色Id
      * @return res
      */
-    @RequestMapping("delRole")
+    @RequestMapping("delRole/{id}")
     @ResponseBody
-    public ResponseEntity<CusResponseBody> getLogList(HttpServletRequest request,
-                                                      @RequestParam("roleId") String roleId) {
+    public ResponseEntity<CusResponseBody> delRole(HttpServletRequest request,
+                                                   @PathVariable("id") String id) {
         try {
-            if (StringUtils.isBlank(roleId)) {
-                throw new BusinessException("角色id不能为空", HttpStatus.BAD_REQUEST.value());
-            }
-            roleApi.delRole(request, roleId.trim());
+            roleApi.delRole(request, id.trim());
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("删除角色成功");
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);

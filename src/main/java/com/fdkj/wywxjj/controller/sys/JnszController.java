@@ -59,7 +59,7 @@ public class JnszController {
      */
     @RequestMapping("getList")
     @ResponseBody
-    public ResponseEntity<CusResponseBody> getWyGsList(HttpServletRequest request,
+    public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
                                                        @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
         try {
             Map<String, String> reqBody = new HashMap<>();
