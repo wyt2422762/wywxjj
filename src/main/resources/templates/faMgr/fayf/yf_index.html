@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/common/header::header(~{::title},~{},~{})">
+<head th:replace="/common/header::header(~{::title},~{::link},~{})">
   <title>物业维修基金管理系统-方案预付信息</title>
+  <link rel="stylesheet" th:href="@{/static/css/print.min.css}" media="all">
 </head>
 <body>
 <input type="hidden" id="opts" th:value="${optsStr}"/>
@@ -39,6 +40,7 @@
 <div th:replace="/common/footer::footer()"></div>
 
 <script type="text/javascript" th:src="@{/static/js/math.js}"></script>
+<script type="text/javascript" th:src="@{/static/js/print.min.js}"></script>
 
 <script th:inline="javascript">
   const cuser = [[${cuser}]];
@@ -115,6 +117,13 @@
           shadeClose: false,
           area: ['1000px', '80%'],
           content: ctx + "/CZF/FAYF/toInfo/" + data.id,
+          btn: ["打印单据"],
+          yes: function (index) {
+            top.layer.msg("打印单据");
+            debugger;
+            Receipt.print(ctx + "CZF/FAYF/printReceipt/" + data.id);
+            return false;
+          },
           end: function (index) {
             top.layer.close(index);
           }

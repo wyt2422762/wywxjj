@@ -5,6 +5,7 @@ bus:
   api:
     baseUrl: http://172.66.66.201:1015
   fileBaseDir: D:/wywxjj/file
+
 # 日志配置
 logging:
   file:

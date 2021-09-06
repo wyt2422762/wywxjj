@@ -21,7 +21,7 @@
           <div class="layui-tab-content">
             <!-- 结算支付信息 -->
             <div class="layui-tab-item layui-show">
-              <form class="layui-form" method="post" id="fa_yfzfForm" lay-filter="fa_yfzfForm">
+              <form class="layui-form" method="post" id="fa_jszfForm" lay-filter="fa_jszfForm">
                 <div class="layui-form" style="padding: 2px;">
                   <table class="layui-table" lay-size="sm">
                     <tr>
@@ -66,7 +66,7 @@
                     </tr>
                   </table>
                 </div>
-                <input type="hidden" name="fk_yfkid" th:value="${id}"/>
+                <input type="hidden" name="fk_jsid" th:value="${id}"/>
                 <input type="hidden" name="fk_xtglid" th:value="${cuser.fk_xtglid}"/>
                 <input type="hidden" name="fk_qybm" th:value="${cuser.fk_qybm}"/>
                 <input type="hidden" name="fk_faid" />
@@ -393,6 +393,7 @@
 
     //提交数据
     form.on('submit(submitBut)', function (data) {
+      debugger;
       let indexOut = top.layer.getFrameIndex(window.name); //获取窗口索引
 
       //方案基本信息

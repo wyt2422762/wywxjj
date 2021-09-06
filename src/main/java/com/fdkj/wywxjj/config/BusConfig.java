@@ -1,12 +1,14 @@
 package com.fdkj.wywxjj.config;
 
-
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
 
+/**
+ * 业务配置
+ * @author wyt
+ */
 @Component
 public class BusConfig {
 
@@ -36,5 +38,12 @@ public class BusConfig {
      */
     public static String getDownLoadBaseDir() {
         return fileBaseDir + File.separator + "download";
+    }
+
+    /**
+     * 获取临时文件路径
+     */
+    public static String getTempBaseDir() {
+        return fileBaseDir + File.separator + "temp";
     }
 }

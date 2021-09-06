@@ -1,6 +1,7 @@
 package com.fdkj.wywxjj.utils.poi;
 
 import com.aspose.cells.License;
+import com.aspose.cells.PdfSaveOptions;
 import com.aspose.cells.SaveFormat;
 import com.aspose.cells.Workbook;
 import org.slf4j.Logger;
@@ -19,21 +20,29 @@ public class ExcelToPdf {
 
     private static void getLicense() {
         try {
-//            File templateFile = FileUtil.file("classpath:templates/license.xml");
-//            FileInputStream inputStream = new FileInputStream(templateFile);
-//            ClassPathResource classPathResource = new ClassPathResource("classpath:templates/license.xml");
-            InputStream is = ExcelToPdf.class.getClassLoader().getResourceAsStream("templates/license.xml"); //  license.xml应放在..\WebRoot\WEB-INF\classes路径下
-            License aposeLic = new License();
-            aposeLic.setLicense(is);
+            InputStream is = ExcelToPdf.class.getClassLoader().getResourceAsStream("receipt/license.xml");
+            License license = new License();
+            license.setLicense(is);
         } catch (Exception e) {
             log.error("获取license 失败 -> {}", e.getLocalizedMessage());
         }
     }
 
     public static void excel2pdf(InputStream inputStream, OutputStream outputStream) throws Exception {
+        //去水印
         //getLicense();
-        Workbook wb = new Workbook(inputStream);// 原始excel路径
-        wb.save(outputStream, SaveFormat.PDF);
+
+        Workbook wb = new Workbook(inputStream);
+
+        PdfSaveOptions pdfSaveOptions = new PdfSaveOptions();
+        //把内容放在一张PDF 页面上；
+        pdfSaveOptions.setOnePagePerSheet(true);
+
+        //wb.save(outputStream, SaveFormat.PDF);
+        wb.save(outputStream, pdfSaveOptions);
+        outputStream.flush();
+        outputStream.close();
+        inputStream.close();
     }
 
 }

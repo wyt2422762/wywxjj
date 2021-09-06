@@ -220,16 +220,17 @@ public class FaJsApi extends BaseApi {
         //组装请求体
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
         ResponseEntity<String> responseEntity =
-                restTemplate.exchange(baseUrl + "/api/CZF/WYWXJJ_FA_ZF_YFZF",
+                restTemplate.exchange(baseUrl + "/api/CZF/WYWXJJ_FA_JS_ZF",
                         HttpMethod.POST, requestEntity, String.class);
         String responseEntityBody = responseEntity.getBody();
         JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
         boolean success = jsonObject.getBooleanValue("Success");
         if (!success) {
-            logger.error("结算支付失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_FA_ZF_YFZF");
+            logger.error("结算支付失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_FA_JS_ZF");
             logger.error("结算支付失败，请求体: " + body.toJSONString());
             logger.error("结算支付失败，返回内容: " + responseEntityBody);
             throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
     }
+
 }

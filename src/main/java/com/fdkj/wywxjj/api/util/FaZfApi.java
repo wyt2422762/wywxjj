@@ -116,7 +116,7 @@ public class FaZfApi extends BaseApi {
     /**
      * 获取方案支付详情
      *
-     * @param request
+     * @param request req
      * @param id      支付id
      * @return res
      * @throws Exception err

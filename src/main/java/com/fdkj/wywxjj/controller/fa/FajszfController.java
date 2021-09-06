@@ -257,7 +257,7 @@ public class FajszfController {
             //4. 构造请求数据
             JSONObject json = new JSONObject();
             //方案预付model
-            json.put("wywxjJ_FA_JSKmodel", JSONObject.parseObject(JSONObject.toJSONString(fajsDetail)));
+            json.put("wywxjJ_FA_JSmodel", JSONObject.parseObject(JSONObject.toJSONString(fajsDetail)));
             //支付model
             json.put("wywxjJ_FA_ZFmodel", JSONObject.parseObject(JSONObject.toJSONString(fa_zf)));
             //5. 请求接口

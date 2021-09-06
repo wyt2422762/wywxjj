@@ -178,6 +178,7 @@ const SERIAL_NUMBER = {
   }
 }
 
+//选项卡操作
 const TAB = {
   open: function(obj) {
     let admin = top.layui.admin;
@@ -187,3 +188,33 @@ const TAB = {
     admin.tabsBodyChange(obj["data-id"], {});
   }
 }
+
+//单据打印操作
+const Receipt = {
+  print: function(url) {
+    //提交数据
+    $.ajax({
+      url: url,
+      type: "GET",
+      xhrFields: {
+        responseType: 'blob'
+      },
+      success: function (data) {
+        console.log(data);
+        debugger;
+        const blob = new Blob([data], { type: 'application/pdf' })
+        const url1 = URL.createObjectURL(blob)
+        printJS({
+          printable: url1,
+          type: 'pdf'
+        });
+      },
+      error: function (XMLHttpRequest, textStatus, errorThrown) {
+        top.layer.msg("单据打印失败");
+        return false;
+      }
+    });
+  }
+}
+
+

@@ -15,6 +15,7 @@ import com.fdkj.wywxjj.api.util.FhApi;
 import com.fdkj.wywxjj.api.util.ZhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
+import com.fdkj.wywxjj.controller.BaseController;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
 import com.fdkj.wywxjj.utils.DateUtils;
@@ -31,7 +32,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import java.math.BigDecimal;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.util.*;
 
 /**
@@ -41,7 +45,7 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("CZF/FAYF")
-public class FaYfController {
+public class FaYfController extends BaseController {
     private static final Logger log = LoggerFactory.getLogger(FaYfController.class);
 
     @Autowired
@@ -523,4 +527,27 @@ public class FaYfController {
         }
     }
 
+    /**
+     * 打印单据
+     * @param request req
+     * @param response res
+     * @param id 预付id
+     */
+    @RequestMapping("printReceipt/{id}")
+    public void printReceipt(HttpServletRequest request, HttpServletResponse response,
+                             @PathVariable("id") String id) {
+        try {
+            //单据模板
+            ClassLoader classLoader = getClass().getClassLoader();
+            URL url = classLoader.getResource("receipt/template/预付单据.xlsx");
+            String path = URLDecoder.decode(url.getPath(),"utf-8");
+            //模板参数
+            Map<String, Object> params = new HashMap<>();
+            params.put("id", id);
+            //打印
+            downLoadReceipt(response, path, params, "预付测试单据.pdf");
+        } catch (Exception e) {
+            log.error("生成预付测试单据失败");
+        }
+    }
 }
