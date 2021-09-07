@@ -282,25 +282,25 @@
 
     //方案审核
     function fash(wkslid, yj, action, dqjdid, index) {
-      let ii = top.layer.load();
+      let loadi = top.layer.load();
       $.ajax({
         url: ctx + "/CZF/FASH/sh/" + wkslid + "?action=" + action + "&yj=" + yj + "&dqjdid=" + dqjdid,
         type: "POST",
         dataType: "json",
         contentType: "application/json;charset=utf-8",
         success: function (data) {
-          top.layer.close(ii);
+          top.layer.close(loadi);
           top.layer.msg(data.msg);
           if (!index) {
             window.location.reload();
           } else {
             top.layer.close(index); //关闭弹出框
-            let ifr = $("div.layui-tab div.layui-tab-content div.layui-show iframe", window.top.document)[0];
-            $(ifr).attr('src', $(ifr).attr('src'));
+
+            TAB.refreshLayerOpen();
           }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-          top.layer.close(ii);
+          top.layer.close(loadi);
           top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
           return false;
         }

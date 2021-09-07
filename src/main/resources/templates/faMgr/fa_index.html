@@ -225,7 +225,6 @@
                     content: ctx + "/CZF/FAJS/toAdd/" + fk_faid,
                     end: function (index) {
                       top.layer.close(index);
-                      window.location.reload();
                     }
                   });
                 });
@@ -239,8 +238,13 @@
                 shadeClose: false,
                 area: ['1000px', '80%'],
                 content: ctx + "/CZF/FAJS/toInfo/" + fa_js_id,
-                btn: opts.indexOf("del") > -1 ? ["删除"] : [],
+                btn: opts.indexOf("del") > -1 ? ["打印单据", "删除"] : ["打印单据"],
                 yes: function (indexOut) {
+                  debugger;
+                  Receipt.print(ctx + "CZF/FAJS/printReceipt/" + fa_js_id);
+                  return false;
+                },
+                btn2: function (indexOut) {
                   top.layer.confirm("确定要删除该结算信息？", {
                     btn: ['确定', '取消'] //按钮
                   }, function (index) { //确定，提交预付

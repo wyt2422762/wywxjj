@@ -1,16 +1,11 @@
 package com.fdkj.wywxjj.controller.sys;
 
-import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.fdkj.wywxjj.api.model.sysMgr.Jnsz;
 import com.fdkj.wywxjj.api.model.sysMgr.Jxsz;
-import com.fdkj.wywxjj.api.model.zhMgr.Zh;
-import com.fdkj.wywxjj.api.util.JnszApi;
 import com.fdkj.wywxjj.api.util.JxszApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
-import com.fdkj.wywxjj.utils.DateUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +47,39 @@ public class JxszController {
         request.setAttribute("cuser", jxszApi.getUserFromCookie(request));
         request.setAttribute("opts", opts);
         return new ModelAndView("sysMgr/jxsz/jxsz_index");
+    }
+
+    /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toAdd")
+    public ModelAndView toAdd(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
+        request.setAttribute("cuser", jxszApi.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        return new ModelAndView("sysMgr/jxsz/jxsz_add");
+    }
+
+    /**
+     * 跳转到
+     *
+     * @param request req
+     * @param opts    操作权限信息
+     * @return res
+     * @throws Exception e
+     */
+    @RequestMapping("toEdit/{id}")
+    public ModelAndView toEdit(HttpServletRequest request,
+                               @PathVariable("id") String id,
+                               @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
+        request.setAttribute("cuser", jxszApi.getUserFromCookie(request));
+        request.setAttribute("opts", opts);
+        request.setAttribute("id", id);
+        return new ModelAndView("sysMgr/jxsz/jxsz_edit");
     }
 
     /**

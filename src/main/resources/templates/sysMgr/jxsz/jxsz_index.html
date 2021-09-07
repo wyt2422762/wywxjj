@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-计息设置</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <fieldset class="layui-elem-field layui-field-title">
+      <legend>计息列表</legend>
+    </fieldset>
+
+    <!-- 计息设置列表 -->
+    <div style="padding: 10px;">
+      <div style="padding-bottom: 10px;">
+        <div class="layui-inline" style="float:right;">
+          <button th:if="${#lists.contains(opts, 'add')}" id="addJxsz" class="layui-btn layui-btn-normal"
+                  style="margin-left:15px;">添加计息设置
+          </button>
+        </div>
+      </div>
+
+      <table id="jxszTable" class="layui-table" lay-filter="jxszTable"></table>
+
+      <script type="text/html" id="jxszTableToolBar">
+        <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs" lay-event="edit">编辑</a>
+        <a th:if="${#lists.contains(opts, 'del')}" class="layui-btn layui-btn-xs layui-btn-danger" lay-event="del">删除</a>
+      </script>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- 弹出框 -->
+<div th:replace="/common/dialog::jxszDialog"></div>
+<!-- 弹出框 -->
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/sysMgr/jxsz/jxsz.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+  const opts = [[${opts}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader', 'drawer'], function () {
+    //let element = layui.element;
+    let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+    let drawer = layui.drawer;
+
+    getTableData();
+
+    //获取方案管理列表
+    function getTableData() {
+      let params = {};
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+      if (cuser.yhType === '银行') {
+        params['fk_bankid'] = cuser['fk_id'];
+      }
+
+      let url = ctx + 'CZF/JXSZ/getList';
+
+      //获取表格数据
+      table.render({
+        elem: '#jxszTable',
+        title: '计息设置列表',
+        url: url, //数据接口
+        where: params, //请求参数
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {
+            title: '生效日期', templet: function (d) {
+              return d.sxrq.substring(0, 10);
+            }
+          },
+          {field: 'rate', title: '利率(%)'},
+          {toolbar: '#jxszTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
+    //工具条事件
+    table.on('tool(jxszTable)', function (obj) {
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'edit') { //编辑
+        top.layer.open({
+          type: 2,
+          title: '添加计息设置',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['520px', '520px'],
+          content: ctx + "CZF/JXSZ/toEdit/" + data.id,
+          btn: ["确定", "取消"],
+          yes: function (index) {
+            let body = top.layer.getChildFrame('body', index);
+            let frm = $(body).find("form#jxsz_editForm");
+            $(frm).find("button.sb").click();
+            return false;
+          }
+        });
+      } else if (layEvent === 'del') { //删除
+        top.layer.confirm("确认要删除该条计息设置？", {
+          btn: ['确定', '取消'] //按钮
+        }, function (index) { //确定，提交删除
+          debugger;
+          delJxsz(data.id, index);
+          return false;
+        });
+      }
+    });
+
+    //新建按钮事件
+    $("#addJxsz").on('click', function () {
+      //弹窗
+      top.layer.open({
+        type: 2,
+        title: '添加计息设置',
+        closeBtn: 1,
+        shadeClose: false,
+        area: ['520px', '520px'],
+        content: ctx + "CZF/JXSZ/toAdd",
+        btn: ["确定", "取消"],
+        yes: function (index) {
+          let body = top.layer.getChildFrame('body', index);
+          let frm = $(body).find("form#jxsz_addForm");
+          $(frm).find("button.sb").click();
+          return false;
+        }
+      });
+    });
+  });
+</script>
+</body>
+</html>

@@ -186,7 +186,7 @@
     });
 
     function getXmDetail() {
-      let index = top.layer.load();
+      let loadi = top.layer.load();
       $.ajax({
         url: ctx + "/CZF/XMGL/getDetail/" + id,
         type: "POST",
@@ -197,7 +197,6 @@
           let data1 = data.data;
           let r = {};
           for (let key in data1) {
-            console.log(key);
             let val = data1[key];
             if (val) {
               r[key] = val;
@@ -206,10 +205,10 @@
           //渲染数据
           form.val("xm_editForm", r);
 
-          top.layer.close(index);
+          top.layer.close(loadi);
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-          top.layer.close(index);
+          top.layer.close(loadi);
           top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
           window.close();
         }
@@ -219,7 +218,6 @@
     form.on('submit(submitBut)', function (data1) {
       let xm = {};
       for (let key in data1.field) {
-        console.log(key);
         let val = data1.field[key];
         if (val) {
           xm[key] = val;

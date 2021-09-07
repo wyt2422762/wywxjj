@@ -116,7 +116,7 @@
             return false;
           },
           btn3: function (index, layero) {
-            let index_i = top.layer.load();
+            let loadi = top.layer.load();
             $.ajax({
               url: ctx + "/CZF/XHSH/getHistoryList/" + data.id,
               type: "POST",
@@ -124,7 +124,7 @@
               dataType: "json",
               contentType: "application/json;charset=utf-8",
               success: function (data) {
-                top.layer.close(index_i);
+                top.layer.close(loadi);
                 let his = data.data;
                 top.layui.drawer.render({
                   title: '审核历史',  //标题
@@ -136,7 +136,7 @@
                 });
               },
               error: function (XMLHttpRequest, textStatus, errorThrown) {
-                top.layer.close(index_i);
+                top.layer.close(loadi);
                 top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
               }
             });
@@ -148,7 +148,6 @@
           },
           end: function () {
             top.layer.close(index);
-            window.location.reload();
           }
         });
       }

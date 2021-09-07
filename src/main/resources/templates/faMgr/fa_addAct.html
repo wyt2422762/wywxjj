@@ -331,7 +331,6 @@
 
     //提交数据
     form.on('submit(submitBut)', function (data) {
-      top.layer.msg("保存按钮点击");
       let indexOut = top.layer.getFrameIndex(window.name); //获取窗口索引
 
       //1. 数据校验，判断每户的钱是否足够
@@ -388,17 +387,16 @@
       dt["mXlist"] = mXlist;
       dt["fHlist"] = fHlist;
 
-      let index = top.layer.load();
+      let loadi = top.layer.load();
       //提交数据
       $.ajax({
         url: ctx + "CZF/FAGL/addFa",
         type: "POST",
         dataType: "json",
-        async: false,
         contentType: "application/json;charset=utf-8",
         data: JSON.stringify(dt),
         success: function (data) {
-          top.layer.close(index); //关闭弹出框
+          top.layer.close(loadi); //关闭弹出框
           if (indexOut) {
             top.layer.close(indexOut); //关闭弹出框
           }
@@ -406,7 +404,7 @@
           return false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-          top.layer.close(index); //关闭弹出框
+          top.layer.close(loadi); //关闭弹出框
           top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
           return false;
         }
@@ -434,23 +432,22 @@
       };
 
       //提交
-      let index = top.layer.load();
+      let loadi = top.layer.load();
       $.ajax({
         url: url,
         type: "GET",
         dataType: "json",
-        async: false,
         contentType: "application/json;charset=utf-8",
         data: data,
         success: function (data) {
-          top.layer.close(index); //关闭弹出框
+          top.layer.close(loadi); //关闭弹出框
           res.canSubmit = data.data.res;
           res.fhList = data.data.data;
           res.msg = data.msg;
           return false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-          top.layer.close(index); //关闭弹出框
+          top.layer.close(loadi); //关闭弹出框
           top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
           return false;
         }

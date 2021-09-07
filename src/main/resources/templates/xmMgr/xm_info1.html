@@ -221,6 +221,7 @@
 
     //获取楼栋信息
     function getInitData() {
+      let loadi = top.layer.load();
       let url = ctx + 'CZF/LDGL/getListAll/' + fk_xmxxid;
       $.ajax({
         url: url,
@@ -229,6 +230,7 @@
         async: false,
         contentType: "application/json;charset=utf-8",
         success: function (data) {
+          top.layer.close(loadi);
           let ldList = data.data;
           if (ldList && ldList.length > 0) {
             let treeDatas = [];
@@ -260,6 +262,7 @@
           }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(loadi);
           top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
         }
       });
@@ -286,7 +289,6 @@
         cancel: function (index, layero) {},
         end: function () {
           top.layer.close(index);
-          window.location.reload();
         }
       });
     });
@@ -352,7 +354,6 @@
         cancel: function (index, layero) {},
         end: function () {
           top.layer.close(index);
-          window.location.reload();
         }
       });
     });
@@ -449,7 +450,6 @@
           cancel: function (index, layero) {},
           end: function () {
             top.layer.close(index);
-            window.location.reload();
           }
         });
       } else {

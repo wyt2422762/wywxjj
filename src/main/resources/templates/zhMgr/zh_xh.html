@@ -141,7 +141,7 @@
     getInitData();
 
     function getInitData() {
-      let index = top.layer.load();
+      let loadi = top.layer.load();
       $.ajax({
         url: ctx + "/CZF/ZHGL/getDetail/" + id,
         type: "POST",
@@ -149,11 +149,12 @@
         dataType: "json",
         contentType: "application/json;charset=utf-8",
         success: function (data) {
+          top.layer.close(loadi);
+
           let zh = data.data;
           if(zh.zt === '0') {
             zh[''] = "正常";
           }
-          top.layer.close(index);
 
           //渲染表单数据
           form.val("zh_Form", zh);
@@ -175,7 +176,7 @@
           });
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-          top.layer.close(index);
+          top.layer.close(loadi);
           top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
           window.close();
         }

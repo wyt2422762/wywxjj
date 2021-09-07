@@ -287,8 +287,7 @@
         success: function (data) {
           top.layer.close(index);
           top.layer.msg(data.msg);
-          let ifr = $("div.layui-tab div.layui-tab-content div.layui-show iframe", window.top.document)[0];
-          $(ifr).attr('src', $(ifr).attr('src'));
+          window.location.reload();
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
           top.layer.close(index);

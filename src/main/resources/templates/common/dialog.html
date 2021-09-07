@@ -198,5 +198,22 @@
   </div>
 </div>
 
+<!-- 计息设置弹出层 -->
+<div style="padding: 10px;display: none;" id="jxszDialog" th:fragment="jxszDialog">
+  <form class="layui-form" method="post" id="jxsz_aeForm">
+    <div class="layui-form" style="padding: 2px;">
+      <table class="layui-table" lay-size="sm">
+        <tr>
+          <th style="white-space: nowrap;">生效日期</th>
+          <td><input type="text" readonly name="sxrq" lay-verify="required" class="layui-input"/></td>
+          <th style="white-space: nowrap;">利率(%)</th>
+          <td><input type="text" readonly name="sxrq" lay-verify="required" class="layui-input"/></td>
+        </tr>
+      </table>
+    </div>
+    <button style="display:none;" lay-submit lay-filter="submitBut" ></button>
+  </form>
+</div>
+
 </body>
 </html>

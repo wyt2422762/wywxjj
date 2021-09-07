@@ -186,6 +186,11 @@ const TAB = {
     //定位当前tabs
     top.layui.element.tabChange('menuTab', obj["data-id"]);
     admin.tabsBodyChange(obj["data-id"], {});
+  },
+  //刷新layer父页面
+  refreshLayerOpen: function() {
+    let ifr = $("div.layui-body div.layui-tabsbody-item.layui-show iframe", window.top.document)[0];
+    $(ifr).attr('src', $(ifr).attr('src'));
   }
 }
 
@@ -200,7 +205,6 @@ const Receipt = {
         responseType: 'blob'
       },
       success: function (data) {
-        console.log(data);
         debugger;
         const blob = new Blob([data], { type: 'application/pdf' })
         const url1 = URL.createObjectURL(blob)

@@ -145,6 +145,12 @@
           shadeClose: false,
           area: ['1000px', '80%'],
           content: ctx + "/CZF/FAYFZF/toInfo/" + data.id,
+          btn: ["支付单据打印"],
+          yes: function (index) {
+            debugger;
+            Receipt.print(ctx + "CZF/FAYFZF/printReceipt/" + data.id);
+            return false;
+          },
           end: function (index) {
             top.layer.close(index);
           }
@@ -168,7 +174,6 @@
           },
           end: function (index) {
             top.layer.close(index);
-            window.location.reload();
           }
         });
       }

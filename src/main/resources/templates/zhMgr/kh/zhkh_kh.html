@@ -128,7 +128,7 @@
           params['fk_qybm'] = cuser['fk_qybm'];
         }*/
 
-        let index = top.layer.load();
+        let loadi = top.layer.load();
         $.ajax({
           url: url,
           type: "POST",
@@ -137,7 +137,7 @@
           data: params,
           contentType: "application/json;charset=utf-8",
           success: function (data1) {
-            top.layer.close(index);
+            top.layer.close(loadi);
 
             let jnsz = data1.data;
             if(!jnsz){
@@ -163,14 +163,13 @@
                 },
                 end: function () {
                   top.layer.close(index);
-                  window.location.reload();
                 }
               });
             }
 
           },
           error: function (XMLHttpRequest, textStatus, errorThrown) {
-            top.layer.close(index);
+            top.layer.close(loadi);
             top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
           }
         });
@@ -181,6 +180,7 @@
     //获取楼栋信息
     function getInitData() {
       let url = ctx + 'CZF/LDGL/getListAll/' + fk_xmxxid;
+      let loadi = top.layer.load();
       $.ajax({
         url: url,
         type: "POST",
@@ -188,6 +188,7 @@
         async: false,
         contentType: "application/json;charset=utf-8",
         success: function (data) {
+          top.layer.close(loadi);
           let ldList = data.data;
           if (ldList && ldList.length > 0) {
             let treeDatas = [];
@@ -214,6 +215,7 @@
           }
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(loadi);
           top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
         }
       });

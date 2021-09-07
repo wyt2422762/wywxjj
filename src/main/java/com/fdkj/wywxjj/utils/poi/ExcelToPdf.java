@@ -18,19 +18,23 @@ import java.io.OutputStream;
 public class ExcelToPdf {
     private static final Logger log = LoggerFactory.getLogger(ExcelToPdf.class);
 
-    private static void getLicense() {
+    public static boolean getLicense() {
+        boolean result = false;
         try {
-            InputStream is = ExcelToPdf.class.getClassLoader().getResourceAsStream("receipt/license.xml");
-            License license = new License();
-            license.setLicense(is);
+            InputStream is = com.aspose.cells.License.class.getResourceAsStream("/com.aspose.cells.lic_2999.xml");
+            License asposeLicense = new License();
+            asposeLicense.setLicense(is);
+            is.close();
+            result = true;
         } catch (Exception e) {
-            log.error("获取license 失败 -> {}", e.getLocalizedMessage());
+            e.printStackTrace();
         }
+        return result;
     }
 
     public static void excel2pdf(InputStream inputStream, OutputStream outputStream) throws Exception {
         //去水印
-        //getLicense();
+        getLicense();
 
         Workbook wb = new Workbook(inputStream);
 

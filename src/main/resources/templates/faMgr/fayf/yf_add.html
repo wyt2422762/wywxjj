@@ -249,7 +249,6 @@
               update[field] = value;
               //把value更新到行中
               obj.update(update);
-              console.log("ftData = " + ftData);
               table.reload('ftTable');
             }
           });
@@ -342,6 +341,9 @@
           //关闭弹窗
           let index1 = top.layer.getFrameIndex(window.name); //获取窗口索引
           top.layer.close(index1);
+
+          TAB.refreshLayerOpen();
+          return false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
           top.layer.close(loadi); //关闭弹出框

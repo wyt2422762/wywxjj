@@ -119,7 +119,6 @@
           content: ctx + "/CZF/FAYF/toInfo/" + data.id,
           btn: ["打印单据"],
           yes: function (index) {
-            top.layer.msg("打印单据");
             debugger;
             Receipt.print(ctx + "CZF/FAYF/printReceipt/" + data.id);
             return false;
@@ -168,7 +167,6 @@
         content: ctx + "/CZF/FAYF/toAdd/" + fk_faid,
         end: function (index) {
           top.layer.close(index);
-          window.location.reload();
         }
       });
     });

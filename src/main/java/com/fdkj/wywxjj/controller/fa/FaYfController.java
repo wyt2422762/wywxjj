@@ -547,7 +547,7 @@ public class FaYfController extends BaseController {
             //打印
             downLoadReceipt(response, path, params, "预付测试单据.pdf");
         } catch (Exception e) {
-            log.error("生成预付测试单据失败");
+            log.error("生成预付测试单据失败", e);
         }
     }
 }

@@ -405,23 +405,25 @@
         }
       }
 
-      let index = top.layer.load();
+      let loadi = top.layer.load();
       //提交数据
       $.ajax({
         url: ctx + "CZF/FAJSZF/zf/" + id,
         type: "POST",
         dataType: "json",
-        async: false,
         contentType: "application/json;charset=utf-8",
         data: JSON.stringify(zfData),
         success: function (data) {
           top.layer.msg(data.msg);
-          top.layer.close(index); //关闭弹出框
+          top.layer.close(loadi); //关闭弹出框
           top.layer.close(indexOut); //关闭弹出框
+
+          TAB.refreshLayerOpen();
+
           return false;
         },
         error: function (XMLHttpRequest, textStatus, errorThrown) {
-          top.layer.close(index); //关闭弹出框
+          top.layer.close(loadi); //关闭弹出框
           top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
           return false;
         }

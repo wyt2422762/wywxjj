@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-添加计息设置</title>
+</head>
+<body>
+
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <div style="padding: 10px;" id="faDialog">
+      <form class="layui-form" method="post" id="jxsz_addForm">
+        <div class="layui-form" style="padding: 2px;">
+          <table class="layui-table" lay-size="sm">
+            <tr>
+              <th style="white-space: nowrap;">生效日期</th>
+              <td><input type="text" readonly name="sxrq" lay-verify="required" class="layui-input"/></td>
+            </tr>
+            <tr>
+              <th style="white-space: nowrap;">利率(%)</th>
+              <td><input type="number" min="0" name="rate" lay-verify="required|cnumber" class="layui-input"/></td>
+            </tr>
+          </table>
+        </div>
+        <input type="hidden" name="fk_bankid" th:value="${cuser.fk_id}"/>
+        <input type="hidden" name="fk_xtglid" th:value="${cuser.fk_xtglid}"/>
+        <input type="hidden" name="fk_qybm" th:value="${cuser.fk_qybm}"/>
+        <button style="display:none;" class="sb" lay-submit lay-filter="submitBut" ></button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script type="text/javascript" th:src="@{/static/js/sysMgr/jxsz/jxsz.js}"></script>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: '/drawer/drawer',
+    tableEdit: 'tableEdit/tableEdit',
+  }).use(['element', 'laydate', 'table', 'tableEdit', 'form', 'cascader', 'drawer'], function () {
+    //let element = layui.element;
+    let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+    let drawer = layui.drawer;
+    let tableEdit = layui.tableEdit;
+
+    //日期选择
+    laydate.render({
+      elem: "input[name='sxrq']"
+    });
+
+    //表单验证
+    form.verify({
+      cnumber: function (value, item) {
+        let reg = new RegExp("^\\d+(?:\\.\\d{1,2})?$")
+        if(value && isNaN(value)){
+          return "只能输入数字";
+        }
+        if(!reg.test(value)) {
+          return "最多两位小数";
+        }
+      }
+    });
+
+    //提交数据
+    form.on('submit(submitBut)', function (data) {
+      let indexOut = top.layer.getFrameIndex(window.name); //获取窗口索引
+      //请求data
+      let data1 = {};
+      for (let key in data.field) {
+        let val = data.field[key];
+        if (val) {
+          data1[key] = val;
+        }
+      }
+
+      aeJxsz(data1, indexOut);
+      return false;
+    });
+
+  });
+</script>
+</body>
+</html>

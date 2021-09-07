@@ -30,7 +30,7 @@
         <druid.version>1.2.6</druid.version>
         <poi-ooxml.version>5.0.0</poi-ooxml.version>
         <easypoi.version>4.4.0</easypoi.version>
-        <aspose-cells.version>21.8</aspose-cells.version>
+        <aspose-cells.version>20.7</aspose-cells.version>
     </properties>
 
     <repositories>

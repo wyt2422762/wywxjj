@@ -1,15 +1,14 @@
 package com.fdkj.wywxjj.api.util;
 
 import com.alibaba.fastjson.JSONObject;
-import com.fdkj.wywxjj.api.model.sysMgr.Jnsz;
-import com.fdkj.wywxjj.api.model.sysMgr.Jnsz_ls;
 import com.fdkj.wywxjj.api.model.sysMgr.Jxsz;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
-import com.fdkj.wywxjj.api.model.xmMgr.Ld;
+import com.fdkj.wywxjj.api.model.sysMgr.Yh;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
@@ -26,6 +25,9 @@ import java.util.Map;
 @Component
 public class JxszApi extends BaseApi {
     private static final Logger logger = LoggerFactory.getLogger(JxszApi.class);
+
+    @Autowired
+    private YhApi yhApi;
 
     /**
      * 获取计息设置列表(分页)
@@ -77,6 +79,11 @@ public class JxszApi extends BaseApi {
         Integer totalRecord = jsonObject.getInteger("TotalCount");
         page.setTotalRecord(totalRecord);
         List<Jxsz> dataList = jsonObject.getJSONArray("Results").toJavaList(Jxsz.class);
+        for (Jxsz jxsz : dataList) {
+            String fk_bankid = jxsz.getFk_bankid();
+            Yh yhDetail = yhApi.getYhDetail(request, fk_bankid);
+            jxsz.setYh(yhDetail);
+        }
         page.setDataList(dataList);
         return page;
     }
@@ -118,7 +125,13 @@ public class JxszApi extends BaseApi {
             throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
         }
 
-        return jsonObject.getJSONArray("Results").toJavaList(Jxsz.class);
+        List<Jxsz> jxszs = jsonObject.getJSONArray("Results").toJavaList(Jxsz.class);
+        for (Jxsz jxsz : jxszs) {
+            String fk_bankid = jxsz.getFk_bankid();
+            Yh yhDetail = yhApi.getYhDetail(request, fk_bankid);
+            jxsz.setYh(yhDetail);
+        }
+        return jxszs;
     }
 
     /**
@@ -157,7 +170,11 @@ public class JxszApi extends BaseApi {
         }
 
         //构造返回信息
-        return jsonObject.getJSONObject("Results").toJavaObject(Jxsz.class);
+        Jxsz jxsz = jsonObject.getJSONObject("Results").toJavaObject(Jxsz.class);
+        String fk_bankid = jxsz.getFk_bankid();
+        Yh yhDetail = yhApi.getYhDetail(request, fk_bankid);
+        jxsz.setYh(yhDetail);
+        return jxsz;
     }
 
     /**

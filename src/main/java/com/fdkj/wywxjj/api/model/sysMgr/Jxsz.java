@@ -36,4 +36,9 @@ public class Jxsz {
      * 利率
      */
     private String rate;
+
+    /**
+     * 银行
+     */
+    private Yh yh;
 }
