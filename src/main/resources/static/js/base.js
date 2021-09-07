@@ -206,8 +206,8 @@ const Receipt = {
       },
       success: function (data) {
         debugger;
-        const blob = new Blob([data], { type: 'application/pdf' })
-        const url1 = URL.createObjectURL(blob)
+        const blob = new Blob([data], { type: 'application/pdf' });
+        const url1 = URL.createObjectURL(blob);
         printJS({
           printable: url1,
           type: 'pdf'
