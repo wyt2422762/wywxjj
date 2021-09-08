@@ -86,7 +86,7 @@
               )
             </th>
             <td>
-              <input type="number" name="jnbz" placeholder=""
+              <input type="number" name="jzbl" placeholder=""
                      class="layui-input" th:value="${jnbz}" th:readonly="${!bgd}"
               />
             </td>
@@ -95,13 +95,15 @@
               <input type="number" name="money" placeholder=""
                      class="layui-input" th:value="${money}" readonly
               />
+              <input type="hidden" name="cjje" placeholder=""
+                     class="layui-input" th:value="${money}" readonly
+              />
             </td>
           </tr>
           <tr>
             <th style="white-space: nowrap;">开户银行</th>
             <td>
-              <input type="text" name="yhmc" readonly placeholder="" class="layui-input" th:value="${yh.yxmc}"/>
-              <input type="hidden" name="fk_yhid" placeholder="" class="layui-input" th:value="${yh.id}"/>
+              <input type="text" name="khyh" readonly placeholder="" class="layui-input" th:value="${yh.yxmc}"/>
             </td>
             <th style="white-space: nowrap;"></th><td></td>
             <th style="white-space: nowrap;"></th><td></td>
@@ -113,6 +115,9 @@
       <input type="hidden" name="fk_qybm" th:value="${cuser.fk_qybm}"/>
       <input type="hidden" name="fk_yhid" th:value="${yh.id}"/>
       <input type="hidden" name="fk_fhxxid" th:value="${fh.id}"/>
+      <input type="hidden" name="fk_ldxxid" th:value="${fh.fk_ldxxid}"/>
+      <input type="hidden" name="fk_xmxxid" th:value="${fh.fk_xmxxid}"/>
+
       <input type="hidden" name="zt" value="正常"/>
 
       <button style="display:none;" lay-submit lay-filter="submitBut" class="sb"></button>

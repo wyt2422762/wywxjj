@@ -58,6 +58,12 @@
 
       <div class="layui-col-md10">
         <div>
+
+          <!--<div class="addBtnDiv">
+            <button id="printLdZh" class="layui-btn layui-btn-normal" style="display: none;margin-left:15px;">当前幢开户信息打印
+            </button>
+          </div>-->
+
           <table id="fhTable" class="layui-table" lay-filter="fhTable"></table>
           <script type="text/html" id="fh_zhTpl">
             {{#  if(d.zh){ }}
@@ -69,7 +75,9 @@
           <script type="text/html" id="fhTableToolBar">
             {{#  if(d.fjzt === "已出售" && !d.zh){ }}
             <a class="layui-btn layui-btn-xs layui-btn-warm" lay-event="kh">开户</a>
-            {{#  } else { }}
+            {{#  } }}
+            {{#  if(d.zh){ }}
+              <a class="layui-btn layui-btn-xs" lay-event="mx">账户明细</a>
             {{#  } }}
           </script>
         </div>
@@ -173,6 +181,25 @@
             top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
           }
         });
+      } else if (layEvent === 'mx') { //明细
+        debugger;
+        let index = top.layer.open({
+          type: 2,
+          title: '账户明细',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "CZF/ZHGL/toInfo/" + data.zh.id,
+          btn: ["打印单据"],
+          yes: function () {
+            debugger;
+            Receipt.print(ctx + "CZF/ZHKH/printReceipt/" + data.zh.id);
+            return false;
+          },
+          end: function () {
+            top.layer.close(index);
+          }
+        });
       }
 
     });
@@ -207,6 +234,8 @@
               click: function (obj) {
                 $(obj.elem[0]).addClass("red").siblings().removeClass("red");
                 fk_ldxxid = obj.data.id;
+
+                $("#printLdZh").hide();
 
                 getFhData(fk_xmxxid, fk_ldxxid);
 
@@ -245,11 +274,20 @@
           {toolbar: '#fhTableToolBar', align: 'center', fixed: 'right', title: '操作'}
         ]],
         parseData: function (res) { //res 即为原始返回的数据
+          let dataList = res.data.dataList
+          for(let i in dataList) {
+            let data = dataList[i];
+            if(data.zh) {
+              $("#printLdZh").show();
+              break;
+            }
+          }
+
           return {
             "code": res.success ? 0 : 1, //解析接口状态
             "msg": res.msg, //解析提示文本
             "count": res.data.totalRecord, //解析数据长度
-            "data": res.data.dataList //解析数据列表
+            "data": dataList //解析数据列表
           };
         }
       });

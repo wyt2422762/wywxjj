@@ -50,7 +50,7 @@
         <a th:if="${#lists.contains(opts, 'show')}" class="layui-btn layui-btn-xs" lay-event="mx">明细</a>
         {{#  if(d.zt == '正常'){ }}
           <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn  layui-btn-normal layui-btn-xs"
-             lay-event="update">过户</a>
+             lay-event="update">修改</a>
           <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-warm"
              lay-event="jf">缴费</a>
           <a th:if="${#lists.contains(opts, 'update')}" class="layui-btn layui-btn-xs layui-btn-danger"
@@ -158,8 +158,13 @@
           shadeClose: false,
           area: ['1000px', '80%'],
           content: ctx + "CZF/ZHGL/toInfo/" + data.id,
-          btn: ["销户历史"],
+          btn: ["信息打印", "销户历史"],
           yes: function () {
+            debugger;
+            Receipt.print(ctx + "CZF/ZHGL/printReceipt/" + data.id);
+            return false;
+          },
+          btn2: function () {
             top.layer.open({
               type: 2,
               title: '销户记录',
@@ -168,6 +173,7 @@
               area: ['1000px', '80%'],
               content: ctx + "CZF/ZHGL/toXhjl/" + data.id,
             });
+            return false;
           },
           end: function () {
             top.layer.close(index);
@@ -176,7 +182,7 @@
       } else if (layEvent === 'update') { //编辑
         let index = top.layer.open({
           type: 2,
-          title: '账户过户',
+          title: '账户修改',
           closeBtn: 1,
           shadeClose: false,
           area: ['1000px', '80%'],

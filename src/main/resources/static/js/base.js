@@ -197,6 +197,7 @@ const TAB = {
 //单据打印操作
 const Receipt = {
   print: function(url) {
+    let loadi = top.layer.load();
     //提交数据
     $.ajax({
       url: url,
@@ -206,6 +207,7 @@ const Receipt = {
       },
       success: function (data) {
         debugger;
+        top.layer.close(loadi);
         const blob = new Blob([data], { type: 'application/pdf' });
         const url1 = URL.createObjectURL(blob);
         printJS({
@@ -214,6 +216,7 @@ const Receipt = {
         });
       },
       error: function (XMLHttpRequest, textStatus, errorThrown) {
+        top.layer.close(loadi);
         top.layer.msg("单据打印失败");
         return false;
       }

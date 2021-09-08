@@ -97,6 +97,11 @@ public class Zh {
     private String lxdh;
 
     /**
+     * 初缴金额
+     */
+    private String cjje;
+
+    /**
      * 明细
      */
     private List<Zh_his> list;

@@ -3,20 +3,27 @@ package com.fdkj.wywxjj.controller.zh;
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
+import com.fdkj.wywxjj.api.model.sysMgr.Yh;
 import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
+import com.fdkj.wywxjj.api.model.xmMgr.Fh;
+import com.fdkj.wywxjj.api.model.xmMgr.Ld;
+import com.fdkj.wywxjj.api.model.xmMgr.Xm;
 import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh_his;
+import com.fdkj.wywxjj.api.util.YhApi;
 import com.fdkj.wywxjj.api.util.ZhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
+import com.fdkj.wywxjj.controller.BaseController;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
 import com.fdkj.wywxjj.service.WorkflowService;
 import com.fdkj.wywxjj.utils.DateUtils;
 import com.fdkj.wywxjj.utils.math.BigDecimalUtil;
+import com.fdkj.wywxjj.utils.text.Convert;
 import com.fdkj.wywxjj.utils.uuid.IdUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -29,6 +36,10 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -38,12 +49,14 @@ import java.util.*;
  */
 @Controller
 @RequestMapping("CZF/ZHGL")
-public class ZhController {
+public class ZhController extends BaseController {
 
     private static final Logger log = LoggerFactory.getLogger(ZhController.class);
 
     @Autowired
     private ZhApi zhApi;
+    @Autowired
+    private YhApi yhApi;
     @Autowired
     private WorkflowService workflowService;
 
@@ -554,6 +567,45 @@ public class ZhController {
             } else {
                 throw new BusinessException("退款失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
             }
+        }
+    }
+
+    /**
+     * 打印单据
+     * @param request req
+     * @param response res
+     * @param id 账户id
+     */
+    @RequestMapping("printReceipt/{id}")
+    public void printReceipt(HttpServletRequest request, HttpServletResponse response,
+                             @PathVariable("id") String id) {
+        try {
+            //单据模板
+            ClassLoader classLoader = getClass().getClassLoader();
+            URL url = classLoader.getResource("receipt/template/账户信息.xlsx");
+            String path = URLDecoder.decode(url.getPath(),"utf-8");
+
+            //获取账户信息
+            Zh zhDetail = zhApi.getZhDetail(request, id);
+
+            //模板参数
+            Map<String, Object> params = new HashMap<>();
+            params.put("no", zhDetail.getNo());
+            params.put("yzmc", zhDetail.getYzmc());
+            params.put("yzzjh", zhDetail.getYzzjh());
+            params.put("cjje", zhDetail.getCjje());
+            params.put("khrq", zhDetail.getKhrq().substring(0, 10));
+            params.put("zt", zhDetail.getZt());
+            params.put("dyrq", DateUtils.parseDateToStr("yyyy年MM月dd日", new Date()));
+
+            String fk_yhid = zhDetail.getFk_yhid();
+            Yh yhDetail = yhApi.getYhDetail(request, fk_yhid);
+            params.put("khyh", yhDetail.getYxmc());
+
+            //打印
+            downLoadReceipt(response, path, params, "账户信息.pdf");
+        } catch (Exception e) {
+            log.error("生成维修基金收据失败", e);
         }
     }
 }
