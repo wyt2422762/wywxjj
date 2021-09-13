@@ -2,6 +2,7 @@ package com.fdkj.wywxjj.controller.zh;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aspose.cells.PdfSaveOptions;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.sysMgr.Yh;
 import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
@@ -603,7 +604,9 @@ public class ZhController extends BaseController {
             params.put("khyh", yhDetail.getYxmc());
 
             //打印
-            downLoadReceipt(response, path, params, "账户信息.pdf");
+            PdfSaveOptions pdfSaveOptions = new PdfSaveOptions();
+            pdfSaveOptions.setOnePagePerSheet(true);
+            downLoadReceipt(response, path, params, "账户信息.pdf", pdfSaveOptions);
         } catch (Exception e) {
             log.error("生成维修基金收据失败", e);
         }

@@ -194,7 +194,6 @@
           {field: 'fjzt', title: '房间状态'},
           {field: 'yzmc', title: '业主名称'},
           {field: 'yzzjh', title: '业主证件号码'},
-          {field: 'yzzjh', title: '业主证件号码'},
           {
             title: '账户状态', templet: function (d) {
               let zh = d.zh;
@@ -215,6 +214,16 @@
               }
             }
           },
+          {
+            title: '账户金额', templet: function (d) {
+              let zh = d.zh;
+              if (zh) {
+                return zh.money;
+              } else {
+                return "";
+              }
+            }
+          }
         ]],
         parseData: function (res) { //res 即为原始返回的数据
           let list = res.data;

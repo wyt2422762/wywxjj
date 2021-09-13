@@ -7,15 +7,18 @@ import com.fdkj.wywxjj.api.model.fa.Fa_mx;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * 方案接口
@@ -77,6 +80,71 @@ public class FaApi extends BaseApi {
     }
 
     /**
+     * 获取方案列表(分页)
+     *
+     * @param request req
+     * @param reqBody 请求体
+     * @return res
+     * @throws Exception err
+     */
+    public Page<Fa> getFaList2(HttpServletRequest request, Map<String, String> reqBody, Integer pageNo, Integer pageSize, String starttime, String endtime) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //请求体
+        JSONObject body = new JSONObject();
+        body.put("fk_xtglid", user.getFk_xtglid());
+        body.putAll(reqBody);
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+
+        //请求参数
+        Map<String, Object> params = new HashMap<>(4);
+        params.put("page", pageNo == null ? 1 : pageNo);
+        params.put("pageNum", pageSize == null ? 10 : pageSize);
+
+        List<String> timeParam = new ArrayList<>();
+        if(StringUtils.isNotBlank(starttime)) {
+            params.put("starttime", starttime.trim());
+            timeParam.add("starttime={starttime}");
+        }
+        if(StringUtils.isNotBlank(endtime)) {
+            params.put("endtime", endtime.trim());
+            timeParam.add("endtime={endtime}");
+        }
+
+        String url = baseUrl + "/api/CZF/WYWXJJ_FA_List?page={page}&pageNum={pageNum}";
+
+        if(!timeParam.isEmpty()) {
+            url += ("&" + String.join("&", timeParam));
+        }
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url,
+                        HttpMethod.POST, requestEntity, String.class, params);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("获取方案列表失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_FA_List");
+            logger.error("获取方案列表失败，请求参数: " + params);
+            logger.error("获取方案列表失败，请求体: " + body.toJSONString());
+            logger.error("获取方案列表失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        Page<Fa> page = new Page<>(pageNo == null ? 1 : pageNo, pageSize == null ? 10 : pageSize);
+        Integer totalRecord = jsonObject.getInteger("TotalCount");
+        page.setTotalRecord(totalRecord);
+        List<Fa> dataList = jsonObject.getJSONArray("Results").toJavaList(Fa.class);
+        page.setDataList(dataList);
+        return page;
+    }
+
+    /**
      * 获取方案列表(全部)
      *
      * @param request req
@@ -96,10 +164,66 @@ public class FaApi extends BaseApi {
         //组装请求体
         HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
 
-        String url = baseUrl + "/api/CZF/WYWXJJ_FA_List?page={page}&pageNum={pageNum}";
+        String url = baseUrl + "/api/CZF/WYWXJJ_FA_List";
         ResponseEntity<String> responseEntity =
                 restTemplate.exchange(url,
                         HttpMethod.POST, requestEntity, String.class);
+        String responseEntityBody = responseEntity.getBody();
+        JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
+
+        boolean success = jsonObject.getBooleanValue("Success");
+        if (!success) {
+            logger.error("获取方案列表失败，请求url: " + baseUrl + "/api/CZF/WYWXJJ_FA_List");
+            logger.error("获取方案列表失败，请求体: " + body.toJSONString());
+            logger.error("获取方案列表失败，返回内容: " + responseEntityBody);
+            throw new BusinessException(jsonObject.getString("Message"), HttpStatus.INTERNAL_SERVER_ERROR.value());
+        }
+
+        //构造返回信息
+        return jsonObject.getJSONArray("Results").toJavaList(Fa.class);
+    }
+
+    /**
+     * 获取方案列表(全部)
+     *
+     * @param request req
+     * @param reqBody 请求体
+     * @return res
+     * @throws Exception err
+     */
+    public List<Fa> getFaList2(HttpServletRequest request, Map<String, String> reqBody, String starttime, String endtime) throws Exception {
+        User user = getUserFromCookie(request);
+        //请求头
+        HttpHeaders headers = getHttpHeaders(request);
+        //请求体
+        JSONObject body = new JSONObject();
+        body.put("fk_xtglid", user.getFk_xtglid());
+        body.putAll(reqBody);
+
+        //请求参数
+        Map<String, Object> params = new HashMap<>();
+        List<String> timeParam = new ArrayList<>();
+        if(StringUtils.isNotBlank(starttime)) {
+            params.put("starttime", starttime.trim());
+            timeParam.add("starttime={starttime}");
+        }
+        if(StringUtils.isNotBlank(endtime)) {
+            params.put("endtime", endtime.trim());
+            timeParam.add("endtime={endtime}");
+        }
+
+        //组装请求体
+        HttpEntity<JSONObject> requestEntity = new HttpEntity<>(body, headers);
+
+        String url = baseUrl + "/api/CZF/WYWXJJ_FA_List";
+
+        if(!timeParam.isEmpty()) {
+            url += ("?" + String.join("&", timeParam));
+        }
+
+        ResponseEntity<String> responseEntity =
+                restTemplate.exchange(url,
+                        HttpMethod.POST, requestEntity, String.class, params);
         String responseEntityBody = responseEntity.getBody();
         JSONObject jsonObject = JSONObject.parseObject(responseEntityBody);
 

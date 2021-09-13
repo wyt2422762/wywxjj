@@ -32,15 +32,11 @@ public class ExcelToPdf {
         return result;
     }
 
-    public static void excel2pdf(InputStream inputStream, OutputStream outputStream) throws Exception {
+    public static void excel2pdf(InputStream inputStream, OutputStream outputStream, PdfSaveOptions pdfSaveOptions) throws Exception {
         //去水印
         getLicense();
 
         Workbook wb = new Workbook(inputStream);
-
-        PdfSaveOptions pdfSaveOptions = new PdfSaveOptions();
-        //把内容放在一张PDF 页面上；
-        pdfSaveOptions.setOnePagePerSheet(true);
 
         //wb.save(outputStream, SaveFormat.PDF);
         wb.save(outputStream, pdfSaveOptions);

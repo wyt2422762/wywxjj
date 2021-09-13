@@ -346,7 +346,8 @@
         top.layer.msg("请选择分摊方式");
         return false;
       }
-      let res = fajeYz(fays, ftfs);
+
+      /*let res = fajeYz(fays, ftfs);
       if ("提交" === res.canSubmit) {
         submitData(data, res.fhList);
       } else if ("询问" === res.canSubmit) {
@@ -364,7 +365,9 @@
         //拒绝
         top.layer.msg("无法提交");
         return false;
-      }
+      }*/
+
+      submitData(data, res.fhList);
       return false;
     });
 
@@ -436,6 +439,7 @@
       $.ajax({
         url: url,
         type: "GET",
+        async: false,
         dataType: "json",
         contentType: "application/json;charset=utf-8",
         data: data,

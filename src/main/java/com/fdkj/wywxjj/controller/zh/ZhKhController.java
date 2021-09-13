@@ -1,5 +1,6 @@
 package com.fdkj.wywxjj.controller.zh;
 
+import com.aspose.cells.PdfSaveOptions;
 import com.fdkj.wywxjj.api.model.sysMgr.Jnsz;
 import com.fdkj.wywxjj.api.model.sysMgr.User;
 import com.fdkj.wywxjj.api.model.sysMgr.Yh;
@@ -249,7 +250,9 @@ public class ZhKhController extends BaseController {
             params.put("wxjjje_dx", StringUtils.isNotBlank(zhDetail.getCjje()) ? Convert.digitUppercase(new Double(zhDetail.getCjje())) : null);
 
             //打印
-            downLoadReceipt(response, path, params, "维修基金收据.pdf");
+            PdfSaveOptions pdfSaveOptions = new PdfSaveOptions();
+            pdfSaveOptions.setOnePagePerSheet(true);
+            downLoadReceipt(response, path, params, "维修基金收据.pdf", pdfSaveOptions);
         } catch (Exception e) {
             log.error("生成维修基金收据失败", e);
         }

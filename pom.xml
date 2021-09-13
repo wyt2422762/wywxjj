@@ -31,6 +31,8 @@
         <poi-ooxml.version>5.0.0</poi-ooxml.version>
         <easypoi.version>4.4.0</easypoi.version>
         <aspose-cells.version>20.7</aspose-cells.version>
+        <aspose-words.version>19.1</aspose-words.version>
+        <freemarker.version>2.3.31</freemarker.version>
     </properties>
 
     <repositories>
@@ -156,6 +158,19 @@
             <groupId>com.aspose</groupId>
             <artifactId>aspose-cells</artifactId>
             <version>${aspose-cells.version}</version>
+        </dependency>
+        <!-- aspose-words -->
+        <dependency>
+            <groupId>com.aspose</groupId>
+            <artifactId>aspose-words</artifactId>
+            <version>${aspose-words.version}</version>
+        </dependency>
+
+        <!-- freemarker -->
+        <dependency>
+            <groupId>org.freemarker</groupId>
+            <artifactId>freemarker</artifactId>
+            <version>${freemarker.version}</version>
         </dependency>
 
 

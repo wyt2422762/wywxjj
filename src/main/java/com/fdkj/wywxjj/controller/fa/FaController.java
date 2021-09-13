@@ -289,6 +289,11 @@ public class FaController {
             if (StringUtils.isNotBlank(fazt)) {
                 reqBody.put("zt", fazt);
             }
+
+            Map<String, Object> params = new HashMap<>(4);
+            params.put("page", page == null ? 1 : page);
+            params.put("pageNum", limit == null ? 10 : limit);
+
             Page<Fa> faList = faApi.getFaList(request, reqBody, page, limit);
             //构造返回数据
             CusResponseBody cusResponseBody = CusResponseBody.success("获取方案列表成功", faList);

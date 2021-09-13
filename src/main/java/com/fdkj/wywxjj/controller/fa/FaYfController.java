@@ -2,6 +2,7 @@ package com.fdkj.wywxjj.controller.fa;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
+import com.aspose.cells.PdfSaveOptions;
 import com.fdkj.wywxjj.api.model.fa.Fa;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf_ft;
@@ -544,8 +545,11 @@ public class FaYfController extends BaseController {
             //模板参数
             Map<String, Object> params = new HashMap<>();
             params.put("id", id);
+
             //打印
-            downLoadReceipt(response, path, params, "预付测试单据.pdf");
+            PdfSaveOptions pdfSaveOptions = new PdfSaveOptions();
+            pdfSaveOptions.setOnePagePerSheet(true);
+            downLoadReceipt(response, path, params, "预付测试单据.pdf", pdfSaveOptions);
         } catch (Exception e) {
             log.error("生成预付测试单据失败", e);
         }

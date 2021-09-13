@@ -1,5 +1,7 @@
 package com.fdkj.wywxjj.api.model.fa;
 
+import com.fdkj.wywxjj.api.model.xmMgr.Ld;
+import com.fdkj.wywxjj.api.model.xmMgr.Xm;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -176,6 +178,16 @@ public class Fa {
     private String fk_wyid;
 
     /**
+     * 方案状态
+     */
+    private String zt;
+
+    /**
+     * 预付款
+     */
+    private String yfk;
+
+    /**
      * 房号账户信息
      */
     private List<Fa_fh> fHlist;
@@ -186,12 +198,17 @@ public class Fa {
     private List<Fa_mx> mXlist;
 
     /**
-     * 方案状态
+     * 项目(小区)信息
      */
-    private String zt;
+    private Xm xm;
 
     /**
-     * 预付款
+     * 楼栋信息
      */
-    private String yfk;
+    private Ld ld;
+
+    /**
+     * 方案描述
+     */
+    private String desc;
 }

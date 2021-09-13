@@ -196,7 +196,7 @@ const TAB = {
 
 //单据打印操作
 const Receipt = {
-  print: function(url) {
+  print: function(url, data) {
     let loadi = top.layer.load();
     //提交数据
     $.ajax({
@@ -205,6 +205,7 @@ const Receipt = {
       xhrFields: {
         responseType: 'blob'
       },
+      data: data,
       success: function (data) {
         debugger;
         top.layer.close(loadi);
