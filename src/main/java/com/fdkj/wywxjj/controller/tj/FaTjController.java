@@ -136,7 +136,7 @@ public class FaTjController extends BaseController {
                     Ld ldDetail = ldApi.getLdDetail(request, fk_ldxxid1);
                     StringBuilder sb = new StringBuilder();
                     sb.append(xmDetail.getXmmc()).append("-").append(ldDetail.getCmc());
-                    if (StringUtils.isNotBlank(dyh)) {
+                    if (StringUtils.isNotBlank(dyh1)) {
                         sb.append(dyh1);
                     }
                     fa.setDesc(sb.toString());
@@ -226,7 +226,7 @@ public class FaTjController extends BaseController {
                     Ld ldDetail = ldApi.getLdDetail(request, fk_ldxxid1);
                     StringBuilder sb = new StringBuilder();
                     sb.append(xmDetail.getXmmc()).append("-").append(ldDetail.getCmc());
-                    if (StringUtils.isNotBlank(dyh)) {
+                    if (StringUtils.isNotBlank(dyh1)) {
                         sb.append(dyh1);
                     }
 
@@ -261,7 +261,7 @@ public class FaTjController extends BaseController {
             }
 
             params.put("hj", "共" + hj + "个");
-            params.put("gcyszh", totalMoney);
+            params.put("totalMoney", totalMoney);
 
             params.put("dyrq", DateUtils.parseDateToStr("yyyy年MM月dd日", new Date()));
 
@@ -274,7 +274,7 @@ public class FaTjController extends BaseController {
             freemarkerWord(response, "方案打印.xml", params, "方案统计.pdf");
 
         } catch (Exception e) {
-            log.error("生成预付测试单据失败", e);
+            log.error("法案统计打印失败", e);
         }
     }
 

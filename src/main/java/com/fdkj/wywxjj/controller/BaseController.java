@@ -88,7 +88,7 @@ public class BaseController {
         FileInputStream inputStream = new FileInputStream(tempFile);
         WordToPdf.word2pdf(inputStream, response.getOutputStream());
 
-        tempFile.delete();
+        //tempFile.delete();
     }
 
     /**
