@@ -549,7 +549,7 @@ public class FaYfController extends BaseController {
             //打印
             PdfSaveOptions pdfSaveOptions = new PdfSaveOptions();
             pdfSaveOptions.setOnePagePerSheet(true);
-            downLoadReceipt(response, path, params, "预付测试单据.pdf", pdfSaveOptions);
+            printExcel2pdf(response, path, params, "预付测试单据.pdf", pdfSaveOptions);
         } catch (Exception e) {
             log.error("生成预付测试单据失败", e);
         }

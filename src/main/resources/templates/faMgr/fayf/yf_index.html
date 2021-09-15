@@ -117,7 +117,6 @@
           content: ctx + "/CZF/FAYF/toInfo/" + data.id,
           btn: ["打印单据"],
           yes: function (index) {
-            debugger;
             Receipt.print(ctx + "CZF/FAYF/printReceipt/" + data.id);
             return false;
           },

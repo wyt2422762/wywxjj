@@ -2,6 +2,7 @@ package com.fdkj.wywxjj.utils.poi;
 
 
 import com.aspose.words.Document;
+import com.aspose.words.ImportFormatMode;
 import com.aspose.words.License;
 import com.aspose.words.SaveFormat;
 import org.slf4j.Logger;
@@ -38,7 +39,12 @@ public class WordToPdf {
         getLicense();
 
         Document doc = new Document(inputStream);
-        doc.save(outputStream, SaveFormat.PDF);
+
+        Document document = new Document();
+        document.removeAllChildren();
+        document.appendDocument(doc, ImportFormatMode.USE_DESTINATION_STYLES);
+
+        document.save(outputStream, SaveFormat.PDF);
 
         outputStream.flush();
         outputStream.close();

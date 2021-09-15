@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="/common/header::header(~{::title},~{},~{})">
+  <title>物业维修基金管理系统-方案结算统计</title>
+</head>
+<body>
+<div class="layui-tab-item layui-show">
+  <div id="LAY_preview">
+    <blockquote class="layui-elem-quote layui-text">
+      方案结算统计
+    </blockquote>
+
+    <div style="padding: 10px;">
+      <div style="padding-bottom: 10px;">
+        <form class="layui-form" id="searchForm" lay-filter="searchForm">
+          <!-- 第一行 -->
+          <div class="layui-form-item">
+            <!-- 小区 -->
+            <div class="layui-inline">
+              <label class="layui-form-label">小区</label>
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <select name="fk_xmxxid" lay-filter="fk_xmxxid" id="fk_xmxxid">
+                    <option value="" selected>全部</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <!-- 楼栋 -->
+            <div class="layui-inline">
+              <label class="layui-form-label">楼栋</label>
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <select name="fk_ldxxid" lay-filter="fk_ldxxid" id="fk_ldxxid">
+                    <option value="" selected>全部</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+            <!-- 单元 -->
+            <div class="layui-inline">
+              <label class="layui-form-label">单元</label>
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <select name="dyh" lay-filter="dyh" id="dyh">
+                    <option value="" selected>全部</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          <!-- 第二行 -->
+          <div class="layui-form-item">
+            <!-- 日期范围 -->
+            <div class="layui-inline">
+              <label class="layui-form-label">统计范围</label>
+              <div class="layui-inline">
+                <div class="layui-input-inline">
+                  <input readonly type="text" name="startDate" id="startDate" class="layui-input" placeholder="开始日期">
+                </div>
+                <div class="layui-form-mid">-</div>
+                <div class="layui-input-inline">
+                  <input readonly type="text" name="endDate" id="endDate" class="layui-input" placeholder="结束日期">
+                </div>
+              </div>
+            </div>
+            <!-- 按钮 -->
+            <div class="layui-inline">
+              <button type="submit" class="layui-btn" lay-submit lay-filter="formDemo1">查询</button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <table id="faTable" class="layui-table" lay-filter="faTable"></table>
+
+      <script type="text/html" id="faTableToolbar">
+        <div class="layui-btn-container">
+          <button class="layui-btn layui-btn-sm" lay-event="print">统计打印</button>
+          <button class="layui-btn layui-btn-sm" lay-event="printDetail2">明细打印</button>
+        </div>
+      </script>
+
+      <script type="text/html" id="faTableToolbar_h">
+        <a class="layui-btn layui-btn-xs" lay-event="detail">详情</a>
+      </script>
+
+    </div>
+
+  </div>
+</div>
+
+<div th:replace="/common/footer::footer()"></div>
+
+<script th:inline="javascript">
+  const cuser = [[${cuser}]];
+  const opts = [[${opts}]];
+
+  layui.config({
+    base: ctx + 'static/js/layuiExts/'
+  }).extend({
+    cascader: 'cascader/cascader',
+    drawer: 'drawer/drawer',
+    opTable: 'opTable/opTable'
+  }).use(['element', 'laydate', 'table', 'form', 'cascader', 'drawer', 'opTable'], function () {
+    //let element = layui.element;
+    let laydate = layui.laydate;
+    let form = layui.form;
+    let table = layui.table;
+    let cascader = layui.cascader;
+    let drawer = layui.drawer;
+    let opTable = layui.opTable;
+
+    //日期选择
+    laydate.render({
+      elem: "input[name='startDate']",
+      done: function (value, date, endDate) {
+        let startDate = new Date(value).getTime();
+        let endTime = new Date($("input[name='endDate']").val()).getTime();
+        if (endTime < startDate) {
+          top.layer.msg('结束日期不能小于开始时间');
+          $("input[name='startDate']").val("");
+        }
+      }
+    });
+    laydate.render({
+      elem: "input[name='endDate']",
+      done: function (value, date, endDate) {
+        let startDate = new Date($("input[name='startDate']").val()).getTime();
+        let endTime = new Date(value).getTime();
+        if (endTime < startDate) {
+          top.layer.msg('结束日期不能小于开始时间');
+          $("input[name='endDate']").val("");
+        }
+      }
+    });
+
+    buildXmSelect();
+
+    //搜索按钮点击
+    form.on('submit(formDemo1)', function (data) {
+      let params = {};
+      let startDate = data.field.startDate;
+      let endDate = data.field.endDate;
+      let fk_xmxxid = data.field.fk_xmxxid;
+      let fk_ldxxid = data.field.fk_ldxxid;
+      let dyh = data.field.dyh;
+      let zt = data.field.zt;
+
+      if (startDate) {
+        params["startDate"] = startDate;
+      }
+      if (endDate) {
+        params["endDate"] = endDate;
+      }
+      if (fk_xmxxid) {
+        params["fk_xmxxid"] = fk_xmxxid;
+      }
+      if (fk_ldxxid) {
+        params["fk_ldxxid"] = fk_ldxxid;
+      }
+      if (dyh) {
+        params["dyh"] = dyh;
+      }
+      if (zt) {
+        params["zt"] = zt;
+      }
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+      if (cuser.yhType === '物业公司') {
+        params['fk_wyid'] = cuser['fk_id'];
+      }
+
+      getFaTableData(params);
+      return false;
+    });
+
+    //获取列表的值
+    function getFaTableData(params) {
+      $("#faTable").empty();
+
+      let url = ctx + "CZF/TJ/FAJSTJ/getFaList";
+      opTable.render({
+        id: '#faTable',
+        elem: '#faTable',
+        title: '方案列表',
+        url: url, //数据接口
+        where: params, //请求参数
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        //totalRow: true,
+        //isOpenAllClick: false,
+        toolbar: '#faTableToolbar', //开启头部工具栏，并为其绑定左侧模板
+        defaultToolbar: [],
+        cols: [[ //表头
+          {field: 'fabh', title: '方案编号', totalRowText: '合计'},
+          {field: 'fayjje', title: '方案预算(元)', totalRow: true},
+          {field: 'sqrq', title: '申请日期'},
+          {field: 'desc', title: '楼盘'},
+          {field: 'zt', title: '状态'},
+          {field: 'yfzt', title: '预付状态'},
+          {field: 'jszt', title: '结算状态'},
+          /*{toolbar: '#faTableToolbar_h', align: 'center', title: '操作'}*/
+        ]],
+        openTable: function (itemData) {
+          return {
+            elem: '#child_1_' + itemData.LAY_INDEX,
+            id: 'child_1_' + itemData.LAY_INDEX,
+            url: ctx + "CZF/TJ/FAJSTJ/getFaJsList/" + itemData.id,
+            page: false,
+            totalRow: true,
+            cols: [[ //列
+              {field: 'jsbh', title: '结算编号', totalRowText: '合计'},
+              {field: 'jsrq', title: '结算日期'},
+              {field: 'jsje', title: '结算金额(元)', totalRow: true},
+              {field: 'yfje', title: '已预付金额(元)', totalRow: true},
+              {field: 'yzfje', title: '应支付金额(元)', totalRow: true},
+              {field: 'jsdj', title: '结算登记'},
+              {field:'zt', title: '状态'},
+            ]],
+            openTable: function (itemData) {
+              return {
+                elem: '#child_2_' + itemData.LAY_INDEX,
+                id: 'child_2_' + itemData.LAY_INDEX,
+                url: ctx + "CZF/TJ/FAJSTJ/getFaJsFtList/" + itemData.id,
+                page: false,
+                openVisible: false,
+                totalRow: true,
+                height: 400,
+                cols: [[ //表头
+                  {
+                    title: '账号', templet: function (d) {
+                      let zh = d.zh;
+                      if (zh) {
+                        return zh.no;
+                      } else {
+                        return "";
+                      }
+                    },
+                    totalRowText: '合计'
+                  },
+                  {
+                    title: '账户姓名', templet: function (d) {
+                      let zh = d.zh;
+                      if (zh) {
+                        return zh.yzmc;
+                      } else {
+                        return "未开户";
+                      }
+                    }
+                  },
+                  {
+                    title: '证件号码', templet: function (d) {
+                      let zh = d.zh;
+                      if (zh) {
+                        return zh.yzzjh;
+                      } else {
+                        return "未开户";
+                      }
+                    }
+                  },
+                  {field: 'ftje', title: '分摊金额(元)', totalRow: true},
+                ]],
+                parseData: function (res) { //res 即为原始返回的数据
+                  return {
+                    "code": res.success ? 0 : 1, //解析接口状态
+                    "msg": res.msg, //解析提示文本
+                    "data": res.data.ftList2 //解析数据列表
+                  };
+                }
+              }
+            },
+            parseData: function (res) { //res 即为原始返回的数据
+              return {
+                "code": res.success ? 0 : 1, //解析接口状态
+                "msg": res.msg, //解析提示文本
+                "data": res.data //解析数据列表
+              };
+            }
+          }
+        },
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+      return false;
+    }
+
+    //触发事件
+    table.on('toolbar(faTable)', function (obj) {
+      let searchData = form.val("searchForm");
+
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        searchData['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+      if (cuser.yhType === '物业公司') {
+        searchData['fk_wyid'] = cuser['fk_id'];
+      }
+
+      switch (obj.event) {
+        case "print":
+          Receipt.print(ctx + "CZF/TJ/FAJSTJ/print", searchData);
+          return false;
+        case "printDetail":
+          Receipt.print(ctx + "CZF/TJ/FAJSTJ/printDetail", searchData);
+          return false;
+        case "printDetail2":
+          Receipt.print(ctx + "CZF/TJ/FAJSTJ/printDetail2", searchData);
+          return false;
+        default:
+      }
+    });
+
+    //监听工具条
+    table.on('tool(faTable)', function(obj){
+      let data = obj.data; //获得当前行数据
+      let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
+      let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
+
+      if (layEvent === 'detail') {
+        top.layer.open({
+          type: 2,
+          title: '方案明细',
+          closeBtn: 1,
+          shadeClose: false,
+          area: ['1000px', '80%'],
+          content: ctx + "/CZF/FAGL/toInfo/" + data.id,
+          btn: ["审核历史"],
+          yes: function (index, layero) {
+            let index_i = top.layer.load();
+            $.ajax({
+              url: ctx + "/CZF/FASH/getHistoryList_yw/" + data.id,
+              type: "POST",
+              async: false,
+              dataType: "json",
+              contentType: "application/json;charset=utf-8",
+              success: function (data) {
+                top.layer.close(index_i);
+                let his = data.data;
+                top.layui.drawer.render({
+                  title: '审核历史',  //标题
+                  offset: 'l',    //r:抽屉在右边、l:抽屉在左边
+                  top: 20,        //抽屉顶部距离，默认0
+                  bottom: 20,     //抽屉底部距离，默认0
+                  width: "600px", //r、l抽屉可以设置宽度
+                  content: DRAWER.buildContent(his)
+                });
+              },
+              error: function (XMLHttpRequest, textStatus, errorThrown) {
+                top.layer.close(index_i);
+                top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+              }
+            });
+            return false;
+          },
+          end: function (index) {
+            top.layer.close(index);
+          }
+        });
+      }
+    });
+
+    //获取项目下拉菜单的值
+    function buildXmSelect() {
+      let url = ctx + 'CZF/XMGL/getListAll';
+      let params = {};
+      if (cuser.fk_id) {
+        params['fk_wyid'] = cuser.fk_id;
+      }
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+      let loadi = top.layer.load();
+      $.ajax({
+        url: url,
+        type: "GET",
+        async: false,
+        cache: false,
+        contentType: 'application/json',
+        dataType: "json",
+        success: function (data) {
+          top.layer.close(loadi); //关闭弹出框
+          let xmList = data.data;
+          let xmHTML = '';
+          if (xmList && xmList.length > 0) {
+            for (let i in xmList) {
+              let xm = xmList[i];
+              xmHTML += "<option value='" + xm.id + "'>" + xm.xmmc + "</option>";
+            }
+          }
+
+          $('#fk_xmxxid').append(xmHTML);
+          form.render();
+
+          //小区选择
+          form.on('select(fk_xmxxid)', function (data) {
+            let fk_xmxxid = data.value;
+            $('#fk_ldxxid').empty();
+            $('#dyh').empty();
+
+            getLdList(fk_xmxxid);
+          });
+
+          return false;
+        },
+        error: function (XMLHttpRequest, textStatus, errorThrown) {
+          top.layer.close(loadi); //关闭弹出框
+          top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          return false;
+        }
+      });
+    }
+
+    //获取楼栋信息
+    function getLdList(fk_xmxxid) {
+      let url = ctx + 'CZF/LDGL/getListAll/' + fk_xmxxid;
+      $.ajax({
+        url: url,
+        type: "POST",
+        dataType: "json",
+        async: false,
+        contentType: "application/json;charset=utf-8",
+        success: function (data) {
+          let ldList = data.data;
+          let ldHtml = "<option value=''>全部</option>";
+          if (ldList && ldList.length > 0) {
+            for (let i in ldList) {
+              let ld = ldList[i];
+              ldHtml += "<option data-dys='" + ld.dys + "' value='" + ld.id + "'>" + ld.cmc + "</option>";
+            }
+          }
+
+          $('#fk_ldxxid').append(ldHtml);
+          form.render();
+
+          //楼栋选择
+          form.on('select(fk_ldxxid)', function (data) {
+            let dys = $(data.elem[data.elem.selectedIndex]).attr("data-dys");
+            $('#dyh').empty();
+            getDyh(dys);
+          });
+        }
+      });
+    }
+
+    //获取单元信息
+    function getDyh(dys) {
+      let dyHtml = "<option value=''>全部</option>";
+      if (dys && dys > 0) {
+        for (let i = 1; i <= dys; i++) {
+          dyHtml += "<option value='" + i + "'>" + i + "单元</option>";
+        }
+      }
+      $('#dyh').append(dyHtml);
+      form.render();
+    }
+
+  });
+</script>
+
+</body>
+</html>

@@ -11,7 +11,6 @@ import com.fdkj.wywxjj.api.util.*;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
 import com.fdkj.wywxjj.controller.BaseController;
-import com.fdkj.wywxjj.controller.fa.FaYfController;
 import com.fdkj.wywxjj.error.BusinessException;
 import com.fdkj.wywxjj.model.base.Page;
 import com.fdkj.wywxjj.utils.DateUtils;
@@ -327,13 +326,12 @@ public class FaYfTjController extends BaseController {
             }
 
             //打印
-            freemarkerWord(response, "方案预付打印.xml", params, "方案预付统计.pdf");
+            printWord2pdf(response, "方案预付打印.xml", params, "方案预付统计.pdf");
 
         } catch (Exception e) {
             log.error("方案预付统计打印失败", e);
         }
     }
-
 
     /**
      * 打印明细
@@ -460,7 +458,139 @@ public class FaYfTjController extends BaseController {
             }
 
             //打印
-            freemarkerWord(response, "方案预付明细打印.xml", params, "方案预付明细统计.pdf");
+            printWord2pdf(response, "方案预付明细打印.xml", params, "方案预付明细统计.pdf");
+
+        } catch (Exception e) {
+            log.error("方案预付明细统计打印失败", e);
+        }
+    }
+
+    /**
+     * 打印明细
+     * @param request req
+     * @param response res
+     */
+    @RequestMapping("printDetail2")
+    public void printDetail2(HttpServletRequest request, HttpServletResponse response,
+                            @RequestParam(value = "startDate", required = false) String startDate,
+                            @RequestParam(value = "endDate", required = false) String endDate,
+                            @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
+                            @RequestParam(value = "fk_wyid", required = false) String fk_wyid,
+                            @RequestParam(value = "fk_xmxxid", required = false) String fk_xmxxid,
+                            @RequestParam(value = "fk_ldxxid", required = false) String fk_ldxxid,
+                            @RequestParam(value = "dyh", required = false) String dyh) {
+        try {
+            Map<String, String> reqBody = new HashMap<>();
+            if (StringUtils.isNotBlank(fk_wyid)) {
+                reqBody.put("fk_wyid", fk_wyid);
+            }
+            if (StringUtils.isNotBlank(fk_qybm)) {
+                reqBody.put("fk_qybm", fk_qybm);
+            }
+            if (StringUtils.isNotBlank(fk_xmxxid)) {
+                reqBody.put("fk_xmxxid", fk_xmxxid);
+            }
+            if (StringUtils.isNotBlank(fk_ldxxid)) {
+                reqBody.put("fk_ldxxid", fk_ldxxid);
+            }
+            if (StringUtils.isNotBlank(dyh)) {
+                reqBody.put("dyh", dyh);
+            }
+
+            reqBody.put("yfzt", Constants.Yfzt.YYF);
+
+            List<Fa> faList = faApi.getFaList2(request, reqBody, startDate, endDate);
+
+            int hj = 0;
+            String totalMoney = "0.00";
+
+            List<Fa_yf> yfList = new ArrayList<>();
+
+            //查询明细
+            if(faList != null && !faList.isEmpty()) {
+                for (Fa fa : faList) {
+
+                    //获取预付信息
+                    String fk_faid = fa.getId();
+                    Map<String, String> reqBody_yf = new HashMap<>();
+                    reqBody_yf.put("fk_faid", fk_faid);
+                    List<Fa_yf> fayfList = faYfApi.getFayfList(request, reqBody_yf);
+                    if(fayfList != null && !fayfList.isEmpty()) {
+                        fa.setYflist(fayfList);
+
+                        for (Fa_yf fa_yf : fayfList) {
+                            hj++;
+                            totalMoney = BigDecimalUtil.add(totalMoney, fa_yf.getYfkje()).toPlainString();
+
+                            //获取分摊信息
+                            //预付详情
+                            Fa_yf fayfDetail = faYfApi.getFayfDetail(request, fa_yf.getId());
+                            //分摊列表
+                            List<Fa_yf_ft> ftList = fayfDetail.getFtList();
+
+                            int hj_yf_ft = 0;
+                            String totalMoney_yf_ft = "0.00";
+
+                            List<Fh> fhList = new ArrayList<>();
+                            for (Fa_yf_ft fa_yf_ft : ftList) {
+                                String fk_fhid = fa_yf_ft.getFk_fhid();
+                                String fk_zhid = fa_yf_ft.getFk_zhid();
+
+                                Fh fhDetail = fhApi.getFhDetail(request, fk_fhid);
+                                fhDetail.setFtje(fa_yf_ft.getFtje());
+
+                                Zh zhDetail = zhApi.getZhDetail(request, fk_zhid);
+                                fhDetail.setZh(zhDetail);
+
+                                fhList.add(fhDetail);
+
+                                hj_yf_ft++;
+                                totalMoney_yf_ft = BigDecimalUtil.add(totalMoney_yf_ft, fa_yf_ft.getFtje()).toPlainString();
+
+                            }
+                            fayfDetail.setFtList2(fhList);
+
+                            fayfDetail.setFtHj("共" + hj_yf_ft + "个");
+                            fayfDetail.setFtTotalMoney(totalMoney_yf_ft);
+
+                            yfList.add(fayfDetail);
+                        }
+
+                    }
+                }
+            }
+
+            //单据模板
+            //模板参数
+            Map<String, Object> params = new HashMap<>();
+            if(StringUtils.isNotBlank(fk_xmxxid)) {
+                Xm xmDetail = xmApi.getXmDetail(request, fk_xmxxid);
+                params.put("fk_xmxxid", xmDetail.getXmmc());
+            }
+            if(StringUtils.isNotBlank(fk_ldxxid)) {
+                Ld ldDetail = ldApi.getLdDetail(request, fk_ldxxid);
+                params.put("fk_ldxxid", ldDetail.getCh());
+            }
+            if(StringUtils.isNotBlank(dyh)) {
+                params.put("dyh", dyh);
+            }
+
+            if(!yfList.isEmpty()) {
+                params.put("faYfList", yfList);
+            }
+
+            params.put("hj", "共" + hj + "个");
+            params.put("totalMoney", totalMoney);
+
+            params.put("dyrq", DateUtils.parseDateToStr("yyyy年MM月dd日", new Date()));
+
+            String staticSection = buildStaticSection(startDate, endDate);
+            if(StringUtils.isNotBlank(staticSection)) {
+                params.put("tjqj", staticSection.trim());
+            }
+
+            //打印
+            printHtml2pdf(response, "方案预付明细打印.html", params, "方案预付明细统计.pdf");
 
         } catch (Exception e) {
             log.error("方案预付明细统计打印失败", e);

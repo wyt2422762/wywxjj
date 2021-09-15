@@ -240,7 +240,6 @@
                 content: ctx + "/CZF/FAJS/toInfo/" + fa_js_id,
                 btn: opts.indexOf("del") > -1 ? ["打印单据", "删除"] : ["打印单据"],
                 yes: function (indexOut) {
-                  debugger;
                   Receipt.print(ctx + "CZF/FAJS/printReceipt/" + fa_js_id);
                   return false;
                 },

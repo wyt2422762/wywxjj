@@ -207,7 +207,6 @@ const Receipt = {
       },
       data: data,
       success: function (data) {
-        debugger;
         top.layer.close(loadi);
         const blob = new Blob([data], { type: 'application/pdf' });
         const url1 = URL.createObjectURL(blob);
@@ -218,7 +217,7 @@ const Receipt = {
       },
       error: function (XMLHttpRequest, textStatus, errorThrown) {
         top.layer.close(loadi);
-        top.layer.msg("单据打印失败");
+        top.layer.msg("打印失败");
         return false;
       }
     });

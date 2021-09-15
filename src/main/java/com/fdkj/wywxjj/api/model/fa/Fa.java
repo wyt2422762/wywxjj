@@ -1,5 +1,6 @@
 package com.fdkj.wywxjj.api.model.fa;
 
+import com.fdkj.wywxjj.api.model.fa.js.Fa_js;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf;
 import com.fdkj.wywxjj.api.model.xmMgr.Ld;
 import com.fdkj.wywxjj.api.model.xmMgr.Xm;
@@ -204,6 +205,16 @@ public class Fa {
     private List<Fa_yf> yflist;
 
     /**
+     * 结算信息
+     */
+    private List<Fa_js> jslist;
+
+    /**
+     * 结算信息
+     */
+    private Fa_js faJs;
+
+    /**
      * 项目(小区)信息
      */
     private Xm xm;
@@ -237,4 +248,14 @@ public class Fa {
      * 结算金额合计(元)
      */
     private String jsTotalMoney;
+
+    /**
+     * 结算已预付金额合计(元)
+     */
+    private String jsTotalMoney_yf;
+
+    /**
+     * 结算支付金额合计(元)
+     */
+    private String jsTotalMoney_zf;
 }

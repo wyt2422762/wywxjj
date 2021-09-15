@@ -252,7 +252,7 @@ public class ZhKhController extends BaseController {
             //打印
             PdfSaveOptions pdfSaveOptions = new PdfSaveOptions();
             pdfSaveOptions.setOnePagePerSheet(true);
-            downLoadReceipt(response, path, params, "维修基金收据.pdf", pdfSaveOptions);
+            printExcel2pdf(response, path, params, "维修基金收据.pdf", pdfSaveOptions);
         } catch (Exception e) {
             log.error("生成维修基金收据失败", e);
         }

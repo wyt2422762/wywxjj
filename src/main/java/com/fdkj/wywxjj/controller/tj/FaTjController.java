@@ -29,7 +29,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.net.URL;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -271,7 +270,7 @@ public class FaTjController extends BaseController {
             }
 
             //打印
-            freemarkerWord(response, "方案打印.xml", params, "方案统计.pdf");
+            printWord2pdf(response, "方案打印.xml", params, "方案统计.pdf");
 
         } catch (Exception e) {
             log.error("法案统计打印失败", e);

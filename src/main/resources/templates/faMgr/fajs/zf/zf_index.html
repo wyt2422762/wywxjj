@@ -149,7 +149,6 @@
           content: ctx + "/CZF/FAJSZF/toInfo/" + data.id,
           btn: ["支付单据打印"],
           yes: function (index) {
-            debugger;
             Receipt.print(ctx + "CZF/FAJSZF/printReceipt/" + data.id);
             return false;
           },

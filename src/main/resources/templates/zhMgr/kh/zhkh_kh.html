@@ -182,7 +182,6 @@
           }
         });
       } else if (layEvent === 'mx') { //明细
-        debugger;
         let index = top.layer.open({
           type: 2,
           title: '账户明细',
@@ -192,7 +191,6 @@
           content: ctx + "CZF/ZHGL/toInfo/" + data.zh.id,
           btn: ["打印单据"],
           yes: function () {
-            debugger;
             Receipt.print(ctx + "CZF/ZHKH/printReceipt/" + data.zh.id);
             return false;
           },

@@ -160,7 +160,6 @@
           content: ctx + "CZF/ZHGL/toInfo/" + data.id,
           btn: ["信息打印", "销户历史"],
           yes: function () {
-            debugger;
             Receipt.print(ctx + "CZF/ZHGL/printReceipt/" + data.id);
             return false;
           },

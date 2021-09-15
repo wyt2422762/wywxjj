@@ -110,4 +110,14 @@ public class Fa_js {
      * 分摊信息列表
      */
     private List<Fh> ftList2;
+
+    /**
+     * 分摊合计(个)
+     */
+    private String ftHj;
+
+    /**
+     * 分摊金额合计(元)
+     */
+    private String ftTotalMoney;
 }

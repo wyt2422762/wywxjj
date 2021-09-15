@@ -8,9 +8,6 @@ import com.fdkj.wywxjj.api.model.sysMgr.Yh;
 import com.fdkj.wywxjj.api.model.wf.WorkflowHistory;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
-import com.fdkj.wywxjj.api.model.xmMgr.Fh;
-import com.fdkj.wywxjj.api.model.xmMgr.Ld;
-import com.fdkj.wywxjj.api.model.xmMgr.Xm;
 import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh_his;
@@ -24,7 +21,6 @@ import com.fdkj.wywxjj.model.base.Page;
 import com.fdkj.wywxjj.service.WorkflowService;
 import com.fdkj.wywxjj.utils.DateUtils;
 import com.fdkj.wywxjj.utils.math.BigDecimalUtil;
-import com.fdkj.wywxjj.utils.text.Convert;
 import com.fdkj.wywxjj.utils.uuid.IdUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -40,7 +36,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.text.DecimalFormat;
 import java.util.*;
 
 /**
@@ -606,7 +601,7 @@ public class ZhController extends BaseController {
             //打印
             PdfSaveOptions pdfSaveOptions = new PdfSaveOptions();
             pdfSaveOptions.setOnePagePerSheet(true);
-            downLoadReceipt(response, path, params, "账户信息.pdf", pdfSaveOptions);
+            printExcel2pdf(response, path, params, "账户信息.pdf", pdfSaveOptions);
         } catch (Exception e) {
             log.error("生成维修基金收据失败", e);
         }
