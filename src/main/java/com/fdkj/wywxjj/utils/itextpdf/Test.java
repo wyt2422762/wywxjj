@@ -22,7 +22,7 @@ public class Test {
 
     private static final String DEST = "C:\\Users\\Administrator\\Downloads\\091510244786\\test.pdf";
 
-    private static final String HTML = "C:\\Users\\Administrator\\Downloads\\091510244786\\方案结算明细打印.html";
+    private static final String HTML = "C:\\Users\\Administrator\\Downloads\\091510244786\\方案结算明细打印.ftl";
 
     private static final String FONT = "C:\\Users\\Administrator\\Downloads\\091510244786\\simhei.ttf";
 

@@ -609,7 +609,7 @@ public class FaJsTjController extends BaseController {
             }
 
             //打印
-            printHtml2pdf(response, "方案结算明细打印.html", params, "方案结算明细统计.pdf");
+            printHtml2pdf(response, "方案结算明细打印.ftl", params, "方案结算明细统计.pdf");
 
         } catch (Exception e) {
             log.error("方案结算明细统计打印失败", e);
