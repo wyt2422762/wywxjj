@@ -93,7 +93,7 @@ public class BaseController {
         FileInputStream inputStream = new FileInputStream(tempFile);
         WordToPdf.word2pdf(inputStream, response.getOutputStream());
 
-        //tempFile.delete();
+        tempFile.delete();
     }
 
     public void printHtml2pdf(HttpServletResponse response, String templateName, Map<String, Object> params, String showName) throws Exception {
