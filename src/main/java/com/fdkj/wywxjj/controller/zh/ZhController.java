@@ -66,11 +66,22 @@ public class ZhController extends BaseController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
+        User cuser = zhApi.getUserFromCookie(request);
+        request.setAttribute("cuser", cuser);
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
+        }
+        if(!Constants.YhLx.YH.equals(cuser.getYhType())) {
+            //获取银行列表
+            String fk_qybm = cuser.getFk_qybm();
+            Map<String, String> yhParam = new HashMap<>();
+            if(StringUtils.isNotBlank(fk_qybm)) {
+                yhParam.put("fk_qybm", fk_qybm);
+            }
+            List<Yh> yhAllList = yhApi.getYhAllList(request, yhParam);
+            request.setAttribute("yhList", yhAllList);
         }
         return new ModelAndView("zhMgr/zh_index");
     }
@@ -397,7 +408,9 @@ public class ZhController extends BaseController {
             // 2. 改账户状态
             zhDetail.setZt(Constants.ZhZt.XHDJ);
             // 3. 设置销户申请
-            xhsq.setId(IdUtils.randomUUID()).setSqrq(dateToStr);
+            xhsq.setId(IdUtils.randomUUID()).setSqrq(dateToStr).setAdd_time(dateToStr)
+                    .setFk_bankid(zhDetail.getFk_yhid()).setFk_yhid(cuser.getId())
+                    .setCzr(cuser.getUsername()).setZt(Constants.XhZt.SHZ);
             // 4. 启动流程，获取启动结点信息
             WorkflowNode startNode = workflowService.getWorkflowStartNode(request, Constants.WorkflowId.XH);
             // 5. 获取启动结点的下一个结点

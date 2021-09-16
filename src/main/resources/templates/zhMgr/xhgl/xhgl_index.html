@@ -14,7 +14,7 @@
     <div style="padding: 10px;">
       <table id="xhglTable" class="layui-table" lay-filter="xhglTable"></table>
       <script type="text/html" id="xhglTableToolBar">
-        <a class="layui-btn layui-btn-xs" lay-event="ls">审核历史</a>
+        <a class="layui-btn layui-btn-xs" lay-event="ls2">审核历史</a>
       </script>
     </div>
 
@@ -39,7 +39,7 @@
     let form = layui.form;
     let table = layui.table;
 
-    getTableData();
+    getTableData2();
 
     //获取待审核列表
     function getTableData() {
@@ -83,6 +83,48 @@
       });
     }
 
+    //获取待审核列表
+    function getTableData2() {
+      let params = {};
+
+      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
+        params['fk_qybm'] = cuser['fk_qybm'];
+      }*/
+
+      let url = ctx + 'CZF/XHGL/getList2';
+      //获取表格数据
+      table.render({
+        elem: '#xhglTable',
+        title: '销户列表',
+        url: url, //数据接口
+        where: params, //请求参数
+        page: {
+          layout: ['prev', 'page', 'next', 'skip', 'count']
+        },
+        // page: true,
+        limit: 10,
+        //limits: [10, 20, 50],
+        cols: [[ //表头
+          {templet: '<div>{{d.zh.no}}</div>', title: '账号'},
+          {templet: '<div>{{d.xhsq}}</div>', title: '销户申请'},
+          {templet: '<div>{{d.xhyy}}</div>', title: '销户原因'},
+          {templet: '<div>{{d.zjhm}}</div>', title: '证件号码'},
+          {templet: '<div>{{d.lxdh}}</div>', title: '联系电话'},
+          {templet: '<div>{{d.sqrq}}</div>', title: '申请日期'},
+          {templet: '<div>{{d.zt}}</div>', title: '状态'},
+          {toolbar: '#xhglTableToolBar', align: 'center', fixed: 'right', title: '操作'}
+        ]],
+        parseData: function (res) { //res 即为原始返回的数据
+          return {
+            "code": res.success ? 0 : 1, //解析接口状态
+            "msg": res.msg, //解析提示文本
+            "count": res.data.totalRecord, //解析数据长度
+            "data": res.data.dataList //解析数据列表
+          };
+        }
+      });
+    }
+
     //工具条事件
     table.on('tool(xhglTable)', function (obj) {
       let data = obj.data; //获得当前行数据
@@ -93,6 +135,31 @@
         let loadi = top.layer.load();
         $.ajax({
           url: ctx + "/CZF/XHSH/getHistoryList/" + data.id,
+          type: "POST",
+          dataType: "json",
+          contentType: "application/json;charset=utf-8",
+          success: function (data) {
+            top.layer.close(loadi);
+            let his = data.data;
+            top.layui.drawer.render({
+              title: '审核历史',  //标题
+              offset: 'l',    //r:抽屉在右边、l:抽屉在左边
+              top: 20,        //抽屉顶部距离，默认0
+              bottom: 20,     //抽屉底部距离，默认0
+              width: "600px", //r、l抽屉可以设置宽度
+              content: DRAWER.buildContent(his)
+            });
+          },
+          error: function (XMLHttpRequest, textStatus, errorThrown) {
+            top.layer.close(loadi);
+            top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
+          }
+        });
+        return false;
+      } else if (layEvent === 'ls2') {
+        let loadi = top.layer.load();
+        $.ajax({
+          url: ctx + "/CZF/XHSH/getHistoryList_yw/" + data.id,
           type: "POST",
           dataType: "json",
           contentType: "application/json;charset=utf-8",

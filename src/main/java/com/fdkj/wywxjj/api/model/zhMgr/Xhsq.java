@@ -74,6 +74,26 @@ public class Xhsq {
     private String djrq;
 
     /**
+     * 银行id
+     */
+    private String fk_bankid;
+
+    /**
+     * 操作人id
+     */
+    private String fk_yhid;
+
+    /**
+     * 操作人
+     */
+    private String czr;
+
+    /**
+     * 状态
+     */
+    private String zt;
+
+    /**
      * 账号
      */
     private Zh zh;

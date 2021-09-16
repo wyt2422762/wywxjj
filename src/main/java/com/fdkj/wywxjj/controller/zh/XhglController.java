@@ -72,7 +72,7 @@ public class XhglController {
      */
     @RequestMapping("getList")
     @ResponseBody
-    public ResponseEntity<CusResponseBody> getPendingReviewList(HttpServletRequest request,
+    public ResponseEntity<CusResponseBody> getList(HttpServletRequest request,
                                                                 @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
                                                                 @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
@@ -101,12 +101,55 @@ public class XhglController {
             }
 
             //构造返回数据
-            CusResponseBody cusResponseBody = CusResponseBody.success("获取审核列表成功", shList);
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取销户列表成功", shList);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
         } catch (Exception e) {
-            log.error("获取审核列表失败", e);
-            throw new BusinessException("获取待审核列表失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+            log.error("获取销户列表失败", e);
+            throw new BusinessException("获取销户列表失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
         }
     }
 
+    /**
+     * 获取审核列表
+     * @param request req
+     * @param fk_qybm 区域编码
+     * @param page 页数
+     * @param limit 每页显示的记录数
+     * @return res
+     */
+    @RequestMapping("getList2")
+    @ResponseBody
+    public ResponseEntity<CusResponseBody> getList2(HttpServletRequest request,
+                                                    @RequestParam(value = "zt", required = false) String zt,
+                                                    @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
+                                                    @RequestParam(value = "startTime", required = false) String startTime,
+                                                    @RequestParam(value = "endTime", required = false) String endTime,
+                                                    @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
+        try {
+            //当前登录用户
+            User cuser = zhApi.getUserFromCookie(request);
+
+            Map<String, String> params = new HashMap<>();
+            if(StringUtils.isNotBlank(zt)) {
+                params.put("zt", zt);
+            }
+
+            Page<Xhsq> xhsqList = zhApi.getXhsqList(request, params, page, limit, startTime, endTime);
+            List<Xhsq> dataList = xhsqList.getDataList();
+            if(dataList != null) {
+                for (Xhsq xhsq : dataList) {
+                    String fk_zhid = xhsq.getFk_zhid();
+                    Zh zhDetail = zhApi.getZhDetail(request, fk_zhid);
+                    xhsq.setZh(zhDetail);
+                }
+            }
+
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取销户列表成功", xhsqList);
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("获取销户列表失败", e);
+            throw new BusinessException("获取销户列表失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
 }

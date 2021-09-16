@@ -13,6 +13,24 @@ public class Constants {
     public static final String RESOURCE_PREFIX = "/profile";
 
     /**
+     * 用户类型
+     */
+    public static class YhLx {
+        /**
+         * 物业科
+         */
+        public static final String WYK = "物业科";
+        /**
+         * 物业公司
+         */
+        public static final String WYGS = "物业公司";
+        /**
+         * 银行
+         */
+        public static final String YH = "银行";
+    }
+
+    /**
      * 账号状态
      */
     public static class ZhZt {
@@ -211,6 +229,24 @@ public class Constants {
          * 询问
          */
         public static final String XW = "询问";
+    }
+
+    /**
+     * 销户状态
+     */
+    public static class XhZt {
+        /**
+         * 审核中
+         */
+        public static final String SHZ = "审核中";
+        /**
+         * 审核通过
+         */
+        public static final String SHTG = "审核通过";
+        /**
+         * 审核不通过
+         */
+        public static final String SHBTG = "审核不通过";
     }
 
     /**

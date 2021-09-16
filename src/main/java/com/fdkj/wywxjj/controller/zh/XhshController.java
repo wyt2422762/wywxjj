@@ -181,6 +181,32 @@ public class XhshController {
     }
 
     /**
+     * 查询审核历史
+     *
+     * @param request req
+     * @param fk_ywid 流程实例id
+     * @param fk_qybm 区域编码
+     * @return res
+     */
+    @RequestMapping("getHistoryList_yw/{fk_ywid}")
+    @ResponseBody
+    public ResponseEntity<CusResponseBody> getHistoryList_yw(HttpServletRequest request,
+                                                             @PathVariable("fk_ywid") String fk_ywid,
+                                                             @RequestParam(value = "fk_qybm", required = false) String fk_qybm) {
+        try {
+            //当前登录用户
+            User cuser = zhApi.getUserFromCookie(request);
+            List<WorkflowHistory> workflowHistoryListByWfslId = workflowService.getWorkflowHistoryListByYwId(request, fk_ywid);
+            //构造返回数据
+            CusResponseBody cusResponseBody = CusResponseBody.success("获取审核历史列表成功", workflowHistoryListByWfslId);
+            return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
+        } catch (Exception e) {
+            log.error("查询审核历史失败", e);
+            throw new BusinessException("查询审核历史失败: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR.value(), e);
+        }
+    }
+
+    /**
      * 审核
      *
      * @param request   req
@@ -239,8 +265,10 @@ public class XhshController {
             if (workflowNextNode.getLx().equals(Constants.WorkflowNodeName.END)) {
                 if (action.equals(Constants.WorkflowAction.PASS)) {
                     zh.setZt("已销户");
+                    xhsq.setZt(Constants.XhZt.SHTG);
                 } else if (action.equals(Constants.WorkflowAction.REJECT)) {
                     zh.setZt("正常");
+                    xhsq.setZt(Constants.XhZt.SHBTG);
                 }
             } else {
                 zh.setZt("销户" + workflowNode.getJdmc());
