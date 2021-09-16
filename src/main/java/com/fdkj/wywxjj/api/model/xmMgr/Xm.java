@@ -51,31 +51,31 @@ public class Xm {
     /**
      * 项目类型
      */
-    @Excel(name = "项目类型", cellType = Excel.ColumnType.STRING, prompt = "项目类型")
+    @Excel(name = "小区类型", cellType = Excel.ColumnType.STRING, prompt = "小区类型")
     private String xmlx;
 
     /**
      * 项目地址
      */
-    @Excel(name = "项目地址", cellType = Excel.ColumnType.STRING, prompt = "项目地址")
+    @Excel(name = "小区地址", cellType = Excel.ColumnType.STRING, prompt = "小区地址")
     private String xmdz;
 
     /**
      * 是否在建
      */
-    @Excel(name = "是否在建", cellType = Excel.ColumnType.STRING, prompt = "是否在建")
+    //@Excel(name = "是否在建", cellType = Excel.ColumnType.STRING, prompt = "是否在建")
     private String sfzj;
 
     /**
      * 项目性质
      */
-    @Excel(name = "项目性质", cellType = Excel.ColumnType.STRING, prompt = "项目性质")
+    //@Excel(name = "小区性质", cellType = Excel.ColumnType.STRING, prompt = "小区性质")
     private String xmxz;
 
     /**
      * 交付标准
      */
-    @Excel(name = "交付标准", cellType = Excel.ColumnType.STRING, prompt = "交付标准")
+    //@Excel(name = "交付标准", cellType = Excel.ColumnType.STRING, prompt = "交付标准")
     private String jfbz;
 
     /**
@@ -87,19 +87,19 @@ public class Xm {
     /**
      * 土地使用权取得方式
      */
-    @Excel(name = "土地使用权取得方式", cellType = Excel.ColumnType.STRING, prompt = "土地使用权取得方式")
+    //@Excel(name = "土地使用权取得方式", cellType = Excel.ColumnType.STRING, prompt = "土地使用权取得方式")
     private String tdsyqqdfs;
 
     /**
      * 土地规划用途
      */
-    @Excel(name = "土地规划用途", cellType = Excel.ColumnType.STRING, prompt = "土地规划用途")
+    //@Excel(name = "土地规划用途", cellType = Excel.ColumnType.STRING, prompt = "土地规划用途")
     private String tdghyt;
 
     /**
      * 投资商
      */
-    @Excel(name = "投资商", cellType = Excel.ColumnType.STRING, prompt = "投资商")
+    //@Excel(name = "投资商", cellType = Excel.ColumnType.STRING, prompt = "投资商")
     private String tzs;
 
     /**
@@ -111,25 +111,25 @@ public class Xm {
     /**
      * 土地投资
      */
-    @Excel(name = "土地投资", cellType = Excel.ColumnType.NUMERIC, prompt = "土地投资(元)")
+    //@Excel(name = "土地投资", cellType = Excel.ColumnType.NUMERIC, prompt = "土地投资(元)")
     private String tdtz;
 
     /**
      * 平均价格
      */
-    @Excel(name = "平均价格", cellType = Excel.ColumnType.NUMERIC, prompt = "平均价格(元)")
+    //@Excel(name = "平均价格", cellType = Excel.ColumnType.NUMERIC, prompt = "平均价格(元)")
     private String pjjg;
 
     /**
      * 计划开工日期
      */
-    @Excel(name = "计划开工日期", cellType = Excel.ColumnType.STRING, prompt = "计划开工日期", dateFormat = "yyyy-MM-dd\'T\'HH:mm:ss.SSS")
+    //@Excel(name = "计划开工日期", cellType = Excel.ColumnType.STRING, prompt = "计划开工日期", dateFormat = "yyyy-MM-dd\'T\'HH:mm:ss.SSS")
     private String jhkgrq;
 
     /**
      * 计划竣工日期
      */
-    @Excel(name = "计划竣工日期", cellType = Excel.ColumnType.STRING, prompt = "计划竣工日期", dateFormat = "yyyy-MM-dd\'T\'HH:mm:ss.SSS")
+    //@Excel(name = "计划竣工日期", cellType = Excel.ColumnType.STRING, prompt = "计划竣工日期", dateFormat = "yyyy-MM-dd\'T\'HH:mm:ss.SSS")
     private String jhjgrq;
 
     /**
@@ -153,13 +153,13 @@ public class Xm {
     /**
      * 容积率
      */
-    @Excel(name = "容积率", cellType = Excel.ColumnType.STRING, prompt = "容积率")
+    //@Excel(name = "容积率", cellType = Excel.ColumnType.STRING, prompt = "容积率")
     private String rjl;
 
     /**
      * 绿化率
      */
-    @Excel(name = "绿化率", cellType = Excel.ColumnType.STRING, prompt = "绿化率")
+    //@Excel(name = "绿化率", cellType = Excel.ColumnType.STRING, prompt = "绿化率")
     private String lhl;
 
     /**
@@ -183,7 +183,7 @@ public class Xm {
     /**
      * 开工证明
      */
-    @Excel(name = "开工证明", cellType = Excel.ColumnType.STRING, prompt = "开工证明")
+    //@Excel(name = "开工证明", cellType = Excel.ColumnType.STRING, prompt = "开工证明")
     private String kgzm;
 
     /**

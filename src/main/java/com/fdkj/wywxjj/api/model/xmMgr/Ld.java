@@ -54,49 +54,49 @@ public class Ld {
     /**
      * 建筑结构
      */
-    @Excel(name = "建筑结构", cellType = Excel.ColumnType.STRING, prompt = "建筑结构")
+    //@Excel(name = "建筑结构", cellType = Excel.ColumnType.STRING, prompt = "建筑结构")
     private String jzjg;
 
     /**
      * 建筑性质
      */
-    @Excel(name = "建筑性质", cellType = Excel.ColumnType.STRING, prompt = "建筑性质")
+    //@Excel(name = "建筑性质", cellType = Excel.ColumnType.STRING, prompt = "建筑性质")
     private String jzxz;
 
     /**
      * 住宅建筑面积
      */
-    @Excel(name = "住宅建筑面积", cellType = Excel.ColumnType.NUMERIC, prompt = "住宅建筑面积")
+    @Excel(name = "住宅面积", cellType = Excel.ColumnType.NUMERIC, prompt = "住宅面积")
     private String zzjzmj;
 
     /**
      * 住宅套内面积
      */
-    @Excel(name = "住宅套内面积", cellType = Excel.ColumnType.NUMERIC, prompt = "住宅套内面积")
+    @Excel(name = "套内面积", cellType = Excel.ColumnType.NUMERIC, prompt = "套内面积")
     private String zztnmj;
 
     /**
      * 住宅共有面积
      */
-    @Excel(name = "住宅共有面积", cellType = Excel.ColumnType.NUMERIC, prompt = "住宅共有面积")
+    //@Excel(name = "住宅共有面积", cellType = Excel.ColumnType.NUMERIC, prompt = "住宅共有面积")
     private String zzgymj;
 
     /**
      * 非住宅面积
      */
-    @Excel(name = "非住宅面积", cellType = Excel.ColumnType.NUMERIC, prompt = "非住宅面积")
+    @Excel(name = "非建筑面积", cellType = Excel.ColumnType.NUMERIC, prompt = "非建筑面积")
     private String fzzmj;
 
     /**
      * 总建筑面积
      */
-    @Excel(name = "总建筑面积", cellType = Excel.ColumnType.NUMERIC, prompt = "总建筑面积")
+    @Excel(name = "建筑面积", cellType = Excel.ColumnType.NUMERIC, prompt = "建筑面积")
     private String zjzmj;
 
     /**
      * 分摊系数
      */
-    @Excel(name = "分摊系数", cellType = Excel.ColumnType.NUMERIC, prompt = "分摊系数")
+    //@Excel(name = "分摊系数", cellType = Excel.ColumnType.NUMERIC, prompt = "分摊系数")
     private String ftxs;
 
     /**
@@ -126,6 +126,6 @@ public class Ld {
     /**
      * 总套数
      */
-    @Excel(name = "总套数", cellType = Excel.ColumnType.NUMERIC, prompt = "总套数")
+    //@Excel(name = "总套数", cellType = Excel.ColumnType.NUMERIC, prompt = "总套数")
     private String zts;
 }

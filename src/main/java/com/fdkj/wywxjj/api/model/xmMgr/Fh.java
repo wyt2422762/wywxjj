@@ -52,7 +52,7 @@ public class Fh {
     /**
      * 户顺序号
      */
-    @Excel(name = "户顺序号", cellType = Excel.ColumnType.STRING, prompt = "户顺序号")
+    //@Excel(name = "户顺序号", cellType = Excel.ColumnType.STRING, prompt = "户顺序号")
     private String hsxh;
 
     /**
@@ -76,37 +76,37 @@ public class Fh {
     /**
      * 所在功能区（住宅、商业、办公、公寓、酒店、商铺、社区、物业、车库、人防、地下室、公共租赁住宅、消防值班室、水箱间）
      */
-    @Excel(name = "所在功能区", cellType = Excel.ColumnType.STRING, prompt = "所在功能区")
+    //@Excel(name = "所在功能区", cellType = Excel.ColumnType.STRING, prompt = "所在功能区")
     private String szgnq;
 
     /**
      * 预测面积_建筑面积 decimal
      */
-    @Excel(name = "预测面积_建筑面积", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_建筑面积")
+    //@Excel(name = "预测面积_建筑面积", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_建筑面积")
     private String ycmj_jzmj;
 
     /**
      * 预测面积_套内面积 decimal
      */
-    @Excel(name = "预测面积_套内面积", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_套内面积")
+    //@Excel(name = "预测面积_套内面积", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_套内面积")
     private String ycmj_tnmj;
 
     /**
      * 预测面积_公摊面积 decimal
      */
-    @Excel(name = "预测面积_公摊面积", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_公摊面积")
+    //@Excel(name = "预测面积_公摊面积", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_公摊面积")
     private String ycmj_gtmj;
 
     /**
      * 预测面积_其中阳台面积 decimal
      */
-    @Excel(name = "预测面积_其中阳台面积", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_其中阳台面积")
+    //@Excel(name = "预测面积_其中阳台面积", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_其中阳台面积")
     private String ycmj_qzytmj;
 
     /**
      * 预测面积_分摊系数 decimal
      */
-    @Excel(name = "预测面积_分摊系数", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_分摊系数")
+    //@Excel(name = "预测面积_分摊系数", cellType = Excel.ColumnType.NUMERIC, prompt = "预测面积_分摊系数")
     private String ycmj_ftxs;
 
     /**
@@ -118,31 +118,31 @@ public class Fh {
     /**
      * 实测面积_建筑面积 decimal
      */
-    @Excel(name = "实测面积_建筑面积", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_建筑面积")
+    @Excel(name = "建筑面积", cellType = Excel.ColumnType.NUMERIC, prompt = "建筑面积")
     private String scmj_jzmj;
 
     /**
      * 实测面积_套内面 decimal
      */
-    @Excel(name = "实测面积_套内面积", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_套内面积")
+    @Excel(name = "套内面积", cellType = Excel.ColumnType.NUMERIC, prompt = "套内面积")
     private String scmj_tnmj;
 
     /**
      * 实测面积_公摊面积 decimal
      */
-    @Excel(name = "实测面积_公摊面积", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_公摊面积")
+    @Excel(name = "公摊面积", cellType = Excel.ColumnType.NUMERIC, prompt = "公摊面积")
     private String scmj_gtmj;
 
     /**
      * 实测面积_其中阳台面 decimal
      */
-    @Excel(name = "实测面积_其中阳台面积", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_其中阳台面积")
+    //@Excel(name = "实测面积_其中阳台面积", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_其中阳台面积")
     private String scmj_qzytmj;
 
     /**
      * 实测面积_分摊系数 decimal
      */
-    @Excel(name = "实测面积_分摊系数", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_分摊系数")
+    //@Excel(name = "实测面积_分摊系数", cellType = Excel.ColumnType.NUMERIC, prompt = "实测面积_分摊系数")
     private String scmj_ftxs;
 
     /**
