@@ -12,9 +12,58 @@
 
     <!-- 待审核列表 -->
     <div style="padding: 10px;">
+
+      <div style="padding-bottom: 10px;">
+        <form class="layui-form" id="searchForm">
+          <!-- 审核状态 -->
+          <div class="layui-inline">
+            <div class="layui-input-inline">
+              <select name="zt" id="zt" placeholder="请选择审核状态">
+                <option value="">请选择审核状态</option>
+                <option value="审核中">审核中</option>
+                <option value="审核通过">审核通过</option>
+                <option value="审核不通过">审核不通过</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 开户银行 -->
+          <div class="layui-inline" th:if="${cuser.yhType != '银行'}">
+            <div class="layui-input-inline">
+              <select name="fk_bankid" id="fk_bankid" placeholder="请选择销户银行">
+                <option value="">请选择销户银行</option>
+                <option th:each="yh:${yhList}" th:value="${yh.id}" th:text="${yh.yxmc}"></option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 申请日期 -->
+          <div class="layui-inline">
+            <label class="layui-form-label">申请日期</label>
+            <div class="layui-inline">
+              <div class="layui-input-inline">
+                <input readonly type="text" name="startDate" id="startDate" class="layui-input" placeholder="开始日期">
+              </div>
+              <div class="layui-form-mid">-</div>
+              <div class="layui-input-inline">
+                <input readonly type="text" name="endDate" id="endDate" class="layui-input" placeholder="结束日期">
+              </div>
+            </div>
+          </div>
+
+          <!-- 搜索按钮 -->
+          <div class="layui-inline">
+            <button class="layui-btn layui-btn-danger btn_search" lay-submit lay-filter="formDemo1">
+              <i class="layui-icon layui-icon-search layuiadmin-button-btn"></i>
+            </button>
+          </div>
+        </form>
+        <div class="clearfix"></div>
+      </div>
+
       <table id="xhglTable" class="layui-table" lay-filter="xhglTable"></table>
       <script type="text/html" id="xhglTableToolBar">
-        <a class="layui-btn layui-btn-xs" lay-event="ls2">审核历史</a>
+        <a class="layui-btn layui-btn-xs" lay-event="ls">审核历史</a>
       </script>
     </div>
 
@@ -35,61 +84,45 @@
     drawer: '/drawer/drawer'
   }).use(['element', 'laydate', 'table', 'form', 'cascader', 'drawer'], function () {
     //let element = layui.element;
-    //let laydate = layui.laydate;
+    let laydate = layui.laydate;
     let form = layui.form;
     let table = layui.table;
 
-    getTableData2();
-
-    //获取待审核列表
-    function getTableData() {
-      let params = {};
-
-      /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
-        params['fk_qybm'] = cuser['fk_qybm'];
-      }*/
-
-      let url = ctx + 'CZF/XHGL/getList';
-      //获取表格数据
-      table.render({
-        elem: '#xhglTable',
-        title: '销户列表',
-        url: url, //数据接口
-        where: params, //请求参数
-        page: {
-          layout: ['prev', 'page', 'next', 'skip', 'count']
-        },
-        // page: true,
-        limit: 10,
-        //limits: [10, 20, 50],
-        cols: [[ //表头
-          {templet: '<div>{{d.data.zh.no}}</div>', title: '账号'},
-          {templet: '<div>{{d.data.xhsq}}</div>', title: '销户申请'},
-          {templet: '<div>{{d.data.xhyy}}</div>', title: '销户原因'},
-          {templet: '<div>{{d.data.zjhm}}</div>', title: '证件号码'},
-          {templet: '<div>{{d.data.lxdh}}</div>', title: '联系电话'},
-          {templet: '<div>{{d.data.sqrq}}</div>', title: '申请日期'},
-          {templet: '<div>{{d.zt}}</div>', title: '状态'},
-          {toolbar: '#xhglTableToolBar', align: 'center', fixed: 'right', title: '操作'}
-        ]],
-        parseData: function (res) { //res 即为原始返回的数据
-          return {
-            "code": res.success ? 0 : 1, //解析接口状态
-            "msg": res.msg, //解析提示文本
-            "count": res.data.totalRecord, //解析数据长度
-            "data": res.data.dataList //解析数据列表
-          };
+    //日期选择
+    laydate.render({
+      elem: "input[name='startDate']",
+      done: function (value, date, endDate) {
+        let startDate = new Date(value).getTime();
+        let endTime = new Date($("input[name='endDate']").val()).getTime();
+        if (endTime < startDate) {
+          top.layer.msg('结束日期不能小于开始时间');
+          $("input[name='startDate']").val("");
         }
-      });
-    }
+      }
+    });
+    laydate.render({
+      elem: "input[name='endDate']",
+      done: function (value, date, endDate) {
+        let startDate = new Date($("input[name='startDate']").val()).getTime();
+        let endTime = new Date(value).getTime();
+        if (endTime < startDate) {
+          top.layer.msg('结束日期不能小于开始时间');
+          $("input[name='endDate']").val("");
+        }
+      }
+    });
 
-    //获取待审核列表
-    function getTableData2() {
-      let params = {};
+    getTableData();
 
+    //获取销户列表
+    function getTableData(params) {
       /*if(cuser.yhType == '物业科' || cuser.yhType == '物业公司' || cuser.yhType == '银行') {
         params['fk_qybm'] = cuser['fk_qybm'];
       }*/
+
+      if (cuser.yhType === "银行" && cuser.fk_id) {
+        params['fk_bankid'] = cuser.fk_id;
+      }
 
       let url = ctx + 'CZF/XHGL/getList2';
       //获取表格数据
@@ -110,7 +143,7 @@
           {templet: '<div>{{d.xhyy}}</div>', title: '销户原因'},
           {templet: '<div>{{d.zjhm}}</div>', title: '证件号码'},
           {templet: '<div>{{d.lxdh}}</div>', title: '联系电话'},
-          {templet: '<div>{{d.sqrq}}</div>', title: '申请日期'},
+          {templet: "<div>{{dayjs(d.sqrq).format(\"YYYY-MM-DD HH:mm:ss\")}}</div>", title: '申请日期'},
           {templet: '<div>{{d.zt}}</div>', title: '状态'},
           {toolbar: '#xhglTableToolBar', align: 'center', fixed: 'right', title: '操作'}
         ]],
@@ -125,38 +158,35 @@
       });
     }
 
+    //搜索按钮事件
+    form.on('submit(formDemo1)', function (data) {
+      let fk_bankid = data.field.fk_bankid;
+      let startDate = data.field.startDate;
+      let endDate = data.field.endDate;
+
+      let params = {};
+      if (fk_bankid) {
+        params["fk_bankid"] = fk_bankid;
+      }
+      if (startDate) {
+        params["startDate"] = startDate;
+      }
+      if (endDate) {
+        params["endDate"] = endDate;
+      }
+
+      getTableData(params);
+
+      return false;
+    });
+
     //工具条事件
     table.on('tool(xhglTable)', function (obj) {
       let data = obj.data; //获得当前行数据
       let layEvent = obj.event; //获得 lay-event 对应的值（也可以是表头的 event 参数对应的值）
       let tr = obj.tr; //获得当前行 tr 的 DOM 对象（如果有的话）
 
-      if (layEvent === 'ls') { //审核历史
-        let loadi = top.layer.load();
-        $.ajax({
-          url: ctx + "/CZF/XHSH/getHistoryList/" + data.id,
-          type: "POST",
-          dataType: "json",
-          contentType: "application/json;charset=utf-8",
-          success: function (data) {
-            top.layer.close(loadi);
-            let his = data.data;
-            top.layui.drawer.render({
-              title: '审核历史',  //标题
-              offset: 'l',    //r:抽屉在右边、l:抽屉在左边
-              top: 20,        //抽屉顶部距离，默认0
-              bottom: 20,     //抽屉底部距离，默认0
-              width: "600px", //r、l抽屉可以设置宽度
-              content: DRAWER.buildContent(his)
-            });
-          },
-          error: function (XMLHttpRequest, textStatus, errorThrown) {
-            top.layer.close(loadi);
-            top.layer.msg(XMLHttpRequest.responseJSON.msg ? XMLHttpRequest.responseJSON.msg : "操作失败!");
-          }
-        });
-        return false;
-      } else if (layEvent === 'ls2') {
+      if (layEvent === 'ls') {
         let loadi = top.layer.load();
         $.ajax({
           url: ctx + "/CZF/XHSH/getHistoryList_yw/" + data.id,

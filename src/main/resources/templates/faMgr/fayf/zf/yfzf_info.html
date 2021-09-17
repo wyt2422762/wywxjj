@@ -276,7 +276,12 @@
         success: function (data) {
           top.layer.close(index); //关闭弹出框
           let fayf = data.data.yfInfo;
+          fayf.yfkrq = dayjs(fayf.yfkrq).format("YYYY-MM-DD");
           let fa = data.data.faInfo;
+          fa.kgrq = dayjs(fa.kgrq).format("YYYY-MM-DD");
+          fa.wgrq = dayjs(fa.wgrq).format("YYYY-MM-DD");
+          fa.djrq = dayjs(fa.djrq).format("YYYY-MM-DD");
+          fa.qzrq = dayjs(fa.qzrq).format("YYYY-MM-DD");
 
           //渲染表单数据
           form.val("fa_yfForm", fayf);

@@ -108,6 +108,7 @@
         success: function (data) {
           top.layer.close(index); //关闭弹出框
           let fayf = data.data;
+          fayf.yfkrq = dayjs(fayf.yfkrq).format("YYYY-MM-DD");
 
           //渲染表单数据
           form.val("fa_yfForm", fayf);

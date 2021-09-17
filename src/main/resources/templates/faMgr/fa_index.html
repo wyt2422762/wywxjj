@@ -125,7 +125,7 @@
         cols: [[ //表头
           {field: 'fabh', title: '方案编号'},
           {field: 'fayjje', title: '方案预算(元)'},
-          {field: 'sqrq', title: '申请日期'},
+          {templet: "<div>{{dayjs(d.sqrq).format(\"YYYY-MM-DD HH:mm:ss\")}}</div>", title: "申请日期"},
           {field: 'zt', title: '状态'},
           {field: 'yfzt', title: '预付状态'},
           {field: 'jszt', title: '结算状态'},
@@ -207,8 +207,8 @@
           contentType: "application/json;charset=utf-8",
           success: function (data) {
             top.layer.close(jsLoad);
-            let fa_js_id = data.data;
-            if (!fa_js_id) {
+            let fa_js = data.data;
+            if (!fa_js) {
               if(opts.indexOf("add") < 0) {
                 top.layer.msg("无结算信息");
               } else {
@@ -237,20 +237,21 @@
                 closeBtn: 1,
                 shadeClose: false,
                 area: ['1000px', '80%'],
-                content: ctx + "/CZF/FAJS/toInfo/" + fa_js_id,
-                btn: opts.indexOf("del") > -1 ? ["打印单据", "删除"] : ["打印单据"],
-                yes: function (indexOut) {
+                content: ctx + "/CZF/FAJS/toInfo/" + fa_js.id,
+                //btn: opts.indexOf("del") > -1 ? ["打印单据", "删除"] : ["打印单据"],
+                btn: opts.indexOf("del") > -1 && fa_js.zt != "已支付" ? ["删除"] : [],
+                /*yes: function (indexOut) {
                   Receipt.print(ctx + "CZF/FAJS/printReceipt/" + fa_js_id);
                   return false;
-                },
-                btn2: function (indexOut) {
+                },*/
+                yes: function (indexOut) {
                   top.layer.confirm("确定要删除该结算信息？", {
                     btn: ['确定', '取消'] //按钮
                   }, function (index) { //确定，提交预付
                     top.layer.close(index);
                     let loa = top.layer.load();
                     $.ajax({
-                      url: ctx + "/CZF/FAJS/del/" + fa_js_id,
+                      url: ctx + "/CZF/FAJS/del/" + fa_js.id,
                       type: "GET",
                       dataType: "json",
                       contentType: "application/json;charset=utf-8",

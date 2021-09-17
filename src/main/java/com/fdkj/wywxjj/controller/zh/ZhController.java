@@ -408,7 +408,7 @@ public class ZhController extends BaseController {
             // 2. 改账户状态
             zhDetail.setZt(Constants.ZhZt.XHDJ);
             // 3. 设置销户申请
-            xhsq.setId(IdUtils.randomUUID()).setSqrq(dateToStr).setAdd_time(dateToStr)
+            xhsq.setId(IdUtils.randomUUID()).setSqrq(dateToStr).setAddtime(dateToStr)
                     .setFk_bankid(zhDetail.getFk_yhid()).setFk_yhid(cuser.getId())
                     .setCzr(cuser.getUsername()).setZt(Constants.XhZt.SHZ);
             // 4. 启动流程，获取启动结点信息

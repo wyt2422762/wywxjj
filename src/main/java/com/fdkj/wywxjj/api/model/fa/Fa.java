@@ -1,5 +1,6 @@
 package com.fdkj.wywxjj.api.model.fa;
 
+import com.alibaba.fastjson.annotation.JSONField;
 import com.fdkj.wywxjj.api.model.fa.js.Fa_js;
 import com.fdkj.wywxjj.api.model.fa.yf.Fa_yf;
 import com.fdkj.wywxjj.api.model.xmMgr.Ld;
@@ -57,11 +58,13 @@ public class Fa {
     /**
      * 计划开工日期
      */
+    @JSONField(format="yyyy-MM-dd")
     private String kgrq;
 
     /**
      * 计划完工日期
      */
+    @JSONField(format="yyyy-MM-dd")
     private String wgrq;
 
     /**
@@ -127,11 +130,13 @@ public class Fa {
     /**
      * 申请日期
      */
+    @JSONField(format="yyyy-MM-dd HH:mm:ss")
     private String sqrq;
 
     /**
      * 登记日期
      */
+    @JSONField(format="yyyy-MM-dd")
     private String djrq;
 
     /**

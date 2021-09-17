@@ -127,6 +127,8 @@ public class BaseController {
         FileInputStream inputStream = new FileInputStream(tempFile);
         Html2Pdf.html2Pdf(inputStream, response.getOutputStream());
 
+        inputStream.close();
+
         tempFile.delete();
     }
 

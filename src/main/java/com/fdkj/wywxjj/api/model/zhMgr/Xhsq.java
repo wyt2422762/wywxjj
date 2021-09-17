@@ -26,7 +26,7 @@ public class Xhsq {
     /**
      * 添加时间
      */
-    private String add_time;
+    private String addtime;
 
     /**
      * 账号id

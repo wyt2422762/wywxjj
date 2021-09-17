@@ -60,51 +60,6 @@ const CommonDownloadUpload = {
   }
 }
 
-//日期相关方法
-const TIME = {
-  parseTime: function (time, pattern) {
-    if (arguments.length === 0 || !time) {
-      return null;
-    }
-    const format = pattern || '{y}-{m}-{d} {h}:{i}:{s}'
-    let date;
-    if (typeof time === 'object') {
-      date = time;
-    } else {
-      if ((typeof time === 'string') && (/^[0-9]+$/.test(time))) {
-        time = parseInt(time);
-      } else if (typeof time === 'string') {
-        time = time.replace(new RegExp(/-/gm), '/');
-      }
-      if ((typeof time === 'number') && (time.toString().length === 10)) {
-        time = time * 1000;
-      }
-      date = new Date(time)
-    }
-    const formatObj = {
-      y: date.getFullYear(),
-      m: date.getMonth() + 1,
-      d: date.getDate(),
-      h: date.getHours(),
-      i: date.getMinutes(),
-      s: date.getSeconds(),
-      a: date.getDay()
-    }
-    const time_str = format.replace(/{(y|m|d|h|i|s|a)+}/g, (result, key) => {
-      let value = formatObj[key];
-      // Note: getDay() returns 0 on Sunday
-      if (key === 'a') {
-        return ['日', '一', '二', '三', '四', '五', '六'][value];
-      }
-      if (result.length > 0 && value < 10) {
-        value = '0' + value;
-      }
-      return value || 0;
-    })
-    return time_str;
-  },
-
-}
 
 const STRING = {
   //字符串格式化(%s )
@@ -140,7 +95,7 @@ const DRAWER = {
       content += "<li class=\"layui-timeline-item\">";
       content += "<i class=\"layui-icon layui-timeline-axis\"></i>";
       content += "<div class=\"layui-timeline-content layui-text\">";
-      content += "<h3 class=\"layui-timeline-title\">" + workHistory.spsj + "&nbsp;&nbsp;&nbsp;&nbsp;" + workHistory.czmc + "</h3>";
+      content += "<h3 class=\"layui-timeline-title\">" + dayjs(workHistory.spsj).format("YYYY-MM-DD HH:mm:ss") + "&nbsp;&nbsp;&nbsp;&nbsp;" + workHistory.czmc + "</h3>";
       content += "<p>";
       content += "操作人: " + workHistory.user.username;
       content += "</p>";

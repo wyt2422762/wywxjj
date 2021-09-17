@@ -111,7 +111,7 @@
         if(value && isNaN(value)){
           return "只能输入数字";
         }
-        if(!reg.test(data)) {
+        if(!reg.test(value)) {
           return "最多两位小数";
         }
       }
@@ -145,6 +145,7 @@
 
     //渲染分摊table
     function buildFtTable(fa_yf) {
+      debugger;
       let index = top.layer.load();
       //获取分摊数据
       $.ajax({

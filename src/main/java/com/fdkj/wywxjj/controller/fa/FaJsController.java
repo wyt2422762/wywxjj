@@ -143,13 +143,13 @@ public class FaJsController {
             //请求接口
             Page<Fa_js> fajsList = faJsApi.getFajsList(request, reqBody, 1, 1);
 
-            String fa_js_id = null;
+            Fa_js fa_js = null;
             //如果有，则结果改为true
             if (fajsList.getTotalRecord() > 0) {
-                fa_js_id = fajsList.getDataList().get(0).getId();
+                fa_js = fajsList.getDataList().get(0);
             }
             //构造返回数据
-            CusResponseBody cusResponseBody = CusResponseBody.success("判断是否有结算信息成功", fa_js_id);
+            CusResponseBody cusResponseBody = CusResponseBody.success("判断是否有结算信息成功", fa_js);
             return new ResponseEntity<>(cusResponseBody, HttpStatus.OK);
         } catch (Exception e) {
             log.error("判断是否有结算信息失败", e);
@@ -413,6 +413,10 @@ public class FaJsController {
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
             //结算详情
             Fa_js fajsDetail = faJsApi.getFajsDetail(request, id);
+            //判断结算状态
+            if(Constants.Zfzt.YZF.equals(fajsDetail.getZt())) {
+                throw new BusinessException("该结算已支付，无法删除", HttpStatus.BAD_REQUEST.value());
+            }
             //分摊列表
             List<Fa_js_ft> ftList = fajsDetail.getFtList();
             // 获取方案信息

@@ -100,7 +100,7 @@
 
     getTableData();
 
-    function getTableData(no, zt) {
+    function getTableData(no, zt, fk_yhid) {
       let url = ctx + 'CZF/ZHGL/getList';
       let params = {};
       if (no) {
@@ -108,6 +108,9 @@
       }
       if(zt) {
         params['zt'] = zt;
+      }
+      if(fk_yhid) {
+        params['fk_yhid'] = fk_yhid;
       }
       if (cuser.yhType === "银行" && cuser.fk_id) {
         params['fk_yhid'] = cuser.fk_id;
@@ -120,7 +123,8 @@
       form.on('submit(formDemo1)', function (data) {
         let no = data.field.no;
         let zt = data.field.zt;
-        getTableData(no, zt);
+        let fk_yhid = data.field.fk_yhid;
+        getTableData(no, zt, fk_yhid);
         return false;
       });
 
@@ -140,9 +144,9 @@
           {field: 'no', title: '账号'},
           {field: 'yzmc', title: '账户名称'},
           {field: 'money', title: '账户金额'},
-          {field: 'khrq', title: '开户日期'},
+          {templet: "<div>{{dayjs(d.khrq).format(\"YYYY-MM-DD HH:mm:ss\")}}</div>", title: '开户日期'},
           {field: 'zt', title: '账户状态'},
-          {toolbar: '#zhTableToolBar', align: 'center', fixed: 'right', title: '操作', width: 300}
+          {toolbar: '#zhTableToolBar', align: 'center', fixed: 'right', title: '操作'}
         ]],
         parseData: function (res) { //res 即为原始返回的数据
           return {

@@ -115,7 +115,7 @@
         cols: [[ //表头
           {field: 'yfkbh', title: '预付编号'},
           {field: 'yfkje', title: '预付金额(元)'},
-          {field: 'yfkrq', title: '预付日期'},
+          {templet: "<div>{{dayjs(d.yfkrq).format(\"YYYY-MM-DD\")}}</div>", title: '预付日期'},
           {field: 'yfkqs', title: '预付签署'},
           {field:'zt', title: '状态'},
           {toolbar: '#fayfTableToolBar', align: 'center', fixed: 'right', title: '操作'}
@@ -145,11 +145,11 @@
           shadeClose: false,
           area: ['1000px', '80%'],
           content: ctx + "/CZF/FAYFZF/toInfo/" + data.id,
-          btn: ["支付单据打印"],
+          /*btn: ["支付单据打印"],
           yes: function (index) {
             Receipt.print(ctx + "CZF/FAYFZF/printReceipt/" + data.id);
             return false;
-          },
+          },*/
           end: function (index) {
             top.layer.close(index);
           }

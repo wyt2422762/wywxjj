@@ -1,10 +1,12 @@
 package com.fdkj.wywxjj.controller.zh;
 
 import com.fdkj.wywxjj.api.model.sysMgr.User;
+import com.fdkj.wywxjj.api.model.sysMgr.Yh;
 import com.fdkj.wywxjj.api.model.wf.WorkflowInstant;
 import com.fdkj.wywxjj.api.model.wf.WorkflowNode;
 import com.fdkj.wywxjj.api.model.zhMgr.Xhsq;
 import com.fdkj.wywxjj.api.model.zhMgr.Zh;
+import com.fdkj.wywxjj.api.util.YhApi;
 import com.fdkj.wywxjj.api.util.ZhApi;
 import com.fdkj.wywxjj.base.CusResponseBody;
 import com.fdkj.wywxjj.constant.Constants;
@@ -41,6 +43,8 @@ public class XhglController {
     @Autowired
     private ZhApi zhApi;
     @Autowired
+    private YhApi yhApi;
+    @Autowired
     private WorkflowService workflowService;
 
     /**
@@ -53,11 +57,22 @@ public class XhglController {
      */
     @RequestMapping("Index")
     public ModelAndView index(HttpServletRequest request, @RequestParam(value = "opts", required = false) List<String> opts) throws Exception {
-        request.setAttribute("cuser", zhApi.getUserFromCookie(request));
+        User cuser = zhApi.getUserFromCookie(request);
+        request.setAttribute("cuser", cuser);
         request.setAttribute("opts", opts);
         if (opts != null && !opts.isEmpty()) {
             String s = StringUtils.join(opts, ",");
             request.setAttribute("optsStr", s);
+        }
+        if(!Constants.YhLx.YH.equals(cuser.getYhType())) {
+            //获取银行列表
+            String fk_qybm = cuser.getFk_qybm();
+            Map<String, String> yhParam = new HashMap<>();
+            if(StringUtils.isNotBlank(fk_qybm)) {
+                yhParam.put("fk_qybm", fk_qybm);
+            }
+            List<Yh> yhAllList = yhApi.getYhAllList(request, yhParam);
+            request.setAttribute("yhList", yhAllList);
         }
         return new ModelAndView("zhMgr/xhgl/xhgl_index");
     }
@@ -122,8 +137,9 @@ public class XhglController {
     public ResponseEntity<CusResponseBody> getList2(HttpServletRequest request,
                                                     @RequestParam(value = "zt", required = false) String zt,
                                                     @RequestParam(value = "fk_qybm", required = false) String fk_qybm,
-                                                    @RequestParam(value = "startTime", required = false) String startTime,
-                                                    @RequestParam(value = "endTime", required = false) String endTime,
+                                                    @RequestParam(value = "fk_bankid", required = false) String fk_bankid,
+                                                    @RequestParam(value = "startDate", required = false) String startDate,
+                                                    @RequestParam(value = "endDate", required = false) String endDate,
                                                     @RequestParam("page") Integer page, @RequestParam("limit") Integer limit) {
         try {
             //当前登录用户
@@ -133,8 +149,11 @@ public class XhglController {
             if(StringUtils.isNotBlank(zt)) {
                 params.put("zt", zt);
             }
+            if(StringUtils.isNotBlank(fk_bankid)) {
+                params.put("fk_bankid", fk_bankid);
+            }
 
-            Page<Xhsq> xhsqList = zhApi.getXhsqList(request, params, page, limit, startTime, endTime);
+            Page<Xhsq> xhsqList = zhApi.getXhsqList(request, params, page, limit, startDate, endDate);
             List<Xhsq> dataList = xhsqList.getDataList();
             if(dataList != null) {
                 for (Xhsq xhsq : dataList) {

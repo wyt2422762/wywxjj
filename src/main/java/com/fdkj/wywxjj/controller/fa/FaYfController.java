@@ -459,6 +459,10 @@ public class FaYfController extends BaseController {
             String dateToStr = DateUtils.parseDateToStr("yyyy-MM-dd'T'HH:mm:ss.sss", new Date());
             //预付详情
             Fa_yf fayfDetail = faYfApi.getFayfDetail(request, id);
+            //判断预付状态
+            if(Constants.Zfzt.YZF.equals(fayfDetail.getZt())) {
+                throw new BusinessException("该预付已支付，无法删除", HttpStatus.BAD_REQUEST.value());
+            }
             //分摊列表
             List<Fa_yf_ft> ftList = fayfDetail.getFtList();
             // 获取方案信息

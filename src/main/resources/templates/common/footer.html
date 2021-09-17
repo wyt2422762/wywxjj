@@ -1,8 +1,8 @@
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
 <div th:with="useAdmin=false" th:fragment="footer()">
-  <!-- Jquery Js -->
+  <!-- jquery -->
   <script type="text/javascript" th:src="@{/static/js/jquery.min.js}"></script>
-  <!-- Layui Js -->
+  <!-- Layui -->
   <script th:if="${useAdmin == true}" type="text/javascript" th:src="@{/static/js/layui-2.42/layui.js}"></script>
   <script th:if="${useAdmin != true}" type="text/javascript" th:src="@{/static/js/layui/layui.js}"></script>
   <!-- zTree -->
@@ -12,9 +12,11 @@
     const ctx = [[@{/}]];
   </script>
 
-  <!-- base.js -->
-  <script type="text/javascript" th:src="@{/static/js/base.js}"></script>
   <!-- print.js -->
   <script type="text/javascript" th:src="@{/static/js/print.min.js}"></script>
+  <!-- day.js -->
+  <script type="text/javascript" th:src="@{/static/js/dayJs-1.8.21/dayjs.min.js}"></script>
+  <!-- base.js -->
+  <script type="text/javascript" th:src="@{/static/js/base.js}"></script>
 </div>
 </html>

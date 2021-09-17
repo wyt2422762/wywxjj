@@ -127,6 +127,7 @@
         success: function (data) {
           top.layer.close(index); //关闭弹出框
           let fajs = data.data;
+          fajs.jsrq = dayjs(fajs.jsrq).format("YYYY-MM-DD");
 
           //渲染表单数据
           form.val("fa_jsForm", fajs);
