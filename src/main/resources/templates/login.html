@@ -5,32 +5,26 @@
   <link rel="stylesheet" th:href="@{/static/css/login.css}" media="all">
 </head>
 <body>
-<div class="pane-header">
-  <img th:src="@{/static/image/logo.png}"/>
-</div>
+<img class="welcome" th:src="@{/static/image/login/left_bj.jpg}"/>
+<img class="title" th:src="@{/static/image/login/title.png}"/>
 <div id="pane">
   <form class="layui-form zyl_pad_01" action="">
     <div class="pane-content">
+      <div class="login">登录</div>
       <div class="userpwd">
-        <img th:src="@{/static/image/icon_lxr.png}"/>
+        <img th:src="@{/static/image/login/icon_lxr.png}"/>
         <input placeholder="请输入账号" name="userName" lay-verify="required|userName" autocomplete="off"/>
       </div>
       <div class="userpwd">
-        <img th:src="@{/static/image/icon_password.png}"/>
+        <img th:src="@{/static/image/login/icon_password.png}" />
         <input placeholder="请输入密码" type="password" name="password" lay-verify="required|pass"
                autocomplete="off"/>
       </div>
-      <!--<div class="userpwd" style="margin-bottom:20px;">
-          <img src="image/icon_yzm2.png"/>
-          <input placeholder="请输入验证码" type="password" name="yzm" style="width:65%;float:left;">
-          <div class="YZM">
-              <img th:src="@{/static/image/icon_yzm2.png}" style="width:80%;height:80%; position:unset;text-align:center;margin-top:5px;margin-left:12px;">
-          </div>
-      </div>-->
-      <button class="login-btn" lay-submit="" lay-filter="login">登&nbsp;录</button>
+      <button class="login-btn" lay-submit lay-filter="login">登&nbsp;录</button>
     </div>
   </form>
 </div>
+<div class="support">技术支持：山西菲达科技有限公司</div>
 
 <div th:replace="/common/footer::footer()"></div>
 

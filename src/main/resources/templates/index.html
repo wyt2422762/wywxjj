@@ -21,7 +21,7 @@
       <li class="layui-nav-item" th:each="mu,stat:${menu}"
           th:attr="data-id=${mu.id},data-xtmkid=${mu.PT_XT_MKid},data-opts=${mu.getOptStr()},data-an=${mu.mkgnan},data-url=${mu.mkurl}">
         <a href="javascript:;">
-          <img th:src="${mu.mkimg}" style="width:16px;height:16px;">
+          <img th:src="@{/static/image/icon/} + ${mu.mkimg}" style="width:16px;height:16px;">
           <cite th:text="${mu.mkmc}"></cite>
         </a>
         <dl class="layui-nav-child">
@@ -89,7 +89,7 @@
   <!-- 内容主体区域 -->
   <div class="layui-body" id="LAY_app_body" style="top: 116px;bottom: 10px; left: 0px !important;">
     <div class="layui-tabsbody-item layui-show">
-      <iframe src="" frameborder="0" class="layui-iframe"></iframe>
+      <iframe th:src="@{/wel}" frameborder="0" class="layui-iframe"></iframe>
     </div>
   </div>
   <!-- 内容主体区域 -->

@@ -1,9 +1,7 @@
-﻿/*登录页样式*/
-body {
-  margin: 0 auto;
-  height: 1080px;
-  background: transparent url(../image/bj.jpg) no-repeat center center;
-  overflow: hidden;
+﻿* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
 }
 
 a {
@@ -11,25 +9,42 @@ a {
   color: black;
 }
 
+.welcome {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 60%;
+  height: 100%;
+}
+
 #pane {
-  width: 440px;
-  height: 419px;
+  width: 40%;
+  height: 500px;
   background-color: #fff;
   text-align: left;
-  box-shadow: 0 10px 20px 1px rgba(103, 197, 246, 0.53);
+  /*box-shadow: -10px 20px 100px black;*/
   position: absolute;
-  top: 35%;
-  left: 50%;
-  margin-left: -220px;
+  top: 28%;
+  left: 60%;
 }
 
 .pane-header {
   position: absolute;
-  top: 18%;
-  left: 50%;
-  width: 609px;
-  height: 63px;
-  margin-left: -304px;
+  top: 16%;
+  left: 12%;
+  width: 619px;
+  height: 89px;
+
+}
+
+.title {
+  position: absolute;
+  top: 12%;
+  right: 7%;
+  color: #136cd6;
+  font-size: 44px;
+  width: 26%;
+  height: auto;
 }
 
 .pane-left {
@@ -49,7 +64,20 @@ a {
 }
 
 .pane-content {
-  padding: 40px;
+  padding: 10px 135px 5px 135px;
+}
+
+.support {
+  margin-top: 70px;
+  /*  width:300px;*/
+  text-align: center;
+  font-size: 14px;
+  position: absolute;
+  bottom: 30px;
+  width: 40%;
+
+  right: 0;
+
 }
 
 .pane-content .userpwd {
@@ -89,11 +117,11 @@ a {
 
 .pane-content .userpwd input:focus {
   outline: none;
-  border: 1px solid #67c5f6;
-  box-shadow: 0 0 10px #67c5f6;
+  border: 1px solid #284677;
+  box-shadow: 0 0 10px #284677;
 }
 
-.pane-content .userpwd input::-webkit-input-placeholder { /* WebKit browsers */
+.pane-content .userpwd input::-webkit-input-placeholder {
   color: #595959;
   font-size: 16px;
 }
@@ -111,7 +139,8 @@ a {
   color: #999;
   text-align: center;
   width: 180px;
-  margin: 30px auto 0;
+  margin: 0 auto;
+  margin-top: 30px;
 }
 
 .zc {
@@ -123,7 +152,7 @@ a {
   /*margin: 15px 0;*/
   width: 100%;
   height: 48px;
-  background: -webkit-gradient(linear, 0% 0%, 100% 0%, from(#00a7ff), to(#a1deff));
+  background: linear-gradient(314.45deg, #284677 0, #5a81d9 100%);
   border: 0;
   font-size: 20px;
   color: white;
@@ -138,6 +167,15 @@ a {
 
 .login-btn:focus {
   outline: none;
+}
+
+.login {
+  color: #2a65b3;
+  border-bottom: 2px #2a65b3 solid;
+  font-size: 25px;
+
+  margin-bottom: 30px;
+  padding-bottom: 10px;
 }
 
 .reg {
@@ -160,4 +198,11 @@ a {
 .pane-footer img {
   width: 30px;
   vertical-align: middle;
+}
+
+.right_bj {
+  width: 40%;
+  position: absolute;
+  right: 12%;
+  top: 36%;
 }

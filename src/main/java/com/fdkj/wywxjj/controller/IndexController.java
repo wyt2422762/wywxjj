@@ -39,6 +39,11 @@ public class IndexController {
         return new ModelAndView("index");
     }
 
+    @RequestMapping("wel")
+    public ModelAndView wel(HttpServletRequest request) throws Exception {
+        return new ModelAndView("wel");
+    }
+
     @RequestMapping("/index/getMenu")
     @ResponseBody
     public ResponseEntity<CusResponseBody> getMenu(HttpServletRequest request) {
