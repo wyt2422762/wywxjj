@@ -48,6 +48,12 @@
             <name>Aspose Java API</name>
             <url>https://repository.aspose.com/repo/</url>
         </repository>
+
+        <repository>
+            <id>aliyun</id>
+            <name>阿里云maven镜像</name>
+            <url>https://maven.aliyun.com/repository/public</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -179,6 +185,7 @@
             <groupId>com.itextpdf</groupId>
             <artifactId>itext7-core</artifactId>
             <version>7.1.16</version>
+            <type>pom</type>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/com.itextpdf/html2pdf -->
@@ -189,11 +196,11 @@
         </dependency>
 
         <!-- 中文字体 -->
-        <dependency>
+        <!--<dependency>
             <groupId>com.itextpdf</groupId>
             <artifactId>font-asian</artifactId>
             <version>7.1.16</version>
-        </dependency>
+        </dependency>-->
 
     </dependencies>
 

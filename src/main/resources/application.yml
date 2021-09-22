@@ -5,6 +5,7 @@ server:
   tomcat:
     # tomcat的URI编码
     uri-encoding: UTF-8
+  port: 8081
 
 # spring配置
 spring:

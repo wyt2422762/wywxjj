@@ -1,13 +1,20 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
-<head th:replace="/common/header::header(~{::title},~{},~{})">
+<head th:replace="/common/header::header(~{::title},~{},~{::style})">
   <title>物业维修基金管理系统-欢迎页面</title>
+  <style th:inline="css">
+    div {
+      height: 650px;
+      background-image:url("[[@{/}]]static/image/wel.jpg");
+      background-size: 100% 100%;
+    }
+  </style>
 </head>
 <body>
-<div class="layui-tab-item layui-show" style="max-height: 650px;">
-  <div id="LAY_preview">
+<div class="layui-tab-item layui-show">
+  <!--<div id="LAY_preview">
     <img th:src="@{/static/image/wel.jpg}" height="620px;" width="100%;"/>
-  </div>
+  </div>-->
 </div>
 </body>
 </html>

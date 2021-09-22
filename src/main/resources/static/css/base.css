@@ -9,3 +9,7 @@ html, body {
   user-select: none;*/
   /*overflow-x:hidden;*/
 }
+
+#LAY_preview {
+  padding-top: 10px;
+}

@@ -51,7 +51,7 @@
         <!-- 结算标题 -->
         <tr style="height:21pt;line-height: 21pt;">
             <td style="width:171.9pt">预付编号</td>
-            <td style="width:146.25pt">预付金额(元)</td>
+            <td style="width:146.25pt;">预付金额(元)</td>
             <td style="width:74.25pt">预付日期</td>
             <td style="width:84.75pt">预付签署</td>
             <td style="width:71.85pt">状态</td>
@@ -62,10 +62,10 @@
                 <!-- 结算数据 -->
                 <tr style="height:21pt;line-height: 21pt;">
                     <td style="width:111.9pt;text-align: left;">${yf.yfkbh!}</td>
-                    <td style="width:63pt">${yf.yfkje!}</td>
-                    <td style="width:81pt;text-align: right;">${yf.yfkrq!?date('yyyy-MM-dd')}</td>
-                    <td style="width:88.5pt;text-align: right;">${yf.yfkqs!}</td>
-                    <td style="width:92.25pt;text-align: right;">${yf.zt!}</td>
+                    <td style="width:63pt;text-align: right;">${yf.yfkje!}</td>
+                    <td style="width:81pt;">${yf.yfkrq!?date('yyyy-MM-dd')}</td>
+                    <td style="width:88.5pt;">${yf.yfkqs!}</td>
+                    <td style="width:92.25pt;">${yf.zt!}</td>
                 </tr>
 
                 <#if yf.ftList2?? && (yf.ftList2?size > 0) >
@@ -110,7 +110,7 @@
         <!-- 结算数据合计 -->
         <tr style="height:21pt;line-height: 21pt;background-color:#fff6ff;">
             <td style=" width:171.9pt">${hj!}</td>
-            <td style="width:146.25pt">${totalMoney!}</td>
+            <td style="width:146.25pt;text-align: right;">${totalMoney!}</td>
             <td colspan="3" style="width:232.35pt"></td>
         </tr>
     </table>
